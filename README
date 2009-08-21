@@ -1,0 +1,135 @@
+==========================================================================
+Maven Cross-Compiler
+==========================================================================
+# Author  : Yunsup Lee, Christopher Batten
+# Date    : August 10, 2009
+# Version : (under version control)
+
+This is the maven C and C++ cross-compiler. It includes a toplevel
+configure script and Makefile which drives the build process. The basic
+build steps are as follows:
+
+ % mkdir build
+ % cd build
+ % ../configure
+ % make
+
+--------------------------------------------------------------------------
+Combined Source Tree Build
+--------------------------------------------------------------------------
+
+To build a full cross-compiler from scratch we need the following
+packages:
+
+ - binutils      : Assembler, linker, etc
+ - newlib        : Simple standard C library
+ - sim           : ISA simulators (usually part of gdb)
+ - gmp           : GNU Multiple Precision Arithmetic Library
+ - mpfr          : GNU Multiple Precision Floating-Point Library
+ - gcc-core      : Core of gcc including standard c compiler
+ - gcc-g++       : C++ compiler
+ - gcc-testsuite : testsuite for all of gcc
+
+We will use a combined source tree build. This means that the various
+packages are copied as subdirectories into the toplevel source directory
+which comes with gcc. The gcc build system is setup such that it will
+detect these subdirectories and take care of all the bootstrapping. This
+greatly simplifies the cross-compilation process. Unfortunately, the
+public releases of these packages do not always work together in such a
+way as to make a combined source tree build possible. So instead we will
+fetch the source for the binutils, newlib, and sim packages directly
+from the sourceware CVS repository. gcc usually tests against the
+sourceware CVS repository, and at least those three packages will be
+consistent, which increases the changes that a combined source tree
+build will work. We fetch gmp and mpfr from the public releases, and the
+various gcc subpackages from the standard gnu site.
+
+The upgrade.sh script in the scripts subdirectory simplifies fetching
+and setting up the combined source tree build. It can be used to upgrade
+the vendor branch by simply changing the version numbers for each
+package which are hard coded into that script. Here is the full upgrade
+process. First we need to make sure our working directory is clean and
+checkout the upstream branch.
+
+ % git status 
+ % git checkout upstream
+
+Now we would edit scripts/upgrade.sh with upgraded package version
+numbers and then run the upgrade script. We completely replace the
+toplevel src directory with the new upgrade subdirectory - so be sure
+that all of your work is commited before doing an upgrade!
+
+ % rm -rf src
+ % ./scripts/upgrade.sh src
+ % mkdir build-upgrade
+ % cd build-upgrade
+ % ../src/configure --target=mipsisa32r2el-elf
+ % make
+ % make check
+ % cd ..
+
+This will build the upstream source for the 'mipsisa32r2el-elf' target
+and verify that it works by running the full gcc testsuite. If
+everything looks okay then we commit the new version, merge into the
+master branch, and check the merge.
+
+ % rm -rf build-upgrade
+ % git add .
+ % git commit -a -m "Upgrade to gcc-x.x.x"
+ % git checkout master
+ % git merge upstream
+
+ % mkdir build-check-merge
+ % cd build-check-merge
+ % make
+ % make check
+ % make longcheck
+
+--------------------------------------------------------------------------
+Testsuite
+--------------------------------------------------------------------------
+
+You can run all of the testsuites on an ISA simulator using the 'check'
+and 'longcheck' targets like this:
+
+ % make check
+ % make longcheck
+
+The basic 'check' target runs the tests located in the 'test'
+subdirectory. Each test "module" in the test subdirectory runs a tool
+and then tries to run the output on the simulator. For example, the
+following does a clean build of just binutils/gas, runs the unit tests
+which try and assemble some source files, then builds gcc, runs the unit
+tests which try and compile some C and C++ files, and then finally
+builds all the tools and tries and runs all the previously compiled
+tests on the ISA simulator.
+
+ % mkdir build
+ % cd build
+ % ../configure
+
+ % make all-gas
+ % make check-gas
+
+ % make all-gcc
+ % make check-gcc check-g++
+
+ % make
+ % make check
+
+These simple tests use small little wrappers around the actual programs.
+The test wrappers are actually shell scripts which call each program
+with the right arguments. For example, the 'mips-gcc' test wrapper will
+correctly add the right include and library arguments to allow gcc to
+compile and link programs. This makes it easy to quickly try a program
+(without installing) during an edit-compile-debug loop like this:
+
+ % make mips-gcc && ./mips-gcc ../test/gcc/test-gcc-simple.c
+
+The 'longcheck' target will run the full testsuite which comes with gcc.
+This includes tens of thousands of tests and can take quite a while to
+run, which is why we have included the quicker basic 'check' target. The
+'longcheck' target will also run the 'test-summary.rb' script in the
+scripts subdirectory which summarizes the test results and all of the
+'.sum' files are collected in a test-summary subdirectory for easy
+archiving.

@@ -1,0 +1,356 @@
+#=========================================================================
+# Toplevel Makefile for building the maven cross-compiler
+#=========================================================================
+# This is a simple wrapper makefile which basically just passes all
+# command line arguments, variables, and targets to the gcc submake. It
+# does however handle a few targets specially as listed below (upgrade
+# is the only one non-standard target):
+#
+#  - default   : build the entire cross-compiler
+#  - check     : run simple gcc testsuite and generate summary
+#  - longcheck : run full gcc testsuite and generate summary
+#  - clean     : remove all generated content (except autoconf files)
+#  - dist      : make a source tarball
+#  - distcheck : make a source tarball, untar it, check it, clean it
+#  - distclean : remove everything
+#
+
+#-------------------------------------------------------------------------
+# Setup
+#-------------------------------------------------------------------------
+
+# Remove all default implicit rules since they can cause subtle bugs
+# and they just make things run slower
+.SUFFIXES:
+% : %,v
+% : RCS/%,v
+% : RCS/%
+% : s.%
+% : SCCS/s.%
+
+# Default is to build everything (defined at bottom)
+default : all
+.PHONY : default
+
+target_alias := @target_alias@
+project_name := @PACKAGE_TARNAME@
+src_dir      := @srcdir@
+scripts_dir  := $(src_dir)/scripts
+stst_dir     := $(src_dir)/stst
+
+# If the version information is not in the configure script, then we
+# assume that we are in a working directory. We use the vcs-version.sh
+# script in the scripts directory to generate an appropriate version
+# string. Currently the way things are setup we have to run this script
+# everytime we run make so the script needs to be as fast as possible.
+
+ifeq (@PACKAGE_VERSION@,?)
+	project_ver:=$(shell $(scripts_dir)/vcs-version.sh $(src_dir))
+else
+  project_ver:=@PACKAGE_VERSION@
+endif
+
+#-------------------------------------------------------------------------
+# Installation directories and programs
+#-------------------------------------------------------------------------
+
+prefix      := @prefix@
+enable_stow := @enable_stow@
+
+ifeq ($(enable_stow),yes)
+  stow_pkg_dir := $(prefix)/pkgs
+  DESTDIR ?= $(stow_pkg_dir)/$(project_name)-$(project_ver)
+else
+  DESTDIR ?= $(prefix)
+endif
+
+install_hdrs_dir := $(DESTDIR)/include
+install_libs_dir := $(DESTDIR)/lib
+install_exes_dir := $(DESTDIR)/bin
+
+MKINSTALLDIRS := $(scripts_dir)/mk-install-dirs.sh
+INSTALL       := @INSTALL@
+INSTALL_HDR   := $(INSTALL) -m 444
+INSTALL_LIB   := $(INSTALL) -m 644
+INSTALL_EXE   := $(INSTALL) -m 555
+STOW          := @stow@
+
+#-------------------------------------------------------------------------
+# Test Wrappers
+#-------------------------------------------------------------------------
+# After building the compiler we may want to try it out before
+# installing it. This can be a little tricky because the binaries are
+# burried in the build tree, and some programs (like gcc) require a
+# bunch of extra command line options. So to simplify debugging we
+# create small helper scripts in the top of the build tree which
+# essentially run the desired program with the right flags. Thus to
+# debug gcc we might use:
+#
+#  % make mips-gcc && ./mips-gcc ../test/gcc/test-gcc-simple.c
+#
+
+# gas
+
+CROSS_GAS       = ./$(target_alias)-gas 
+CROSS_GAS_BIN   = @cross_gas_bin@
+CROSS_GAS_FLAGS = @cross_gas_flags@
+
+$(CROSS_GAS) :
+	$(MAKE) -C src all-gas
+	echo "#!/bin/sh" > $@
+	echo "$(CROSS_GAS_BIN) $(CROSS_GAS_FLAGS) \"\$$@\"" >> $@
+	chmod a+x $@
+
+test_wrappers += $(CROSS_GAS)
+test_wrappers_junk += $(CROSS_GAS)
+
+# objdump
+
+CROSS_OBJDUMP       = ./$(target_alias)-objdump
+CROSS_OBJDUMP_BIN   = @cross_objdump_bin@
+CROSS_OBJDUMP_FLAGS = @cross_objdump_flags@
+
+$(CROSS_OBJDUMP) :
+	$(MAKE) -C src all-binutils
+	echo "#!/bin/sh" > $@
+	echo "$(CROSS_OBJDUMP_BIN) $(CROSS_OBJDUMP_FLAGS) \"\$$@\"" >> $@
+	chmod a+x $@
+
+test_wrappers += $(CROSS_OBJDUMP)
+test_wrappers_junk += $(CROSS_OBJDUMP)
+
+# gcc
+
+CROSS_GCC       = ./$(target_alias)-gcc
+CROSS_GCC_BIN   = @cross_gcc_bin@
+CROSS_GCC_FLAGS = @cross_gcc_flags@
+
+$(CROSS_GCC) :
+	$(MAKE) -C src all-gcc
+	echo "#!/bin/sh" > $@
+	echo "$(CROSS_GCC_BIN) $(CROSS_GCC_FLAGS) \"\$$@\"" >> $@
+	chmod a+x $@
+
+test_wrappers += $(CROSS_GCC)
+test_wrappers_junk += $(CROSS_GCC)
+
+# g++
+
+CROSS_GXX       = ./$(target_alias)-g++
+CROSS_GXX_BIN   = @cross_gxx_bin@
+CROSS_GXX_FLAGS = @cross_gxx_flags@
+
+$(CROSS_GXX) :
+	$(MAKE) -C src all-gcc
+	echo "#!/bin/sh" > $@
+	echo "$(CROSS_GXX_BIN) $(CROSS_GXX_FLAGS) \"\$$@\"" >> $@
+	chmod a+x $@
+
+test_wrappers += $(CROSS_GXX)
+test_wrappers_junk += $(CROSS_GXX)
+
+# run 
+
+# The simulator is a little special since sometimes we want to use the
+# included gdb simulator, and sometimes we want to use an externally
+# installed simulator as with maven. When we use an externally installed
+# simulator we don't create the test wrapper.
+
+cross_run_internal = @cross_run_internal@
+CROSS_RUN          = @cross_run@
+CROSS_RUN_BIN      = @cross_run_bin@
+CROSS_RUN_FLAGS    = @cross_run_flags@
+
+ifeq ($(cross_run_internal),yes)
+
+$(CROSS_RUN) :
+	$(MAKE) -C src
+	echo "#!/bin/sh" > $@
+	echo "$(CROSS_RUN_BIN) $(CROSS_RUN_FLAGS) \"\$$@\"" >> $@
+	chmod a+x $@
+
+test_wrappers_junk += $(CROSS_RUN)
+test_wrappers += $(CROSS_RUN)
+
+endif
+
+# test-wrappers targets
+
+test-wrappers : $(test_wrappers)
+
+clean-test-wrappers :
+	rm -rf $(test_wrappers_junk)
+
+junk += $(test_wrappers_junk)
+.PHONY : test-wrappers clean-test-wrappers
+
+#-------------------------------------------------------------------------
+# Testsuite: check (simple tests)
+#-------------------------------------------------------------------------
+# Compile, execute, and verify results for some simple regression tests.
+# We can always run the full blown gcc testsuite but it is pertty
+# extensive and thus pretty slow to run. We include some simple tests
+# for a quick check and also as a way to explicitly test and
+# modifications we make to gcc (which is what we are most interested in
+# anyways). 
+
+# Test modules
+
+test_dir     = $(src_dir)/test
+test_modules = gas gcc g++
+
+# Include make fragments from test directories
+
+VPATH := $(addprefix $(test_dir)/, $(test_modules))
+test_mks = \
+	$(join $(addprefix $(test_dir)/, $(test_modules)), \
+	       $(patsubst %, /test-%.mk, $(test_modules)))
+
+include $(test_mks)
+
+# Simple test targets (we have to reference test_outs because we
+# generate two files for the compilation tests, a .o and a .out so we
+# just really tell make about the .o files).
+
+check : $(test_objs) $(test_run_outs)
+	$(scripts_dir)/check-summary.rb $(test_outs)
+
+clean-check : 
+	rm -rf $(test_junk)
+
+junk += $(test_junk)
+.PHONY : check clean-check
+
+#-------------------------------------------------------------------------
+# Testsuite: longcheck (full gcc testsuite)
+#-------------------------------------------------------------------------
+# We agument the basic gcc check to make sure that it uses the simulator
+# and that it doesn't stop on failures since failures will probably be
+# common. We also create a test summary once the testsuite is finished.
+
+test_results_dir = test-results-$(project_ver)
+
+longcheck% :: check
+	-$(MAKE) -k -C src $@ RUNTESTFLAGS="--target_board=mips-sim"
+	rm -rf $(test_results_dir)
+	mkdir $(test_results_dir)
+	find src -name "*.sum" -exec cp {} $(test_results_dir) \;
+	$(scripts_dir)/longcheck-summary.rb src \
+    > $(test_results_dir)/test-results-$(project_ver).txt
+
+.PHONY : longcheck
+
+#-------------------------------------------------------------------------
+# Installation
+#-------------------------------------------------------------------------
+
+install% ::
+	$(MAKE) -C src $@ prefix=$(DESTDIR)
+ifeq ($(enable_stow),yes)
+	$(MKINSTALLDIRS) $(stow_pkg_dir)
+	cd $(stow_pkg_dir) && \
+    $(STOW) --delete $(project_name)-* && \
+    $(STOW) $(project_name)-$(project_ver)
+endif
+
+.PHONY : install
+
+#-------------------------------------------------------------------------
+# Regenerate configure information
+#-------------------------------------------------------------------------
+# This is obviously not perfect because of all the recursive configure
+# scripts but it is better than nothing.
+
+configure_prereq = \
+	$(src_dir)/configure.ac \
+
+$(src_dir)/configure : $(configure_prereq)
+	cd $(src_dir) && autoconf
+
+config.status : $(src_dir)/configure
+	./config.status --recheck
+
+Makefile : 	$(src_dir)/Makefile.in config.status
+	./config.status
+
+dist_junk += config.status Makefile config.log
+
+#-------------------------------------------------------------------------
+# Distribution
+#-------------------------------------------------------------------------
+# The distribution tarball is named project-ver.tar.gz 
+
+dist_files = \
+	README \
+	src \
+	scripts \
+	test \
+	aclocal.m4 \
+	configure.ac \
+	configure \
+	Makefile.in \
+
+dist_dir := $(project_name)-$(project_ver)
+dist_tgz := $(project_name)-$(project_ver).tar.gz
+
+# Notice that when we make the distribution we rewrite the configure.ac
+# script with the current version and we rerun autoconf in the new
+# source directory so that the distribution will have the proper version
+# information. We also rewrite the "Version : " line in the README.
+
+dist :
+	rm -rf $(dist_dir)
+	mkdir $(dist_dir)
+	tar -C $(src_dir) -cf - $(dist_files) | tar -C $(dist_dir) -xpf -
+	sed -i.bak 's/^\(# Version :\).*/\1 $(project_ver)/' $(dist_dir)/README
+	sed -i.bak 's/\( proj_version,\).*/\1 [$(project_ver)])/' $(dist_dir)/configure.ac
+	cd $(dist_dir) && \
+    autoconf && autoheader && \
+	  rm -rf autom4te.cache configure.ac.bak README.bak
+	tar -czvf $(dist_tgz) $(dist_dir)
+	rm -rf $(dist_dir)
+
+# You can use the distcheck target to try untarring the distribution and
+# then running configure, make, make check, and make distclean. A
+# "directory is not empty" error means distclean is not removing
+# everything.
+
+distcheck : dist
+	rm -rf $(dist_dir)
+	tar -xzvf $(dist_tgz)
+	mkdir -p $(dist_dir)/build
+	cd $(dist_dir)/build; ../configure; make; make check; make distclean
+	rm -rf $(dist_dir)
+
+junk += $(project_name)-*.tar.gz
+
+.PHONY : dist distcheck
+
+#-------------------------------------------------------------------------
+# Default 
+#-------------------------------------------------------------------------
+
+# By default we just run the submake without any targets
+all : 
+	$(MAKE) -C src
+
+.PHONY : all
+
+# This is a last resort rule which passes any targets which we don't
+# define in this makefile down to the submake
+%::
+	$(MAKE) -C src $@
+
+#-------------------------------------------------------------------------
+# Clean up junk
+#-------------------------------------------------------------------------
+
+clean :
+	$(MAKE) -C src clean
+	rm -rf *~ \#* $(junk)
+
+distclean :
+	$(MAKE) -C src distclean
+	rm -rf *~ \#* $(junk) $(dist_junk) src
+
+.PHONY : clean distclean
