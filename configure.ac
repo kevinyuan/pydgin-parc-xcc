@@ -1,7 +1,7 @@
 #=========================================================================
-# Toplevel configure.ac for building the mips cross-compiler
+# Toplevel configure.ac for building the maven cross-compiler
 #=========================================================================
-# This script will configure a gcc mips cross-compiler. It sets several
+# This script will configure a gcc maven cross-compiler. It sets several
 # default configure arguments and then recursively calls the configure
 # script in the gcc combined source tree.
 
@@ -9,7 +9,7 @@
 # Project metadata
 #-------------------------------------------------------------------------
 
-m4_define( proj_name,         [MIPS Cross-Compiler])
+m4_define( proj_name,         [Maven GCC Cross-Compiler])
 m4_define( proj_maintainer,   [Christopher Batten])
 m4_define( proj_abbreviation, [maven-sys-xcc])
 
@@ -40,13 +40,20 @@ AX_STOW_INSTALL
 #-------------------------------------------------------------------------
 # Target
 #-------------------------------------------------------------------------
-# Eventually we will set this to the maven target. If we just set the
-# target to be mips, then the cross compiler will use the big-endian
-# MIPS I ISA by default. So we set the default target to be
-# mipsisa32r2el so that by default the compiler use the MIPS 32 Release
-# 2 which is what we are basing our maven ISA on.
+# We set the default target to maven. We have modified
+# scripts/config.sub and src/config.sub so that this alias is translated
+# into mipsmavenel-ucb-elf. This target will set several things up
+# automatically.
+#
+#  - mips*-*-*   : use many mips defaults
+#  - mips*el-*-* : configure for little endian
+#  - *-*-elf     : use bare elf based "os"
+#
+# The we only need to worry about overriding this which are explicitly
+# different from mips*el-*-elf. Many places we just make mipsmaven*-*-*
+# act like mipsisa32r2*-*-*.
 
-default_target_alias=mipsisa32r2el-elf
+default_target_alias=maven
 AS_IF([test -z "${target_alias}"],
 [
   target_alias=${default_target_alias}
@@ -79,7 +86,7 @@ AC_SUBST([cross_gas_flags])
 
 # cross objdump
 
-cross_objdump_bin="src/binutils/objdump;"
+cross_objdump_bin="src/binutils/objdump"
 cross_objdump_flags=
 
 AC_SUBST([cross_objdump_bin])

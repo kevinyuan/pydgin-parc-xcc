@@ -99,6 +99,22 @@ if test -n "$enable_targets" ; then
   GAS_UNIQ(canon_targets)
 fi
 
+dnl cbatten - We want to support separate tc-mips.h, tc-mips.c, and
+dnl itbl-mips.h for architectures which are mips-like but which are
+dnl different enough so that a separate file will be cleaner. So for
+dnl these targets we define a new shell variable called
+dnl $target_mips_file_suffix and we do corresponding substitution in the
+dnl makefile for @target_mips_file_suffix@. For example, for maven these
+dnl variables will equal "-maven" (although we could easily define a
+dnl different suffix for other mips-like architectures with their own
+dnl source files).
+
+case "${target_cpu}" in
+  mipsmaven*) target_mips_file_suffix="-maven" ;;
+  *)          target_mips_file_suffix="" ;;
+esac
+AC_SUBST(target_mips_file_suffix)
+
 emulations=""
 
 for this_target in $target $canon_targets ; do
@@ -220,6 +236,12 @@ changequote(,)dnl
 	    mips_cpu=`echo $target_cpu | sed -e 's/[a-z]*..//' -e 's/el$//'`
 changequote([,])dnl
 	    ;;
+
+	  # cbatten - add mips cpu name for maven
+	  mipsmaven*)
+	    mips_cpu=maven
+	    ;;
+
 	  *)
 	    AC_MSG_ERROR($target_cpu isn't a supported MIPS CPU name)
 	    ;;
@@ -256,6 +278,12 @@ changequote([,])dnl
 	  mips64*-openbsd*)
 	    mips_default_abi=N64_ABI
 	    ;;
+
+	  # cbatten - Make the default abi for maven always eabi
+	  mipsmaven*-*-*)
+	    mips_default_abi=EABI_ABI
+	    ;;
+
 	  *)
 	    mips_default_abi=NO_ABI
 	    ;;
@@ -708,17 +736,25 @@ dnl the build directory which include the right .h file.  Make sure
 dnl the old symlinks don't exist, so that a reconfigure in an existing
 dnl directory behaves reasonably.
 
+dnl cbatten - We need to take into account the target_mips_file_suffix
+dnl so the right files are included. The commands in AC_CONFIG_COMMANDS
+dnl are executed in config.status and thus the shell variables available
+dnl in configure are not by default available in config.status. So
+dnl notice that we need explicitly "export" the target_mips_file_suffix
+dnl variable in the third parameter to AC_CONFIG_COMMANDS.
+
 AC_CONFIG_FILES(Makefile doc/Makefile po/Makefile.in:po/Make-in)
 AC_CONFIG_COMMANDS([default],
 [rm -f targ-cpu.c targ-cpu.h obj-format.h obj-format.c targ-env.h atof-targ.c itbl-cpu.h
- echo '#include "tc-'"${target_cpu_type}"'.h"' > targ-cpu.h
+ echo '#include "tc-'"${target_cpu_type}${target_mips_file_suffix}"'.h"' > targ-cpu.h
  echo '#include "obj-'"${obj_format}"'.h"' > obj-format.h
  echo '#include "te-'"${te_file}"'.h"' > targ-env.h
- echo '#include "itbl-'"${target_cpu_type}"'.h"' > itbl-cpu.h
+ echo '#include "itbl-'"${target_cpu_type}${target_mips_file_suffix}"'.h"' > itbl-cpu.h
  if test "x$cgen_cpu_prefix" != x ; then
    echo '#include "opcodes/'"${cgen_cpu_prefix}"'-desc.h"' > cgen-desc.h
  fi],
 [target_cpu_type=${target_cpu_type}
+ target_mips_file_suffix=${target_mips_file_suffix}
  cgen_cpu_prefix=${cgen_cpu_prefix}
  obj_format=${obj_format}
  te_file=${te_file}])

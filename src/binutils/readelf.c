@@ -2244,6 +2244,8 @@ get_machine_flags (unsigned e_flags, unsigned e_machine)
   	    case E_MIPS_MACH_LS2F: strcat (buf, ", loongson-2f"); break;
 	    case E_MIPS_MACH_OCTEON: strcat (buf, ", octeon"); break;
 	    case E_MIPS_MACH_XLR:  strcat (buf, ", xlr"); break;
+      /* cbatten - Add maven target (following xlr/loongson changes) */
+      case E_MIPS_MACH_MAVEN: strcat (buf, ", maven"); break;
 	    case 0:
 	    /* We simply ignore the field in this case to avoid confusion:
 	       MIPS ELF does not specify EF_MIPS_MACH, it is a GNU

@@ -226,6 +226,7 @@ target = @target@
 target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_cpu_type = @target_cpu_type@
+target_mips_file_suffix = @target_mips_file_suffix@
 target_os = @target_os@
 target_vendor = @target_vendor@
 te_file = @te_file@

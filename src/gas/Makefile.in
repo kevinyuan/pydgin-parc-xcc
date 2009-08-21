@@ -14,6 +14,15 @@
 
 @SET_MAKE@
 
+# cbatten - We want to support separate tc-mips.h, tc-mips.c, and
+# itbl-mips.h for architectures which are mips-like but which are
+# different enough so that a separate file will be cleaner. So for these
+# targets we define a new shell variable called $target_mips_file_suffix
+# and we do corresponding substitution in the makefile for
+# @target_mips_file_suffix@. For example, for maven these variables will
+# equal "-maven" (although we could easily define a different suffix for
+# other mips-like architectures with their own source files).
+
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -86,7 +95,7 @@ am__objects_1 = app.$(OBJEXT) as.$(OBJEXT) atof-generic.$(OBJEXT) \
 	symbols.$(OBJEXT) write.$(OBJEXT)
 am_as_new_OBJECTS = $(am__objects_1)
 as_new_OBJECTS = $(am_as_new_OBJECTS)
-am__DEPENDENCIES_1 = tc-@target_cpu_type@.o
+am__DEPENDENCIES_1 = tc-@target_cpu_type@@target_mips_file_suffix@.o
 am__DEPENDENCIES_2 = obj-@obj_format@.o
 am__DEPENDENCIES_3 = atof-@atof@.o
 am__DEPENDENCIES_4 =
@@ -271,6 +280,7 @@ target = @target@
 target_alias = @target_alias@
 target_cpu = @target_cpu@
 target_cpu_type = @target_cpu_type@
+target_mips_file_suffix = @target_mips_file_suffix@
 target_os = @target_os@
 target_vendor = @target_vendor@
 te_file = @te_file@
@@ -287,10 +297,10 @@ tooldir = $(exec_prefix)/$(target_alias)
 YFLAGS = 
 AM_CFLAGS = $(WARN_CFLAGS)
 MKDEP = gcc -MM
-TARG_CPU = @target_cpu_type@
-TARG_CPU_C = $(srcdir)/config/tc-@target_cpu_type@.c
-TARG_CPU_O = tc-@target_cpu_type@.o
-TARG_CPU_H = $(srcdir)/config/tc-@target_cpu_type@.h
+TARG_CPU = @target_cpu_type@@target_mips_file_suffix@
+TARG_CPU_C = $(srcdir)/config/tc-@target_cpu_type@@target_mips_file_suffix@.c
+TARG_CPU_O = tc-@target_cpu_type@@target_mips_file_suffix@.o
+TARG_CPU_H = $(srcdir)/config/tc-@target_cpu_type@@target_mips_file_suffix@.h
 OBJ_FORMAT_C = $(srcdir)/config/obj-@obj_format@.c
 OBJ_FORMAT_O = obj-@obj_format@.o
 OBJ_FORMAT_H = $(srcdir)/config/obj-@obj_format@.h
@@ -301,8 +311,12 @@ ATOF_TARG_O = atof-@atof@.o
 # use @target_cpu_type@ for refering to configured target name
 IT_HDRS = itbl-parse.h $(srcdir)/itbl-ops.h
 IT_SRCS = itbl-parse.c itbl-lex.c $(srcdir)/itbl-ops.c
-IT_DEPS = $(srcdir)/itbl-parse.y $(srcdir)/itbl-lex.l $(srcdir)/config/itbl-@target_cpu_type@.h
 IT_OBJS = itbl-parse.o itbl-lex.o itbl-ops.o
+IT_DEPS = \
+  $(srcdir)/itbl-parse.y \
+  $(srcdir)/itbl-lex.l \
+  $(srcdir)/config/itbl-@target_cpu_type@@target_mips_file_suffix@.h
+
 
 # CPU types.  This is only used for dependency information.
 CPU_TYPES = \
@@ -534,7 +548,7 @@ TARGET_CPU_CFILES = \
 	config/tc-maxq.c \
 	config/tc-mcore.c \
 	config/tc-mep.c \
-	config/tc-mips.c \
+	config/tc-mips@target_mips_file_suffix@.c \
 	config/tc-mmix.c \
 	config/tc-mn10200.c \
 	config/tc-mn10300.c \
@@ -595,7 +609,7 @@ TARGET_CPU_HFILES = \
 	config/tc-maxq.h \
 	config/tc-mcore.h \
 	config/tc-mep.h \
-	config/tc-mips.h \
+	config/tc-mips@target_mips_file_suffix@.h \
 	config/tc-mmix.h \
 	config/tc-mn10200.h \
 	config/tc-mn10300.h \
@@ -1572,11 +1586,11 @@ DEPTC_mips_coff = \
   $(INCDIR)/elf/mips.h \
   $(INCDIR)/elf/reloc-macros.h \
   $(INCDIR)/obstack.h \
-  $(INCDIR)/opcode/mips.h \
+  $(INCDIR)/opcode/mips@target_mips_file_suffix@.h \
   $(INCDIR)/safe-ctype.h \
   $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   dw2gencfi.h \
   dwarf2dbg.h \
   ecoff.h \
@@ -1596,11 +1610,11 @@ DEPTC_mips_ecoff = \
   $(INCDIR)/elf/mips.h \
   $(INCDIR)/elf/reloc-macros.h \
   $(INCDIR)/obstack.h \
-  $(INCDIR)/opcode/mips.h \
+  $(INCDIR)/opcode/mips@target_mips_file_suffix@.h \
   $(INCDIR)/safe-ctype.h \
   $(srcdir)/config/obj-ecoff.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   dw2gencfi.h \
   dwarf2dbg.h \
   ecoff.h \
@@ -1620,10 +1634,10 @@ DEPTC_mips_elf = \
   $(INCDIR)/elf/mips.h \
   $(INCDIR)/elf/reloc-macros.h \
   $(INCDIR)/obstack.h \
-  $(INCDIR)/opcode/mips.h \
+  $(INCDIR)/opcode/mips@target_mips_file_suffix@.h \
   $(INCDIR)/safe-ctype.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   dw2gencfi.h \
   dwarf2dbg.h \
   ecoff.h \
@@ -2823,7 +2837,7 @@ DEPOBJ_mips_coff = \
   $(INCDIR)/coff/mipspe.h \
   $(INCDIR)/obstack.h \
   $(srcdir)/config/obj-coff.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   subsegs.h
 
 DEPOBJ_mips_ecoff = \
@@ -2835,7 +2849,7 @@ DEPOBJ_mips_ecoff = \
   $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/sym.h \
   $(srcdir)/config/obj-ecoff.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   ecoff.h
 
 DEPOBJ_mips_elf = \
@@ -2853,7 +2867,7 @@ DEPOBJ_mips_elf = \
   $(INCDIR)/obstack.h \
   $(INCDIR)/safe-ctype.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   dwarf2dbg.h \
   ecoff.h \
   struc-symbol.h \
@@ -3857,13 +3871,13 @@ DEP_mips_coff = \
   $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/mipspe.h \
   $(srcdir)/config/obj-coff.h \
-  $(srcdir)/config/tc-mips.h
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h
 
 DEP_mips_ecoff = \
   $(INCDIR)/coff/ecoff.h \
   $(INCDIR)/coff/sym.h \
   $(srcdir)/config/obj-ecoff.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   ecoff.h
 
 DEP_mips_elf = \
@@ -3873,7 +3887,7 @@ DEP_mips_elf = \
   $(INCDIR)/elf/external.h \
   $(INCDIR)/elf/internal.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h
 
 DEP_mmix_elf = \
   $(BFDDIR)/elf-bfd.h \
@@ -4295,15 +4309,15 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --cygnus '; \
-	      cd $(srcdir) && $(AUTOMAKE) --cygnus  \
+	      echo ' cd $(srcdir) && $(AUTOMAKE) --foreign '; \
+	      cd $(srcdir) && $(AUTOMAKE) --foreign  \
 		&& exit 0; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus  Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus  Makefile
+	  $(AUTOMAKE) --foreign  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

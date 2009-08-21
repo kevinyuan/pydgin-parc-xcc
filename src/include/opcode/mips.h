@@ -138,8 +138,7 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 #define OP_MASK_ALN		0x7
 #define OP_SH_VSEL		21
 #define OP_MASK_VSEL		0x1f
-#define OP_MASK_VECBYTE		0x7	/* Selector field is really 4 bits,
-					   but 0x8-0xf don't select bytes.  */
+#define OP_MASK_VECBYTE		0x7	/* Selector field is really 4 bits, but 0x8-0xf don't select bytes.  */
 #define OP_SH_VECBYTE		22
 #define OP_MASK_VECALIGN	0x7	/* Vector byte-align (alni.ob) op.  */
 #define OP_SH_VECALIGN		21
@@ -229,29 +228,37 @@ Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, US
 
 struct mips_opcode
 {
+
   /* The name of the instruction.  */
   const char *name;
+
   /* A string describing the arguments for this instruction.  */
   const char *args;
+
   /* The basic opcode for the instruction.  When assembling, this
      opcode is modified by the arguments to produce the actual opcode
      that is used.  If pinfo is INSN_MACRO, then this is 0.  */
   unsigned long match;
+
   /* If pinfo is not INSN_MACRO, then this is a bit mask for the
      relevant portions of the opcode when disassembling.  If the
      actual opcode anded with the match field equals the opcode field,
      then we have found the correct instruction.  If pinfo is
      INSN_MACRO, then this field is the macro identifier.  */
   unsigned long mask;
+
   /* For a macro, this is INSN_MACRO.  Otherwise, it is a collection
      of bits describing the instruction, notably any relevant hazard
      information.  */
   unsigned long pinfo;
+
   /* A collection of additional bits describing the instruction. */
   unsigned long pinfo2;
+
   /* A collection of bits describing the instruction sets of which this
      instruction or macro is a member. */
   unsigned long membership;
+
 };
 
 /* These are the characters which may appear in the args field of an

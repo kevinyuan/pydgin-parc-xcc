@@ -191,6 +191,22 @@ done
 
 cgen_files="cgen-opc.lo cgen-asm.lo cgen-dis.lo cgen-bitset.lo"
 
+dnl cbatten - We want to support separate mips-dis.c, mips-opc.c, and
+dnl mips16-opc.c for architectures which are mips-like but which are
+dnl different enough so that a separate file will be cleaner. So for
+dnl these targets we define a new shell variable called
+dnl $target_mips_file_suffix and we do corresponding substitution in the
+dnl makefile for @target_mips_file_suffix@. For example, for maven these
+dnl variables will equal "-maven" (although we could easily define a
+dnl different suffix for other mips-like architectures with their own
+dnl source files).
+
+case "${target_cpu}" in
+  mipsmaven*) target_mips_file_suffix="-maven" ;;
+  *)          target_mips_file_suffix="" ;;
+esac
+AC_SUBST(target_mips_file_suffix)
+
 # We don't do any links based on the target system, just makefile config.
 
 if test x${all_targets} = xfalse ; then
@@ -237,7 +253,10 @@ if test x${all_targets} = xfalse ; then
 	bfd_maxq_arch)		ta="$ta maxq-dis.lo" ;;
 	bfd_mcore_arch)		ta="$ta mcore-dis.lo" ;;
 	bfd_mep_arch)		ta="$ta mep-asm.lo mep-desc.lo mep-dis.lo mep-ibld.lo mep-opc.lo" using_cgen=yes ;;
-	bfd_mips_arch)		ta="$ta mips-dis.lo mips-opc.lo mips16-opc.lo" ;;
+
+	# cbatten - Add support for mips file suffix
+	bfd_mips_arch)          ta="$ta mips${target_mips_file_suffix}-dis.lo mips${target_mips_file_suffix}-opc.lo mips16${target_mips_file_suffix}-opc.lo" ;;
+
 	bfd_mmix_arch)		ta="$ta mmix-dis.lo mmix-opc.lo" ;;
 	bfd_mn10200_arch)	ta="$ta m10200-dis.lo m10200-opc.lo" ;;
 	bfd_mn10300_arch)	ta="$ta m10300-dis.lo m10300-opc.lo" ;;

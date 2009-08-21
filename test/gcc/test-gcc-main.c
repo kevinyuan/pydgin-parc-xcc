@@ -7,7 +7,7 @@
 
 int test();
 
-int main()
+int main( int argv, char* argc[] )
 {
   return test();
 }

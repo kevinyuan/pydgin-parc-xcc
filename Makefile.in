@@ -86,7 +86,7 @@ STOW          := @stow@
 # essentially run the desired program with the right flags. Thus to
 # debug gcc we might use:
 #
-#  % make mips-gcc && ./mips-gcc ../test/gcc/test-gcc-simple.c
+#  % make maven-gcc && ./maven-gcc ../test/gcc/test-gcc-simple.c
 #
 
 # gas

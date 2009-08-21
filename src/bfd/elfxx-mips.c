@@ -5896,6 +5896,10 @@ _bfd_elf_mips_mach (flagword flags)
     case E_MIPS_MACH_XLR:
       return bfd_mach_mips_xlr;
 
+    /* cbatten - Add maven target (following xlr/loongson changes) */
+    case E_MIPS_MACH_MAVEN:
+      return bfd_mach_mips_maven;
+
     default:
       switch (flags & EF_MIPS_ARCH)
 	{
@@ -10474,6 +10478,12 @@ mips_set_isa_flags (bfd *abfd)
     case bfd_mach_mipsisa64r2:
       val = E_MIPS_ARCH_64R2;
       break;
+
+      /* cbatten - Add maven target (following loongson changes) */
+    case bfd_mach_mips_maven:
+      val = E_MIPS_ARCH_32R2 | E_MIPS_MACH_MAVEN;
+      break;
+
     }
   elf_elfheader (abfd)->e_flags &= ~(EF_MIPS_ARCH | EF_MIPS_MACH);
   elf_elfheader (abfd)->e_flags |= val;
@@ -12155,6 +12165,9 @@ static const struct mips_mach_extension mips_mach_extensions[] = {
   { bfd_mach_mipsisa64r2, bfd_mach_mipsisa64 },
   { bfd_mach_mips_sb1, bfd_mach_mipsisa64 },
   { bfd_mach_mips_xlr, bfd_mach_mipsisa64 },
+
+  /* cbatten - MIPS32r2 extensions (needed for maven target?) */
+  { bfd_mach_mips_maven, bfd_mach_mipsisa32r2 },
 
   /* MIPS V extensions.  */
   { bfd_mach_mipsisa64, bfd_mach_mips5 },

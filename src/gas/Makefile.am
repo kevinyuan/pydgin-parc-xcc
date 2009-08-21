@@ -1,5 +1,14 @@
 ## Process this file with automake to generate Makefile.in
 
+# cbatten - We want to support separate tc-mips.h, tc-mips.c, and
+# itbl-mips.h for architectures which are mips-like but which are
+# different enough so that a separate file will be cleaner. So for these
+# targets we define a new shell variable called $target_mips_file_suffix
+# and we do corresponding substitution in the makefile for
+# @target_mips_file_suffix@. For example, for maven these variables will
+# equal "-maven" (although we could easily define a different suffix for
+# other mips-like architectures with their own source files).
+
 AUTOMAKE_OPTIONS = 1.8 cygnus dejagnu
 ACLOCAL_AMFLAGS = -I .. -I ../config -I ../bfd
 
@@ -23,10 +32,10 @@ AM_CFLAGS = $(WARN_CFLAGS)
 
 MKDEP = gcc -MM
 
-TARG_CPU = @target_cpu_type@
-TARG_CPU_C = $(srcdir)/config/tc-@target_cpu_type@.c
-TARG_CPU_O = tc-@target_cpu_type@.o
-TARG_CPU_H = $(srcdir)/config/tc-@target_cpu_type@.h
+TARG_CPU = @target_cpu_type@@target_mips_file_suffix@
+TARG_CPU_C = $(srcdir)/config/tc-@target_cpu_type@@target_mips_file_suffix@.c
+TARG_CPU_O = tc-@target_cpu_type@@target_mips_file_suffix@.o
+TARG_CPU_H = $(srcdir)/config/tc-@target_cpu_type@@target_mips_file_suffix@.h
 OBJ_FORMAT_C = $(srcdir)/config/obj-@obj_format@.c
 OBJ_FORMAT_O = obj-@obj_format@.o
 OBJ_FORMAT_H = $(srcdir)/config/obj-@obj_format@.h
@@ -37,8 +46,11 @@ ATOF_TARG_O = atof-@atof@.o
 # use @target_cpu_type@ for refering to configured target name
 IT_HDRS=itbl-parse.h $(srcdir)/itbl-ops.h
 IT_SRCS=itbl-parse.c itbl-lex.c $(srcdir)/itbl-ops.c
-IT_DEPS=$(srcdir)/itbl-parse.y $(srcdir)/itbl-lex.l $(srcdir)/config/itbl-@target_cpu_type@.h
 IT_OBJS=itbl-parse.o itbl-lex.o itbl-ops.o
+IT_DEPS=\
+  $(srcdir)/itbl-parse.y \
+  $(srcdir)/itbl-lex.l \
+  $(srcdir)/config/itbl-@target_cpu_type@@target_mips_file_suffix@.h
 
 # CPU types.  This is only used for dependency information.
 
@@ -273,7 +285,7 @@ TARGET_CPU_CFILES = \
 	config/tc-maxq.c \
 	config/tc-mcore.c \
 	config/tc-mep.c \
-	config/tc-mips.c \
+	config/tc-mips@target_mips_file_suffix@.c \
 	config/tc-mmix.c \
 	config/tc-mn10200.c \
 	config/tc-mn10300.c \
@@ -334,7 +346,7 @@ TARGET_CPU_HFILES = \
 	config/tc-maxq.h \
 	config/tc-mcore.h \
 	config/tc-mep.h \
-	config/tc-mips.h \
+	config/tc-mips@target_mips_file_suffix@.h \
 	config/tc-mmix.h \
 	config/tc-mn10200.h \
 	config/tc-mn10300.h \
@@ -1805,11 +1817,11 @@ DEPTC_mips_coff = \
   $(INCDIR)/elf/mips.h \
   $(INCDIR)/elf/reloc-macros.h \
   $(INCDIR)/obstack.h \
-  $(INCDIR)/opcode/mips.h \
+  $(INCDIR)/opcode/mips@target_mips_file_suffix@.h \
   $(INCDIR)/safe-ctype.h \
   $(srcdir)/config/obj-coff.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   dw2gencfi.h \
   dwarf2dbg.h \
   ecoff.h \
@@ -1828,11 +1840,11 @@ DEPTC_mips_ecoff = \
   $(INCDIR)/elf/mips.h \
   $(INCDIR)/elf/reloc-macros.h \
   $(INCDIR)/obstack.h \
-  $(INCDIR)/opcode/mips.h \
+  $(INCDIR)/opcode/mips@target_mips_file_suffix@.h \
   $(INCDIR)/safe-ctype.h \
   $(srcdir)/config/obj-ecoff.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   dw2gencfi.h \
   dwarf2dbg.h \
   ecoff.h \
@@ -1851,10 +1863,10 @@ DEPTC_mips_elf = \
   $(INCDIR)/elf/mips.h \
   $(INCDIR)/elf/reloc-macros.h \
   $(INCDIR)/obstack.h \
-  $(INCDIR)/opcode/mips.h \
+  $(INCDIR)/opcode/mips@target_mips_file_suffix@.h \
   $(INCDIR)/safe-ctype.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   dw2gencfi.h \
   dwarf2dbg.h \
   ecoff.h \
@@ -2975,7 +2987,7 @@ DEPOBJ_mips_coff = \
   $(INCDIR)/coff/mipspe.h \
   $(INCDIR)/obstack.h \
   $(srcdir)/config/obj-coff.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   subsegs.h
 DEPOBJ_mips_ecoff = \
   $(BFDDIR)/libcoff.h \
@@ -2986,7 +2998,7 @@ DEPOBJ_mips_ecoff = \
   $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/sym.h \
   $(srcdir)/config/obj-ecoff.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   ecoff.h
 DEPOBJ_mips_elf = \
   $(BFDDIR)/elf-bfd.h \
@@ -3003,7 +3015,7 @@ DEPOBJ_mips_elf = \
   $(INCDIR)/obstack.h \
   $(INCDIR)/safe-ctype.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   dwarf2dbg.h \
   ecoff.h \
   struc-symbol.h \
@@ -3928,12 +3940,12 @@ DEP_mips_coff = \
   $(INCDIR)/coff/internal.h \
   $(INCDIR)/coff/mipspe.h \
   $(srcdir)/config/obj-coff.h \
-  $(srcdir)/config/tc-mips.h
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h
 DEP_mips_ecoff = \
   $(INCDIR)/coff/ecoff.h \
   $(INCDIR)/coff/sym.h \
   $(srcdir)/config/obj-ecoff.h \
-  $(srcdir)/config/tc-mips.h \
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h \
   ecoff.h
 DEP_mips_elf = \
   $(BFDDIR)/elf-bfd.h \
@@ -3942,7 +3954,7 @@ DEP_mips_elf = \
   $(INCDIR)/elf/external.h \
   $(INCDIR)/elf/internal.h \
   $(srcdir)/config/obj-elf.h \
-  $(srcdir)/config/tc-mips.h
+  $(srcdir)/config/tc-mips@target_mips_file_suffix@.h
 DEP_mmix_elf = \
   $(BFDDIR)/elf-bfd.h \
   $(BFDDIR)/libcoff.h \

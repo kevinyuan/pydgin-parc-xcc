@@ -21,14 +21,14 @@ Combined Source Tree Build
 To build a full cross-compiler from scratch we need the following
 packages:
 
- - binutils      : Assembler, linker, etc
- - newlib        : Simple standard C library
- - sim           : ISA simulators (usually part of gdb)
- - gmp           : GNU Multiple Precision Arithmetic Library
- - mpfr          : GNU Multiple Precision Floating-Point Library
- - gcc-core      : Core of gcc including standard c compiler
- - gcc-g++       : C++ compiler
- - gcc-testsuite : testsuite for all of gcc
+ - 'binutils'      : Assembler, linker, etc
+ - 'newlib'        : Simple standard C library
+ - 'sim'           : ISA simulators (usually part of gdb)
+ - 'gmp'           : GNU Multiple Precision Arithmetic Library
+ - 'mpfr'          : GNU Multiple Precision Floating-Point Library
+ - 'gcc-core'      : Core of gcc including standard c compiler
+ - 'gcc-g++'       : C++ compiler
+ - 'gcc-testsuite' : testsuite for all of gcc
 
 We will use a combined source tree build. This means that the various
 packages are copied as subdirectories into the toplevel source directory
@@ -44,7 +44,7 @@ consistent, which increases the changes that a combined source tree
 build will work. We fetch gmp and mpfr from the public releases, and the
 various gcc subpackages from the standard gnu site.
 
-The upgrade.sh script in the scripts subdirectory simplifies fetching
+The 'upgrade.sh' script in the scripts subdirectory simplifies fetching
 and setting up the combined source tree build. It can be used to upgrade
 the vendor branch by simply changing the version numbers for each
 package which are hard coded into that script. Here is the full upgrade
@@ -63,15 +63,15 @@ that all of your work is commited before doing an upgrade!
  % ./scripts/upgrade.sh src
  % mkdir build-upgrade
  % cd build-upgrade
- % ../src/configure --target=mipsisa32r2el-elf
+ % ../src/configure --target=mipsisa32r2el
  % make
  % make check
  % cd ..
 
-This will build the upstream source for the 'mipsisa32r2el-elf' target
-and verify that it works by running the full gcc testsuite. If
-everything looks okay then we commit the new version, merge into the
-master branch, and check the merge.
+This will build the upstream source for the 'mipsisa32r2el' target and
+verify that it works by running the full gcc testsuite. If everything
+looks okay then we commit the new version, merge into the master branch,
+and check the merge.
 
  % rm -rf build-upgrade
  % git add .
@@ -84,6 +84,38 @@ master branch, and check the merge.
  % make
  % make check
  % make longcheck
+
+--------------------------------------------------------------------------
+Maven Customizations
+--------------------------------------------------------------------------
+
+We have modified various configure and build scripts to enable a new
+target alias called 'maven' which expands to 'mipsmavenel-ucb-elf'
+through a modified 'scripts/config.sub' and 'src/config.sub'. If you
+want to eventually add another target and need to edit any of the
+'configure.ac', 'configure.in', 'Makefile.am' files then you will need
+to make sure you are using the right version of the autoconf tools.
+Currently it seems that gcc wants you to use exactly autoconf-2.59 and
+automake-1.9.6. The makefile dependency tracking doesn't seem to work to
+automatically rerun the autoconf tools, so you will need to change into
+the directory with the modified 'configure.ac', 'configure.in', or
+'Makefile.am' and run the 'autoreconf' command. This will run
+'autoconf', 'automake', 'autoheader', etc as necessary.
+
+We have also made some changes in binutils, newlib, etc to support the
+new target. The following are they key files which we have duplicated
+for the maven target and thus this is where the majority of the changes
+are located:
+
+ - 'src/include/opcode/mips-maven.h'
+
+ - 'src/opcodes/mips-maven-dis.c'
+ - 'src/opcodes/mips-maven-opc.c'
+ - 'src/opcodes/mips16-maven-opc.c'
+
+ - 'src/gas/config/itbl-mips-maven.h'
+ - 'src/gas/config/tc-mips-maven.h'
+ - 'src/gas/config/tc-mips-maven.c'
 
 --------------------------------------------------------------------------
 Testsuite
@@ -119,12 +151,12 @@ tests on the ISA simulator.
 
 These simple tests use small little wrappers around the actual programs.
 The test wrappers are actually shell scripts which call each program
-with the right arguments. For example, the 'mips-gcc' test wrapper will
+with the right arguments. For example, the 'maven-gcc' test wrapper will
 correctly add the right include and library arguments to allow gcc to
 compile and link programs. This makes it easy to quickly try a program
 (without installing) during an edit-compile-debug loop like this:
 
- % make mips-gcc && ./mips-gcc ../test/gcc/test-gcc-simple.c
+ % make maven-gcc && ./maven-gcc ../test/gcc/test-gcc-simple.c
 
 The 'longcheck' target will run the full testsuite which comes with gcc.
 This includes tens of thousands of tests and can take quite a while to

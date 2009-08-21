@@ -2621,6 +2621,11 @@ case "${target}" in
   mips*-*-linux*)
     noconfigdirs="$noconfigdirs target-newlib target-libgloss"
     ;;
+  # cbatten - Adding maven target
+  mipsmaven*-*-*)
+    noconfigdirs="$noconfigdirs gprof ${libgcj}"
+    libgloss_dir=maven
+    ;;
   mips*-*-*)
     noconfigdirs="$noconfigdirs gprof ${libgcj}"
     libgloss_dir=mips

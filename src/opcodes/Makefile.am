@@ -1,5 +1,14 @@
 ## Process this file with automake to generate Makefile.in
 
+# cbatten - We want to support separate mips-dis.c, mips-opc.c, and
+# mips16-opc.c for architectures which are mips-like but which are
+# different enough so that a separate file will be cleaner. So for these
+# targets we define a new shell variable called $target_mips_file_suffix
+# and we do corresponding substitution in the makefile for
+# @target_mips_file_suffix@. For example, for maven these variables will
+# equal "-maven" (although we could easily define a different suffix for
+# other mips-like architectures with their own source files).
+
 AUTOMAKE_OPTIONS = 1.9 cygnus
 ACLOCAL_AMFLAGS = -I .. -I ../config -I ../bfd
 
@@ -159,9 +168,9 @@ CFILES = \
 	mep-dis.c \
 	mep-ibld.c \
 	mep-opc.c \
-	mips-dis.c \
-	mips-opc.c \
-	mips16-opc.c \
+	mips@target_mips_file_suffix@-dis.c \
+	mips@target_mips_file_suffix@-opc.c \
+	mips16@target_mips_file_suffix@-opc.c \
 	m10200-dis.c \
 	m10200-opc.c \
 	m10300-dis.c \
@@ -314,9 +323,9 @@ ALL_MACHINES = \
 	mep-dis.lo \
 	mep-ibld.lo \
 	mep-opc.lo \
-	mips-dis.lo \
-	mips-opc.lo \
-	mips16-opc.lo \
+	mips@target_cpu_mips_suffix@-dis.lo \
+	mips@target_cpu_mips_suffix@-opc.lo \
+	mips16@target_cpu_mips_suffix@-opc.lo \
 	mmix-dis.lo \
 	mmix-opc.lo \
 	msp430-dis.lo \
@@ -1798,7 +1807,7 @@ mep-opc.lo: \
   mep-desc.h \
   mep-opc.h \
   sysdep.h
-mips-dis.lo: \
+mips@target_mips_file_suffix@-dis.lo: \
   mips-dis.c \
   $(BFDDIR)/elf-bfd.h \
   $(BFD_H) \
@@ -1811,21 +1820,21 @@ mips-dis.lo: \
   $(INCDIR)/elf/mips.h \
   $(INCDIR)/elf/reloc-macros.h \
   $(INCDIR)/libiberty.h \
-  $(INCDIR)/opcode/mips.h \
+  $(INCDIR)/opcode/mips@target_mips_file_suffix@.h \
   $(INCDIR)/symcat.h \
   config.h \
   opintl.h \
   sysdep.h
-mips-opc.lo: \
+mips@target_mips_file_suffix@-opc.lo: \
   mips-opc.c \
   $(INCDIR)/ansidecl.h \
-  $(INCDIR)/opcode/mips.h \
+  $(INCDIR)/opcode/mips@target_mips_file_suffix@.h \
   config.h \
   sysdep.h
-mips16-opc.lo: \
+mips16@target_mips_file_suffix@-opc.lo: \
   mips16-opc.c \
   $(INCDIR)/ansidecl.h \
-  $(INCDIR)/opcode/mips.h \
+  $(INCDIR)/opcode/mips@target_mips_file_suffix@.h \
   config.h \
   sysdep.h
 m10200-dis.lo: \
