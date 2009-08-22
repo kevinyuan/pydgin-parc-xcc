@@ -104,6 +104,11 @@ fi
 
 if !( ${GIT} diff --quiet ); then
   ver_str="${ver_str}-dirty"
+else
+  untracked=`git ls-files --directory --exclude-standard --others -t`
+	if ( test -n "${untracked}" ); then
+    ver_str="${ver_str}-dirty"
+	fi  
 fi
 
 # Output the final version string
