@@ -27,6 +27,7 @@ case "${target}" in
   mips*tx39*)           SIM_SUBTARGET="-DSUBTARGET_R3900=1";;
   mips*-sde-elf*)       SIM_SUBTARGET="-DTARGET_ENABLE_FR=1";;
   mipsisa32*-*-*)       SIM_SUBTARGET="-DTARGET_ENABLE_FR=1";;
+  mipsmaven*-*-*)       SIM_SUBTARGET="-DTARGET_ENABLE_FR=1";;
   mipsisa64*-*-*)       SIM_SUBTARGET="-DTARGET_ENABLE_FR=1";;
   *)                    SIM_SUBTARGET="";;
 esac
@@ -45,6 +46,7 @@ case "${target}" in
   mips64*-*-*)          default_endian=BIG_ENDIAN ;;
   mips16*-*-*)          default_endian=BIG_ENDIAN ;;
   mipsisa32*-*-*)       default_endian=BIG_ENDIAN ;;
+  mipsmavenel-*-*)      default_endian=LITTLE_ENDIAN ;;
   mipsisa64*-*-*)       default_endian=BIG_ENDIAN ;;
   mips*-*-*)            default_endian=BIG_ENDIAN ;;
   *)                    default_endian=BIG_ENDIAN ;;
@@ -62,6 +64,7 @@ case "${target}" in
   mips64*-*-*)          mips_bitsize=64 ; mips_msb=63 ;;
   mips16*-*-*)          mips_bitsize=64 ; mips_msb=63 ;;
   mipsisa32*-*-*)       mips_bitsize=32 ; mips_msb=31 ;;
+  mipsmaven*-*-*)       mips_bitsize=32 ; mips_msb=31 ;;
   mipsisa64*-*-*)       mips_bitsize=64 ; mips_msb=63 ;;
   mips*-*-*)            mips_bitsize=32 ; mips_msb=31 ;;
   *)                    mips_bitsize=64 ; mips_msb=63 ;;
@@ -81,6 +84,7 @@ case "${target}" in
   mips64*-*-*)          mips_fpu=HARD_FLOATING_POINT ;;
   mips16*-*-*)          mips_fpu=HARD_FLOATING_POINT ;;
   mipsisa32*-*-*)       mips_fpu=HARD_FLOATING_POINT ; mips_fpu_bitsize=64 ;;
+  mipsmaven*-*-*)       mips_fpu=HARD_FLOATING_POINT ; mips_fpu_bitsize=64 ;;
   mipsisa64*-*-*)       mips_fpu=HARD_FLOATING_POINT ; mips_fpu_bitsize=64 ;;
   mips*-*-*)            mips_fpu=HARD_FLOATING_POINT ; mips_fpu_bitsize=32 ;;
   *)                    mips_fpu=HARD_FLOATING_POINT ;;
@@ -158,6 +162,16 @@ case "${target}" in
 			sim_igen_filter="32,f"
 			sim_mach_default="mipsisa32r2"
 			;;
+
+	# cbatten - Add maven target (following mipsisa32r2 above)
+  mipsmaven*-*-*)	
+      sim_gen=M16
+			sim_igen_machine="-M mips32r2,mips16,mips16e,mdmx,dsp,dsp2,smartmips"
+			sim_m16_machine="-M mips16,mips16e,mips32r2"
+			sim_igen_filter="32,f"
+			sim_mach_default="mips_maven"
+			;;
+
   mipsisa32*-*-*)	sim_gen=M16
 			sim_igen_machine="-M mips32,mips16,mips16e,smartmips"
 			sim_m16_machine="-M mips16,mips16e,mips32"

@@ -117,6 +117,13 @@ are located:
  - 'src/gas/config/tc-mips-maven.h'
  - 'src/gas/config/tc-mips-maven.c'
 
+ - 'src/gcc/config/mips/mips-maven.h'
+ - 'src/gcc/config/mips/mips-maven.c'
+ - 'src/gcc/config/mips/mips-maven.md'
+ - 'src/gcc/config/mips/constraints-maven.md'
+ - 'src/gcc/config/mips/predicates-maven.md'
+ - 'src/gcc/config/mips/t-maven'
+
 --------------------------------------------------------------------------
 Testsuite
 --------------------------------------------------------------------------

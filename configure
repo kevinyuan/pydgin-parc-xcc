@@ -1575,7 +1575,7 @@ cross_gas_flags=
 
 # cross objdump
 
-cross_objdump_bin="src/binutils/objdump;"
+cross_objdump_bin="src/binutils/objdump"
 cross_objdump_flags=
 
 
