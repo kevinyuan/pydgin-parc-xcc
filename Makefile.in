@@ -230,7 +230,7 @@ junk += $(test_junk)
 
 test_results_dir = test-results-$(project_ver)
 
-longcheck% :: 
+longcheck longcheck% :: 
 	-$(MAKE) -k -C src check$* RUNTESTFLAGS="--target_board=mips-sim"
 	rm -rf $(test_results_dir)
 	mkdir $(test_results_dir)
@@ -244,7 +244,7 @@ longcheck% ::
 # Installation
 #-------------------------------------------------------------------------
 
-install% ::
+install install% ::
 	$(MAKE) -C src $@ prefix=$(DESTDIR)
 ifeq ($(enable_stow),yes)
 	$(MKINSTALLDIRS) $(stow_pkg_dir)
