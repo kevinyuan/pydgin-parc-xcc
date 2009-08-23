@@ -270,7 +270,7 @@ $(src_dir)/configure : $(configure_prereq)
 config.status : $(src_dir)/configure
 	./config.status --recheck
 
-Makefile : 	$(src_dir)/Makefile.in config.status
+Makefile : $(src_dir)/Makefile.in config.status
 	./config.status
 
 dist_junk += config.status Makefile config.log

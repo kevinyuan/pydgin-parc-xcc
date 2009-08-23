@@ -3,9 +3,9 @@
 #=========================================================================
 
 test_gxx_srcs = \
-	test-g++-simple.cc \
-	test-g++-gcd.cc \
-	test-g++-stl.cc \
+  test-g++-simple.cc \
+  test-g++-gcd.cc \
+  test-g++-stl.cc \
 
 #-------------------------------------------------------------------------
 # Rules for testing just compilation

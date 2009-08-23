@@ -3,9 +3,9 @@
 #=========================================================================
 
 test_gcc_srcs = \
-	test-gcc-simple.c \
-	test-gcc-gcd.c \
-	test-gcc-libc.c \
+  test-gcc-simple.c \
+  test-gcc-gcd.c \
+  test-gcc-libc.c \
 
 #-------------------------------------------------------------------------
 # Rules for testing just compilation
