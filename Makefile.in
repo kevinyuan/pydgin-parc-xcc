@@ -45,7 +45,7 @@ stst_dir     := $(src_dir)/stst
 # everytime we run make so the script needs to be as fast as possible.
 
 ifeq (@PACKAGE_VERSION@,?)
-	project_ver:=$(shell $(scripts_dir)/vcs-version.sh $(src_dir))
+  project_ver:=$(shell $(scripts_dir)/vcs-version.sh $(src_dir))
 else
   project_ver:=@PACKAGE_VERSION@
 endif
@@ -203,8 +203,8 @@ test_modules = gas gcc g++
 
 VPATH := $(addprefix $(test_dir)/, $(test_modules))
 test_mks = \
-	$(join $(addprefix $(test_dir)/, $(test_modules)), \
-	       $(patsubst %, /test-%.mk, $(test_modules)))
+  $(join $(addprefix $(test_dir)/, $(test_modules)), \
+         $(patsubst %, /test-%.mk, $(test_modules)))
 
 include $(test_mks)
 
@@ -230,8 +230,8 @@ junk += $(test_junk)
 
 test_results_dir = test-results-$(project_ver)
 
-longcheck% :: check
-	-$(MAKE) -k -C src $@ RUNTESTFLAGS="--target_board=mips-sim"
+longcheck% :: 
+	-$(MAKE) -k -C src check$* RUNTESTFLAGS="--target_board=mips-sim"
 	rm -rf $(test_results_dir)
 	mkdir $(test_results_dir)
 	find src -name "*.sum" -exec cp {} $(test_results_dir) \;
@@ -281,14 +281,14 @@ dist_junk += config.status Makefile config.log
 # The distribution tarball is named project-ver.tar.gz 
 
 dist_files = \
-	README \
-	src \
-	scripts \
-	test \
-	aclocal.m4 \
-	configure.ac \
-	configure \
-	Makefile.in \
+  README \
+  src \
+  scripts \
+  test \
+  aclocal.m4 \
+  configure.ac \
+  configure \
+  Makefile.in \
 
 dist_dir := $(project_name)-$(project_ver)
 dist_tgz := $(project_name)-$(project_ver).tar.gz
@@ -306,7 +306,7 @@ dist :
 	sed -i.bak 's/\( proj_version,\).*/\1 [$(project_ver)])/' $(dist_dir)/configure.ac
 	cd $(dist_dir) && \
     autoconf && autoheader && \
-	  rm -rf autom4te.cache configure.ac.bak README.bak
+    rm -rf autom4te.cache configure.ac.bak README.bak
 	tar -czvf $(dist_tgz) $(dist_dir)
 	rm -rf $(dist_dir)
 
