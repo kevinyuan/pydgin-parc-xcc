@@ -6,24 +6,16 @@
 # to a known good answer. If a test fails we return a number which
 # indicates which test failed.
 
-        .text
-        .align  4
-        .globl  test
-        .type   test,@function
-        .ent    test
-
-#-------------------------------------------------------------------------
-# Test data and known good answers
-#-------------------------------------------------------------------------
-
-n:        .word 7
-vec_a:    .word 0, 1, 13, 15, 24, 16, 24 
-vec_b:    .word 0, 1, 13, 24, 15, 24, 16
-vec_ref:  .word 0, 1, 13,  3,  3,  8,  8
-
 #-------------------------------------------------------------------------
 # gcd_itr_sub( a, b )
 #-------------------------------------------------------------------------
+# This is a helper "function" called by our assembly below.        
+
+        .text
+        .align  4
+        .globl  gcd_itr_sub
+        .type   gcd_itr_sub,@function
+        .ent    gcd_itr_sub
 
 gcd_itr_sub:
 
@@ -47,49 +39,69 @@ gis_done:
 
         jr      $ra
 
+        .end    gcd_itr_sub
+        
+#-------------------------------------------------------------------------
+# Test data and known good answers
+#-------------------------------------------------------------------------
+
+        .rdata
+        .align  4
+        
+n:        .word 7
+vec_a:    .word 0, 1, 13, 15, 24, 16, 24 
+vec_b:    .word 0, 1, 13, 24, 15, 24, 16
+vec_ref:  .word 0, 1, 13,  3,  3,  8,  8
+
 #-------------------------------------------------------------------------
 # Test
 #-------------------------------------------------------------------------
 
+        .text
+        .align  4
+        .globl  test
+        .type   test,@function
+        .ent    test
+
 test:
 
-        lw    $t0, n                # t0 = count
-        la    $t1, vec_a            # t1 = vec_a_ptr
-        la    $t2, vec_b            # t2 = vec_b_ptr
-        la    $t3, vec_ref          # t3 = vec_ref_ptr
+        lw      $t0, n              # t0 = count
+        la      $t1, vec_a          # t1 = vec_a_ptr
+        la      $t2, vec_b          # t2 = vec_b_ptr
+        la      $t3, vec_ref        # t3 = vec_ref_ptr
 
 loop:
 
-        beq   $t0, $0, pass
-
-        lw    $a0, ($t1)            # a0 = *vec_a_ptr
-        lw    $a1, ($t2)            # a1 = *vec_b_ptr
+        beq     $t0, $0, pass
+                 
+        lw      $a0, ($t1)          # a0 = *vec_a_ptr
+        lw      $a1, ($t2)          # a1 = *vec_b_ptr
                                      
-        sw    $ra, 0($sp)           # 
-        jal   gcd_itr_sub           # v0 = gcd_itr_sub( a0, a1 )
-        lw    $ra, 0($sp)           # 
+        sw      $ra, 0($sp)         # 
+        jal     gcd_itr_sub         # v0 = gcd_itr_sub( a0, a1 )
+        lw      $ra, 0($sp)         # 
                                      
-        lw    $t4, ($t3)            # t4 = *vec_ref_ptr
-        bne   $v0, $t4, fail        # if ( v0 != t4 ) goto fail
+        lw      $t4, ($t3)          # t4 = *vec_ref_ptr
+        bne     $v0, $t4, fail      # if ( v0 != t4 ) goto fail
                                      
-        subu  $t0, $t0, 1           # count = count - 1
-        addu  $t1, $t1, 4           # vec_a_ptr   = vec_a_ptr + 4
-        addu  $t2, $t2, 4           # vec_b_ptr   = vec_b_ptr + 4
-        addu  $t3, $t3, 4           # vec_ref_ptr = vec_ref_ptr + 4
+        subu    $t0, $t0, 1         # count = count - 1
+        addu    $t1, $t1, 4         # vec_a_ptr   = vec_a_ptr + 4
+        addu    $t2, $t2, 4         # vec_b_ptr   = vec_b_ptr + 4
+        addu    $t3, $t3, 4         # vec_ref_ptr = vec_ref_ptr + 4
                                      
-        j       loop                 
+        j       loop                
                                      
 fail:                                
                                      
-        lw    $t4, n                # return index of failure
-        subu  $v0, $t4, $t0          
-        addu  $v0, $v0, 1            
-        jr    $ra                    
+        lw      $t4, n              # return index of failure
+        subu    $v0, $t4, $t0        
+        addu    $v0, $v0, 1          
+        jr      $ra                  
                                      
 pass:                                
                                      
-        li    $v0, 0                # return zero for success
-        jr    $ra
-
+        li      $v0, 0              # return zero for success
+        jr      $ra
+                 
         .end    test
 

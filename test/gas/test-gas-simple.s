@@ -3,7 +3,7 @@
 #=========================================================================
 
         .text
-        .align  2
+        .align  4
         .globl  test
         .type   test,@function
         .ent    test

@@ -14,7 +14,7 @@ test_gas_outs = $(patsubst %.s, %.out, $(test_gas_srcs))
 test_gas_objs = $(patsubst %.s, %.o, $(test_gas_srcs))
 
 $(test_gas_objs) : %.o : %.s $(CROSS_GAS)
-	{ $(CROSS_GAS) -o $@ $<; \
+	-{ $(CROSS_GAS) -o $@ $<; \
     echo "*** gas exit = $$?"; \
   } | tee $*.out
 
@@ -28,10 +28,10 @@ test_gas_exes     = $(patsubst %.s, %, $(test_gas_srcs))
 test_gas_run_outs = $(patsubst %, %-run.out, $(test_gas_exes))
 
 $(test_gas_exes) : % : %.o test-gas-main.c $(CROSS_GCC)
-	$(CROSS_GCC) -o $@ $(test_dir)/gas/test-gas-main.c $<
+	-$(CROSS_GCC) -o $@ $(test_dir)/gas/test-gas-main.c $<
 
-$(test_gas_run_outs) : %-run.out : % $(CROSS_RUN)
-	{ $(CROSS_RUN) $<; \
+$(test_gas_run_outs) : %-run.out : % $(cross_run_dep)
+	-{ $(CROSS_RUN) $<; \
     echo "*** run exit = $$?"; \
   } | tee $@
 

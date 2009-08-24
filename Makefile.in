@@ -154,7 +154,11 @@ test_wrappers_junk += $(CROSS_GXX)
 # The simulator is a little special since sometimes we want to use the
 # included gdb simulator, and sometimes we want to use an externally
 # installed simulator as with maven. When we use an externally installed
-# simulator we don't create the test wrapper.
+# simulator we don't create the test wrapper. Also notice that we create
+# a cross_run_dep variable which is the wrapper for internal simulators
+# and empty for external simulators. Rules in test modules which run
+# their tests can depend on this variable to correctly build the test
+# wrapper when using the internal simulator.
 
 cross_run_internal = @cross_run_internal@
 CROSS_RUN          = @cross_run@
@@ -169,6 +173,7 @@ $(CROSS_RUN) :
 	echo "$(CROSS_RUN_BIN) $(CROSS_RUN_FLAGS) \"\$$@\"" >> $@
 	chmod a+x $@
 
+cross_run_dep = $(CROSS_RUN)
 test_wrappers_junk += $(CROSS_RUN)
 test_wrappers += $(CROSS_RUN)
 

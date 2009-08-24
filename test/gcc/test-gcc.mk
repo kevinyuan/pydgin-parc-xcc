@@ -15,7 +15,7 @@ test_gcc_outs = $(patsubst %.c, %.out, $(test_gcc_srcs))
 test_gcc_objs = $(patsubst %.c, %.o, $(test_gcc_srcs))
 
 $(test_gcc_objs) : %.o : %.c $(CROSS_GCC)
-	{ $(CROSS_GCC) -std=gnu99 -c -o $@ $<; \
+	-{ $(CROSS_GCC) -std=gnu99 -c -o $@ $<; \
     echo "*** gcc exit = $$?"; \
   } | tee $*.out
 
@@ -29,10 +29,10 @@ test_gcc_exes     = $(patsubst %.c, %, $(test_gcc_srcs))
 test_gcc_run_outs = $(patsubst %, %-run.out, $(test_gcc_exes))
 
 $(test_gcc_exes) : % : %.o test-gcc-main.c $(CROSS_GCC)
-	$(CROSS_GCC) -o $@ $(test_dir)/gcc/test-gcc-main.c $<
+	-$(CROSS_GCC) -o $@ $(test_dir)/gcc/test-gcc-main.c $<
 
-$(test_gcc_run_outs) : %-run.out : % $(CROSS_RUN)
-	{ $(CROSS_RUN) $<; \
+$(test_gcc_run_outs) : %-run.out : % $(cross_run_dep)
+	-{ $(CROSS_RUN) $<; \
     echo "*** run exit = $$?"; \
   } | tee $@
 

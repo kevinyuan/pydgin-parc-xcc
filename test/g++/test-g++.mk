@@ -15,7 +15,7 @@ test_gxx_outs = $(patsubst %.cc, %.out, $(test_gxx_srcs))
 test_gxx_objs = $(patsubst %.cc, %.o, $(test_gxx_srcs))
 
 $(test_gxx_objs) : %.o : %.cc $(CROSS_GXX)
-	{ $(CROSS_GXX) -c -o $@ $<; \
+	-{ $(CROSS_GXX) -c -o $@ $<; \
     echo "*** g++ exit = $$?"; \
   } | tee $*.out
 
@@ -29,10 +29,10 @@ test_gxx_exes     = $(patsubst %.cc, %, $(test_gxx_srcs))
 test_gxx_run_outs = $(patsubst %, %-run.out, $(test_gxx_exes))
 
 $(test_gxx_exes) : % : %.o test-g++-main.cc $(CROSS_GXX)
-	$(CROSS_GXX) -o $@ $(test_dir)/g++/test-g++-main.cc $<
+	-$(CROSS_GXX) -o $@ $(test_dir)/g++/test-g++-main.cc $<
 
-$(test_gxx_run_outs) : %-run.out : % $(CROSS_RUN)
-	{ $(CROSS_RUN) $<; \
+$(test_gxx_run_outs) : %-run.out : % $(cross_run_dep)
+	-{ $(CROSS_RUN) $<; \
     echo "*** run exit = $$?"; \
   } | tee $@
 
