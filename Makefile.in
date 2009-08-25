@@ -213,11 +213,12 @@ test_mks = \
 
 include $(test_mks)
 
-# Simple test targets (we have to reference test_outs because we
-# generate two files for the compilation tests, a .o and a .out so we
-# just really tell make about the .o files).
+# Simple test targets. we have to reference test_objs and test_exes
+# instead of their repsective .out files because we generate two files
+# for the compilation/link tests, a .o/exe and a .out so we just really
+# tell make about the .o/exe files.
 
-check : $(test_objs) $(test_run_outs)
+check : $(test_objs) $(test_exes) $(test_run_outs)
 	$(scripts_dir)/check-summary.rb $(test_outs)
 
 clean-check : 
