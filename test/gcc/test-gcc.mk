@@ -11,26 +11,37 @@ test_gcc_srcs = \
 # Compile tests
 #-------------------------------------------------------------------------
 
-test_gcc_objs         = $(patsubst %.c, %.o, $(test_gcc_srcs))
-test_gcc_compile_outs = $(patsubst %.c, %-compile.out, $(test_gcc_srcs))
+test_gcc_O0_objs = $(patsubst %.c, %-O0.o, $(test_gcc_srcs))
+test_gcc_O3_objs = $(patsubst %.c, %-O3.o, $(test_gcc_srcs))
+test_gcc_objs    = $(test_gcc_O0_objs) $(test_gcc_O3_objs)
 
-$(test_gcc_objs) : %.o : %.c $(CROSS_GCC)
+test_gcc_O0_compile_outs = $(patsubst %.c, %-O0-compile.out, $(test_gcc_srcs))
+test_gcc_O3_compile_outs = $(patsubst %.c, %-O3-compile.out, $(test_gcc_srcs))
+test_gcc_compile_outs = \
+  $(test_gcc_O0_compile_outs) $(test_gcc_O3_compile_outs)
+
+$(test_gcc_O0_objs) : %-O0.o : %.c $(CROSS_GCC)
 	-{ $(CROSS_GCC) -std=gnu99 -c -o $@ $<; \
     echo "*** gcc compile exit = $$?"; \
-  } | tee $*-compile.out
+  } | tee $*-O0-compile.out
+
+$(test_gcc_O3_objs) : %-O3.o : %.c $(CROSS_GCC)
+	-{ $(CROSS_GCC) -O3 -std=gnu99 -c -o $@ $<; \
+    echo "*** gcc compile exit = $$?"; \
+  } | tee $*-O3-compile.out
 
 check-gcc-compile : $(test_gcc_objs)
 	$(scripts_dir)/check-summary.rb $(test_gcc_compile_outs)
 
 test_gcc_outs += $(test_gcc_compile_outs)
-test_gcc_junk += $(test_gcc_objs) $(test_gcc_compile_outs) 
+test_gcc_junk += $(test_gcc_objs) $(test_gcc_compile_outs)
 
 #-------------------------------------------------------------------------
 # Link tests
 #-------------------------------------------------------------------------
 
-test_gcc_exes      = $(patsubst %.c, %, $(test_gcc_srcs))
-test_gcc_link_outs = $(patsubst %.c, %-link.out, $(test_gcc_srcs))
+test_gcc_exes      = $(patsubst %.o, %, $(test_gcc_objs))
+test_gcc_link_outs = $(patsubst %.o, %-link.out, $(test_gcc_objs))
 
 $(test_gcc_exes) : % : %.o test-gcc-main.c $(CROSS_GCC)
 	-{ $(CROSS_GCC) -o $@ $(test_dir)/gcc/test-gcc-main.c $<; \

@@ -97,6 +97,7 @@ void foreach_gcd( int vec_a[], int vec_b[], int vec_res[], int n )
 // foreach_gcd (with virtual functions)
 //------------------------------------------------------------------------
 
+__attribute__ ((noinline))
 void foreach_gcd( const IGcdImpl& algo, 
                   int vec_a[], int vec_b[], int vec_res[], int n )
 {

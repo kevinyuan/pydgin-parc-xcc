@@ -2,6 +2,7 @@
 // Simple C++ Test
 //========================================================================
 
+__attribute__ ((noinline))
 int foo( int a, int b )
 {
   return a + b;

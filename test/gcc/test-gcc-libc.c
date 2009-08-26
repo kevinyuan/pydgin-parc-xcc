@@ -4,7 +4,10 @@
 // This test sorts an array of strings and then assembles a new string
 // for displaying the sorted array. It acts as a primitive test to make
 // sure at least some of libc is working. If a test fails we return a
-// number which indicates which test failed.
+// number which indicates which test failed. Theoretically none of these
+// library calls will end up calling the libgloss routines except for
+// sbrk, so this test should work even with a stubbed out version of
+// libgloss.
 
 #include <stdio.h>
 #include <string.h>

@@ -11,6 +11,7 @@
 // gcd_itr_sub
 //------------------------------------------------------------------------
 
+__attribute__ ((noinline))
 int gcd_itr_sub( int a, int b )
 {
   if ( a == 0 )
@@ -30,6 +31,7 @@ int gcd_itr_sub( int a, int b )
 // gcd_itr_div
 //------------------------------------------------------------------------
 
+__attribute__ ((noinline))
 int gcd_itr_div( int a, int b )
 {
   int temp;
@@ -45,6 +47,7 @@ int gcd_itr_div( int a, int b )
 // gcd_recursive
 //------------------------------------------------------------------------
 
+__attribute__ ((noinline))
 int gcd_rec_div( int a, int b )
 {
   if ( a == 0 )
