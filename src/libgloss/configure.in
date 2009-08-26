@@ -58,6 +58,11 @@ case "${target}" in
   sh*-*-pe | mips*-*-pe | *arm-wince-pe)
 	AC_CONFIG_SUBDIRS([wince])
 	;;
+  # cbatten - Add maven target and make it use maven subdir
+  mipsmaven*-*-*)
+	AC_CONFIG_SUBDIRS([maven])
+	config_libnosys=false
+	;;
   mips*-*-*)
 	AC_CONFIG_SUBDIRS([mips])
 	;;

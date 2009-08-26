@@ -98,6 +98,12 @@ AC_SUBST([cross_objdump_flags])
 
 case ${target} in
 
+  mipsmaven*-*-*) 
+    cross_libgloss_flags=" \
+      -L src/${target_alias}/libgloss/maven \
+      -T ${srcdir}/src/libgloss/maven/maven.ld"
+  ;;
+
   mips*-*-*) 
     cross_libgloss_flags=" \
       -L src/${target_alias}/libgloss/mips \
@@ -134,6 +140,15 @@ AC_SUBST([cross_gxx_flags])
 # cross run (target specific)
 
 case ${target} in
+
+  mipsmaven*-*-*) 
+    cross_run_internal="no"
+    AC_CHECK_TARGET_TOOL([cross_run],[isa-run],[no])
+    AS_IF([ test ${cross_run} = "no" ],
+    [
+      AC_MSG_ERROR([Cannot find maven ISA simulator])
+    ])
+  ;;
 
   mips*-*-*) 
     cross_run_internal="yes"

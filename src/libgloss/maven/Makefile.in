@@ -1,0 +1,163 @@
+#=========================================================================
+# Makefile for maven libgloss and crt1
+#=========================================================================
+# This makefile builds a maven version of libgloss which includes an
+# implementation of the narrow operating system interface for newlib. It
+# also builds a simple crt1.o. Currently there is no support for
+# multilib.
+
+#-------------------------------------------------------------------------
+# Source files
+#-------------------------------------------------------------------------
+
+crt1_asm   = crt1.S
+gloss_hdrs = 
+gloss_srcs = gloss.c
+
+#-------------------------------------------------------------------------
+# Basic setup
+#-------------------------------------------------------------------------
+
+# Remove all default implicit rules since they can cause subtle bugs
+# and they just make things run slower
+
+.SUFFIXES:
+% : %,v
+% : RCS/%,v
+% : RCS/%
+% : s.%
+% : SCCS/s.%
+
+# Default is to build the prereqs of the all target (defined at bottom)
+
+default : all
+.PHONY : default
+
+# Source directory
+
+obj_dir := .
+src_dir := @srcdir@
+VPATH   := $(src_dir)
+
+# Installation directories
+
+prefix  := @prefix@
+DESTDIR ?= $(prefix)
+
+install_libs_dir := $(DESTDIR)$(prefix)/$(target_alias)/lib
+
+#-------------------------------------------------------------------------
+# Programs and flags 
+#-------------------------------------------------------------------------
+
+# C compiler
+
+CC            := @CC@
+CFLAGS        := @CFLAGS@
+CPPFLAGS      := -I$(obj_dir) -I$(src_dir) @CPPFLAGS@
+COMPILE       := $(CC) -MMD -MP $(CPPFLAGS) $(CFLAGS)
+
+# Library creation
+
+AR            := @AR@
+RANLIB        := @RANLIB@
+
+# Installation
+
+INSTALL       := @INSTALL@
+INSTALL_LIB   := $(INSTALL) -m 644
+
+#-------------------------------------------------------------------------
+# Build crt1.o
+#-------------------------------------------------------------------------
+
+crt1_obj  = $(patsubst %.S, %.o, $(crt1_asm))
+crt1_deps = $(patsubst %.S, %.d, $(crt1_asm))
+
+$(crt1_obj) : %.o : %.S
+	$(COMPILE) -c $<
+
+deps += $(crt1_deps)
+junk += $(crt1_deps) $(crt1_obj)
+
+install_libs += $(crt1_obj)
+
+#-------------------------------------------------------------------------
+# Build libgloss.a
+#-------------------------------------------------------------------------
+
+gloss_lib  = libgloss.a
+gloss_objs = $(patsubst %.c, %.o, $(gloss_srcs))
+gloss_deps = $(patsubst %.c, %.d, $(gloss_srcs))
+
+$(gloss_objs) : %.o : %.c
+	$(COMPILE) -c $<
+
+$(gloss_lib) : $(gloss_objs)
+	$(AR) rcv $@ $^
+	$(RANLIB) $@
+
+libs += $(gloss_lib)
+deps += $(gloss_deps)
+junk += $(gloss_deps) $(gloss_objs)
+
+install_libs += $(gloss_lib)
+
+#-------------------------------------------------------------------------
+# Autodependency files
+#-------------------------------------------------------------------------
+
+-include $(deps)
+
+deps : $(deps)
+.PHONY : deps
+
+#-------------------------------------------------------------------------
+# Installation
+#-------------------------------------------------------------------------
+
+install-libs : $(install_libs)
+	for file in $(install_libs); \
+  do \
+    $(INSTALL_LIB) $$file $(install_libs_dir); \
+  done
+
+install : install-libs 
+.PHONY : install install-libs
+
+#-------------------------------------------------------------------------
+# Regenerate configure information
+#-------------------------------------------------------------------------
+
+configure_prereq = \
+  $(src_dir)/configure.ac \
+
+$(src_dir)/configure : $(configure_prereq)
+	cd $(src_dir) && autoconf
+
+config.status : $(src_dir)/configure
+	./config.status --recheck
+
+Makefile : $(src_dir)/Makefile.in config.status
+	./config.status
+
+dist_junk += config.status Makefile config.log
+
+#-------------------------------------------------------------------------
+# Default
+#-------------------------------------------------------------------------
+
+all : $(install_libs)
+.PHONY : all
+
+#-------------------------------------------------------------------------
+# Clean up junk
+#-------------------------------------------------------------------------
+
+clean :
+	rm -rf *~ \#* $(junk)
+
+distclean :
+	rm -rf *~ \#* $(junk) $(dist_junk)
+
+.PHONY : clean distclean

@@ -281,6 +281,7 @@ ac_subdirs_all="$ac_subdirs_all pa"
 ac_subdirs_all="$ac_subdirs_all i960"
 ac_subdirs_all="$ac_subdirs_all sparc"
 ac_subdirs_all="$ac_subdirs_all wince"
+ac_subdirs_all="$ac_subdirs_all maven"
 ac_subdirs_all="$ac_subdirs_all mips"
 ac_subdirs_all="$ac_subdirs_all rs6000"
 ac_subdirs_all="$ac_subdirs_all mn10200"
@@ -1875,6 +1876,14 @@ subdirs="$subdirs sparc"
 
 subdirs="$subdirs wince"
 
+	;;
+  # cbatten - Add maven target and make it use maven subdir
+  mipsmaven*-*-*)
+
+
+subdirs="$subdirs maven"
+
+	config_libnosys=false
 	;;
   mips*-*-*)
 
