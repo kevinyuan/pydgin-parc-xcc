@@ -6,6 +6,7 @@ test_gcc_srcs = \
   test-gcc-simple.c \
   test-gcc-gcd.c \
   test-gcc-libc.c \
+  test-gcc-ext-ins.c \
 
 #-------------------------------------------------------------------------
 # Compile tests

@@ -6663,16 +6663,34 @@ mips_block_move_straight( rtx dest, rtx src, HOST_WIDE_INT length )
   enum machine_mode mode;
   rtx *regs;
 
-  /* Work out how many bits to move at a time. If both operands have
-     half-word alignment, it is usually better to move in half words.
-     For instance, lh/lh/sh/sh is usually better than lwl/lwr/swl/swr
-     and lw/lw/sw/sw is usually better than ldl/ldr/sdl/sdr. Otherwise
-     move word-sized chunks. */
-  if ( MEM_ALIGN(src) == BITS_PER_WORD / 2
-       && MEM_ALIGN(dest) == BITS_PER_WORD / 2 )
-    bits = BITS_PER_WORD / 2;
-  else
+  /* General MIPS approach: Work out how many bits to move at a time. If
+     both operands have half-word alignment, it is usually better to
+     move in half words. For instance, lh/lh/sh/sh is usually better
+     than lwl/lwr/swl/swr and lw/lw/sw/sw is usually better than
+     ldl/ldr/sdl/sdr. Otherwise move word-sized chunks.
+
+      if ( MEM_ALIGN(src) == BITS_PER_WORD / 2
+           && MEM_ALIGN(dest) == BITS_PER_WORD / 2 )
+        bits = BITS_PER_WORD / 2;
+      else
+        bits = BITS_PER_WORD; */
+ 
+  /* Maven approach: since maven does not support unaligned loads and
+     stores, so if the source and destination are word aligned we move
+     in word chunks. It the source and destination are halfword aligned
+     then we move in half word chunks. Otherwise we move bytes. */
+
+  bool src_align_w  = ( MEM_ALIGN(src)  == BITS_PER_WORD   );
+  bool src_align_h  = ( MEM_ALIGN(src)  == BITS_PER_WORD/2 );
+  bool dest_align_w = ( MEM_ALIGN(dest) == BITS_PER_WORD   );
+  bool dest_align_h = ( MEM_ALIGN(dest) == BITS_PER_WORD/2 );
+
+  if ( src_align_w && dest_align_w )
     bits = BITS_PER_WORD;
+  else if ( src_align_h && dest_align_h )
+    bits = BITS_PER_WORD/2;
+  else
+    bits = 8;
 
   mode = mode_for_size( bits, MODE_INT, 0 );
   delta = bits / BITS_PER_UNIT;
@@ -6680,28 +6698,43 @@ mips_block_move_straight( rtx dest, rtx src, HOST_WIDE_INT length )
   /* Allocate a buffer for the temporary registers. */
   regs = XALLOCAVEC( rtx, length / delta );
 
-  /* Load as many BITS-sized chunks as possible. Use a normal load if
-     the source has enough alignment, otherwise use left/right pairs. */
+  /* General MIPS approach: load as many BITS-sized chunks as possible.
+     Use a normal load if the source has enough alignment, otherwise use
+     left/right pairs.
+
+      for ( offset = 0, i = 0; offset + delta <= length; offset += delta, i++ ) {
+        regs[i] = gen_reg_rtx(mode);
+        if ( MEM_ALIGN(src) >= bits )
+          mips_emit_move( regs[i], adjust_address( src, mode, offset ) );
+        else {
+          rtx part = adjust_address( src, BLKmode, offset );
+          if ( !mips_expand_ext_as_unaligned_load( regs[i], part, bits, 0 ) ) 
+            gcc_unreachable();
+        }
+      }
+
+      for ( offset = 0, i = 0; offset + delta <= length; offset += delta, i++ ) {
+        if ( MEM_ALIGN(dest) >= bits )
+          mips_emit_move( adjust_address( dest, mode, offset ), regs[i] );
+        else {
+          rtx part = adjust_address( dest, BLKmode, offset );
+          if ( !mips_expand_ins_as_unaligned_store( part, regs[i], bits, 0 ) )
+            gcc_unreachable();
+        }
+      } */
+
+  /* Maven approach: since maven doesn not support unaligned loads and
+     stores, we have already set bits appropriately according to the
+     alignment. */
+
   for ( offset = 0, i = 0; offset + delta <= length; offset += delta, i++ ) {
     regs[i] = gen_reg_rtx(mode);
-    if ( MEM_ALIGN(src) >= bits )
-      mips_emit_move( regs[i], adjust_address( src, mode, offset ) );
-    else {
-      rtx part = adjust_address( src, BLKmode, offset );
-      if ( !mips_expand_ext_as_unaligned_load( regs[i], part, bits, 0 ) )
-        gcc_unreachable();
-    }
+    mips_emit_move( regs[i], adjust_address( src, mode, offset ) );
   }
 
-  /* Copy the chunks to the destination. */
-  for ( offset = 0, i = 0; offset + delta <= length; offset += delta, i++ )
-    if ( MEM_ALIGN(dest) >= bits )
-      mips_emit_move( adjust_address( dest, mode, offset ), regs[i] );
-    else {
-      rtx part = adjust_address( dest, BLKmode, offset );
-      if ( !mips_expand_ins_as_unaligned_store( part, regs[i], bits, 0 ) )
-        gcc_unreachable();
-    }
+  for ( offset = 0, i = 0; offset + delta <= length; offset += delta, i++ ) {
+    mips_emit_move( adjust_address( dest, mode, offset ), regs[i] );
+  }
 
   /* Mop up any left-over bytes. */
   if ( offset < length ) {
@@ -6948,8 +6981,11 @@ mips_expand_atomic_qihi( union mips_gen_fn_ptrs generator,
    instructions (LWL, SWL, LDL, SDL).
 
    *RIGHT is a QImode reference to the opposite end of the field and can
-   be used in the patterning right-side instruction. */
+   be used in the patterning right-side instruction. 
 
+   Maven does not support unaligned loads and stores. */
+
+#if 0
 static bool
 mips_get_unaligned_mem( rtx *op, HOST_WIDE_INT width, 
                         HOST_WIDE_INT bitpos,
@@ -6997,6 +7033,7 @@ mips_get_unaligned_mem( rtx *op, HOST_WIDE_INT width,
 
   return true;
 }
+#endif
 
 /*----------------------------------------------------------------------*/
 /* mips_expand_ext_as_unaligned_load                                    */
@@ -7007,8 +7044,11 @@ mips_get_unaligned_mem( rtx *op, HOST_WIDE_INT width,
 
     (set DEST (*_extract SRC WIDTH BITPOS))
 
-   Return true on success. */
+   Return true on success.
 
+   Maven does not support unaligned loads and stores. */
+
+#if 0
 bool
 mips_expand_ext_as_unaligned_load( rtx dest, rtx src, HOST_WIDE_INT width,
                                    HOST_WIDE_INT bitpos )
@@ -7042,6 +7082,7 @@ mips_expand_ext_as_unaligned_load( rtx dest, rtx src, HOST_WIDE_INT width,
   }
   return true;
 }
+#endif
 
 /*----------------------------------------------------------------------*/
 /* mips_expand_ins_as_unaligned_store                                   */
@@ -7052,8 +7093,11 @@ mips_expand_ext_as_unaligned_load( rtx dest, rtx src, HOST_WIDE_INT width,
 
     (set (zero_extract DEST WIDTH BITPOS) SRC)
 
-   Return true on success. */
+   Return true on success.
 
+   Maven does not support unaligned loads and stores. */
+
+#if 0
 bool
 mips_expand_ins_as_unaligned_store( rtx dest, rtx src, HOST_WIDE_INT width,
                                     HOST_WIDE_INT bitpos )
@@ -7076,6 +7120,7 @@ mips_expand_ins_as_unaligned_store( rtx dest, rtx src, HOST_WIDE_INT width,
   }
   return true;
 }
+#endif
 
 /*----------------------------------------------------------------------*/
 /* mips_mem_fits_mode_p                                                 */
@@ -7107,8 +7152,11 @@ mips_mem_fits_mode_p( enum machine_mode mode, rtx x )
     0 < BITPOS + WIDTH <= GET_MODE_BITSIZE (GET_MODE (op))
 
    Also reject lengths equal to a word as they are better handled
-   by the move patterns. */
+   by the move patterns.
 
+   Maven does not support ins/ext instructions */
+
+#if 0
 bool
 mips_use_ins_ext_p( rtx op, HOST_WIDE_INT width, HOST_WIDE_INT bitpos )
 {
@@ -7125,6 +7173,7 @@ mips_use_ins_ext_p( rtx op, HOST_WIDE_INT width, HOST_WIDE_INT bitpos )
 
   return true;
 }
+#endif
 
 /*----------------------------------------------------------------------*/
 /* mask_low_and_shift_p                                                 */
