@@ -31,7 +31,7 @@ ENTRY( _start )
    idt32.ld includes it explicitly here and I was seeing link errors
    without it. */
 
-GROUP( -lc -lgloss -lgcc )
+GROUP( -lc -lsyscalls -lgcc )
 
 /* The STARTUP command specifes any additional startup files which
    should be always linked _first_ into the executable. */
@@ -39,22 +39,22 @@ GROUP( -lc -lgloss -lgcc )
 STARTUP( crt1.o )
 
 /*----------------------------------------------------------------------*/
-/* Sections                                                             */
+/* Sections */
 /*----------------------------------------------------------------------*/
 /* This is where we specify how the input sections map to output
-   sections. The .= commands set the location counter, and the sections
-   are inserted in increasing address order according to the location
-   counter. The following statement will take all of the .bar input
-   sections and reloate them into the .foo output section which starts
-   at address 0x1000.
+sections. The .= commands set the location counter, and the sections are
+inserted in increasing address order according to the location counter.
+The following statement will take all of the .bar input sections and
+reloate them into the .foo output section which starts at address
+0x1000.
 
     . = 0.x1000;
     .foo : { *(.bar) }
 
-	 If we wrap an input specification with a KEEP command then it
-	 prevents it from being eliminted during "link-time garbage
-	 collection". I'm not sure what this is, so I just followed what was
-	 done in idt32.ld.
+   If we wrap an input specification with a KEEP command then it
+   prevents it from being eliminted during "link-time garbage
+   collection". I'm not sure what this is, so I just followed what was
+   done in idt32.ld.
 
    We can also set a global external symbol to a specific address in the
    output binary with this syntax:
@@ -63,86 +63,86 @@ STARTUP( crt1.o )
     PROVIDE( etext = . );
 
    This will set the global symbol _ftext to the current location. If we
-	 wrap this in a PROVIDE commad, the symbol will only be set if it is
-	 not defined. We do this with symbols which don't begin with an
-	 underscore since technically in ansi C someone might have a function
-	 with the same name (eg. etext). 
+   wrap this in a PROVIDE commad, the symbol will only be set if it is
+   not defined. We do this with symbols which don't begin with an
+   underscore since technically in ansi C someone might have a function
+   with the same name (eg. etext).
 
-	 If we need to label the beginning of a section we need to make sure
-	 that the linker doesn't insert an orphan section inbetween where we
-	 set the symbol and the actual begining of the section. We can do that
-	 by assigning the location dot to itself.
+   If we need to label the beginning of a section we need to make sure
+   that the linker doesn't insert an orphan section inbetween where we
+   set the symbol and the actual begining of the section. We can do that
+   by assigning the location dot to itself.
 
-	  . = .
+    . = .
     _ftext = .;
-		.text :
+    .text :
     { }
 
-	 */
+   */
 
 SECTIONS
 {
 
-	/*--------------------------------------------------------------------*/
-	/* Code and read-only segment                                         */
-	/*--------------------------------------------------------------------*/
+  /*--------------------------------------------------------------------*/
+  /* Code and read-only segment                                         */
+  /*--------------------------------------------------------------------*/
 
-	/* Begining of code and text segment */
+  /* Begining of code and text segment */
   . = 0x00001000;
   _ftext = .;
   PROVIDE( eprol = . );
 
-	/* text: Program code section */
+  /* text: Program code section */
   .text : 
-	{
+  {
     *(.text)
     *(.text.*)
     *(.gnu.linkonce.t.*)
   }
 
-	/* init: Code to execute before main (called by crt1.S) */
+  /* init: Code to execute before main (called by crt1.S) */
   .init : 
- 	{
+  {
     KEEP( *(.init) )
   }
 
-	/* fini: Code to execute after main (called by crt1.S) */
+  /* fini: Code to execute after main (called by crt1.S) */
   .fini : 
-	{
+  {
     KEEP( *(.fini) )
   }
 
-	/* rodata: Read-only data */
+  /* rodata: Read-only data */
   .rodata : 
-	{
+  {
     *(.rdata)
     *(.rodata)
     *(.rodata.*)
     *(.gnu.linkonce.r.*)
   }
 
-	/* End of code and read-only segment */
+  /* End of code and read-only segment */
   PROVIDE( etext = . );
   _etext = .;
 
-	/*--------------------------------------------------------------------*/
-	/* Global constructor/destructor segement                             */
-	/*--------------------------------------------------------------------*/
- 	/* The .ctors/.dtors sections are special sections which contain a
-   	 list of constructor/destructor function pointers. crtbegin.o
-   	 includes code in a .init section which goes through the .ctors list
-   	 and calls each constuctor. crtend.o includes code in a .fini
-   	 section which goes through the .dtors list and calls each
-   	 destructor. crtbegin.o includes a special null pointer in its own
-   	 .ctors/.dtors sections which acts as a start indicator for those
-   	 lists. crtend.o also includes a special null pointer in its own
-   	 .ctors/.dtors sections which acts as an end indictor. The linker
-   	 commands below are setup so that crtbegin.o's .ctors/.dtors
-   	 sections are always first and crtend.o's .ctors/.dtors sections are
-   	 always last. This is the only way the list of functions will have
-   	 the begin and end indicators in the right place. */
+  /*--------------------------------------------------------------------*/
+  /* Global constructor/destructor segement                             */
+  /*--------------------------------------------------------------------*/
+  /* The .ctors/.dtors sections are special sections which contain a
+     list of constructor/destructor function pointers. crtbegin.o
+     includes code in a .init section which goes through the .ctors list
+     and calls each constuctor. crtend.o includes code in a .fini
+     section which goes through the .dtors list and calls each
+     destructor. crtbegin.o includes a special null pointer in its own
+     .ctors/.dtors sections which acts as a start indicator for those
+     lists. crtend.o also includes a special null pointer in its own
+     .ctors/.dtors sections which acts as an end indictor. The linker
+     commands below are setup so that crtbegin.o's .ctors/.dtors
+     sections are always first and crtend.o's .ctors/.dtors sections are
+     always last. This is the only way the list of functions will have
+     the begin and end indicators in the right place. */
 
-	/* ctors : Array of global constructor function pointers */
+  /* ctors : Array of global constructor function pointers */
   .ctors :
   {
     KEEP( *crtbegin.o(.ctors) )
@@ -151,7 +151,7 @@ SECTIONS
     KEEP( *(.ctors) )
   }
 
-	/* dtors : Array of global destructor function pointers */
+  /* dtors : Array of global destructor function pointers */
   .dtors :
   {
     KEEP( *crtbegin.o(.dtors) )
@@ -160,9 +160,9 @@ SECTIONS
     KEEP( *(.dtors) )
   }
 
-	/*--------------------------------------------------------------------*/
-	/* Other misc gcc segments (this was in idt32.ld)                     */
-	/*--------------------------------------------------------------------*/
+  /*--------------------------------------------------------------------*/
+  /* Other misc gcc segments (this was in idt32.ld)                     */
+  /*--------------------------------------------------------------------*/
   /* I am not quite sure about these sections but it seems they are for
      C++ exception handling. I think .jcr is for "Java Class
      Registration" but it seems to end up in C++ binaries as well. */
@@ -172,75 +172,75 @@ SECTIONS
   .gcc_except_table : { *(.gcc_except_table) }
   .jcr              : { KEEP (*(.jcr))       } 
 
-	/*--------------------------------------------------------------------*/
-	/* Initialized data segment                                           */
-	/*--------------------------------------------------------------------*/
+  /*--------------------------------------------------------------------*/
+  /* Initialized data segment                                           */
+  /*--------------------------------------------------------------------*/
 
-	/* Start of initialized data segment */
-	. = ALIGN(16);
+  /* Start of initialized data segment */
+  . = ALIGN(16);
    _fdata = .;
 
-	/* data: Writable data */
+  /* data: Writable data */
   .data : 
-	{
+  {
     *(.data)
     *(.data.*)
     *(.gnu.linkonce.d.*)
   }
 
-	/* gp: Address for initializing gp register (used by crt1.S) */
+  /* gp: Address for initializing gp register (used by crt1.S) */
   . = ALIGN(8);
   _gp = . + 0x8000;
 
-	/* sdata: Writable small data */
+  /* sdata: Writable small data */
   .sdata : 
-	{
+  {
     *(.sdata)
     *(.sdata.*)
     *(.gnu.linkonce.s.*)
   }
 
-	/* lit4: Single precision floating point constants created by gas */
+  /* lit4: Single precision floating point constants created by gas */
   .lit4 : 
-	{
+  {
     *(.lit4)
   }
 
-	/* lit8: Double precision floating point constants created by gas */
+  /* lit8: Double precision floating point constants created by gas */
   .lit8 : 
-	{
+  {
     *(.lit8)
   }
 
-	/* End of initialized data segment */
+  /* End of initialized data segment */
   . = ALIGN(4);
   PROVIDE( edata = . );
   _edata = .;
 
-	/*--------------------------------------------------------------------*/
-	/* Uninitialized data segment                                         */
-	/*--------------------------------------------------------------------*/
+  /*--------------------------------------------------------------------*/
+  /* Uninitialized data segment                                         */
+  /*--------------------------------------------------------------------*/
 
   /* Start of uninitialized data segment */
-	. = .;
+  . = .;
   _fbss = .;
 
-	/* sbss: Uninitialized writeable small data section */
-	. = .;
+  /* sbss: Uninitialized writeable small data section */
+  . = .;
   _sbss_start = .;
   .sbss : 
-	{
+  {
     *(.sbss)
     *(.sbss.*)
     *(.gnu.linkonce.sb.*)
     *(.scommon)
   }
 
-	/* bss: Uninitialized writeable data section */
-	. = .;
+  /* bss: Uninitialized writeable data section */
+  . = .;
   _bss_start = .;
   .bss : 
-	{
+  {
     *(.bss)
     *(.bss.*)
     *(.gnu.linkonce.b.*)
@@ -251,9 +251,9 @@ SECTIONS
   PROVIDE( end = . );
   _end = .;
 
-	/*--------------------------------------------------------------------*/
-	/* Special gcc sections (this was in idt32.ld)                        */
-	/*--------------------------------------------------------------------*/
+  /*--------------------------------------------------------------------*/
+  /* Special gcc sections (this was in idt32.ld)                        */
+  /*--------------------------------------------------------------------*/
 
   .mdebug.abi32        0 : { KEEP(*(.mdebug.abi32))        }
   .mdebug.abiN32       0 : { KEEP(*(.mdebug.abiN32))       }

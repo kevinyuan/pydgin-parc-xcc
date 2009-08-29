@@ -10,9 +10,9 @@
 # Source files
 #-------------------------------------------------------------------------
 
-crt1_asm   = crt1.S
-gloss_hdrs = 
-gloss_srcs = gloss.c
+crt1_asm      = crt1.S
+syscalls_hdrs = syscalls.h
+syscalls_srcs = syscalls.c
 
 #-------------------------------------------------------------------------
 # Basic setup
@@ -44,6 +44,7 @@ VPATH   := $(src_dir)
 prefix  := @prefix@
 DESTDIR ?= $(prefix)
 
+install_hdrs_dir := $(DESTDIR)$(prefix)/$(target_alias)/include/machine
 install_libs_dir := $(DESTDIR)$(prefix)/$(target_alias)/lib
 
 #-------------------------------------------------------------------------
@@ -65,6 +66,7 @@ RANLIB        := @RANLIB@
 # Installation
 
 INSTALL       := @INSTALL@
+INSTALL_HDR   := $(INSTALL) -m 444
 INSTALL_LIB   := $(INSTALL) -m 644
 
 #-------------------------------------------------------------------------
@@ -83,25 +85,26 @@ junk += $(crt1_deps) $(crt1_obj)
 install_libs += $(crt1_obj)
 
 #-------------------------------------------------------------------------
-# Build libgloss.a
+# Build libsyscalls.a
 #-------------------------------------------------------------------------
 
-gloss_lib  = libgloss.a
-gloss_objs = $(patsubst %.c, %.o, $(gloss_srcs))
-gloss_deps = $(patsubst %.c, %.d, $(gloss_srcs))
+syscalls_lib  = libsyscalls.a
+syscalls_objs = $(patsubst %.c, %.o, $(syscalls_srcs))
+syscalls_deps = $(patsubst %.c, %.d, $(syscalls_srcs))
 
-$(gloss_objs) : %.o : %.c
+$(syscalls_objs) : %.o : %.c
 	$(COMPILE) -c $<
 
-$(gloss_lib) : $(gloss_objs)
+$(syscalls_lib) : $(syscalls_objs)
 	$(AR) rcv $@ $^
 	$(RANLIB) $@
 
-libs += $(gloss_lib)
-deps += $(gloss_deps)
-junk += $(gloss_deps) $(gloss_objs)
+libs += $(syscalls_lib)
+deps += $(syscalls_deps)
+junk += $(syscalls_deps) $(syscalls_objs)
 
-install_libs += $(gloss_lib)
+install_hdrs += $(addprefix $(src_dir)/, $(syscalls_hdrs))
+install_libs += $(syscalls_lib)
 
 #-------------------------------------------------------------------------
 # Autodependency files
@@ -116,14 +119,20 @@ deps : $(deps)
 # Installation
 #-------------------------------------------------------------------------
 
+install-hdrs : $(install_hdrs)
+	for file in $(install_hdrs); \
+  do \
+    $(INSTALL_HDR) $$file $(install_hdrs_dir); \
+  done
+
 install-libs : $(install_libs)
 	for file in $(install_libs); \
   do \
     $(INSTALL_LIB) $$file $(install_libs_dir); \
   done
 
-install : install-libs 
-.PHONY : install install-libs
+install : install-hdrs install-libs 
+.PHONY : install install-hdrs install-libs
 
 #-------------------------------------------------------------------------
 # Regenerate configure information

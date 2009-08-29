@@ -1,10 +1,10 @@
 /*======================================================================*/
-/* gloss.c : GNU Low-Level Operating System Support                     */
+/* syscalls.c : Newlib operating system interface                       */
 /*======================================================================*/
 /* This is the maven implementation of the narrow newlib operating
-   system interface (gloss). It is based on the minimum stubs in the
-   newlib documentation, the error stubs in libnosys, and the previous
-   scale implementation. 
+   system interface. It is based on the minimum stubs in the newlib
+   documentation, the error stubs in libnosys, and the previous scale
+   implementation.
 
    Here is a list of the functions which make up the operating system
    interface. The file management instructions execute syscall assembly
@@ -13,32 +13,52 @@
    mainly just stubs since for now maven only supports a single process.
 
     - File management functions
-       + open   : open file
-       + lseek  : set position in file
-       + read   : read from file
-       + write  : write to file
-       + fstat  : status of an open file
-       + stat   : status of a file by name
-       + close  : close a file
-       + link   : rename a file
-       + unlink : remote file's directory entry
+       + open   : (v) open file
+       + lseek  : (v) set position in file
+       + read   : (v) read from file
+       + write  : (v) write to file
+       + fstat  : (z) status of an open file
+       + stat   : (z) status of a file by name
+       + close  : (z) close a file
+       + link   : (z) rename a file
+       + unlink : (z) remote file's directory entry
 
     - Process management functions
-       + execve : transfer control to new process
-       + fork   : create a new process
-       + getpid : get process id
-       + kill   : send signal to child process
-       + wait   : wait for a child process
+       + execve : (z) transfer control to new proc
+       + fork   : (z) create a new process 
+       + getpid : (v) get process id 
+       + kill   : (z) send signal to child process
+       + wait   : (z) wait for a child process
        
     - Misc functions
-       + isatty : query whether output stream is a terminal
-       + times  : timing information for current process
-       + sbrk   : increase program data space
-       + _exit  : exit program without cleaning up files
+       + isatty : (v) query whether output stream is a terminal
+       + times  : (z) timing information for current process
+       + sbrk   : (v) increase program data space
+       + _exit  : (-) exit program without cleaning up files
+
+   The current implementation of these functions assumes the following
+   mips syscall instruction interface:
+
+    - a0 : syscall argument 0
+    - a1 : syscall argument 1
+    - a2 : syscall argument 2
+    - a3 : error flag (0 = success, 1 = failure)
+    - v0 : syscall id, then return value from system call
    
-   See the newlib documentatin for more information 
+   There are two types of system calls. Those which return a value when
+   everything is okay (marked with (v) in above list) and those which
+   return a zero when everything is okay (marked with (z) in above
+   list). On an error (ie. when the error flag is 1) the return value is
+   always an errno which should correspond to the numbers in
+   newlib/libc/include/sys/errno.h The implementations currently assume
+   that syscall arguments stay in a0-a2 which they should unless of
+   course one of the functions are inlined. So keep that in mind if you
+   wanted to call one function from another function.
+
+   See the newlib documentation for more information 
    http://sourceware.org/newlib/libc.html#Syscalls */
 
+#include "syscalls.h"
 #include <sys/stat.h>
 #include <sys/times.h>
 #include <errno.h>
@@ -84,7 +104,17 @@ char** environ = __env;
 
 int open( const char* name, int flags, int mode )
 {
-  return -1;
+  register int result     asm ("v0");
+  register int error_flag asm ("a3");
+  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
+                                  : "i"  (_MAVEN_SYSCALL_OPEN) );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+  
+  return result;
 }
 
 /*----------------------------------------------------------------------*/
@@ -94,7 +124,17 @@ int open( const char* name, int flags, int mode )
 
 int lseek( int file, int ptr, int dir )
 {
-  return 0;
+  register int result     asm ("v0");
+  register int error_flag asm ("a3");
+  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
+                                  : "i"  (_MAVEN_SYSCALL_LSEEK) );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+  
+  return result;
 }
 
 /*----------------------------------------------------------------------*/
@@ -104,43 +144,57 @@ int lseek( int file, int ptr, int dir )
 
 int read( int file, char* ptr, int len )
 {
-  return 0;
+  register int result     asm ("v0");
+  register int error_flag asm ("a3");
+  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
+                                  : "i"  (_MAVEN_SYSCALL_READ) );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+  
+  return result;
 }
 
 /*----------------------------------------------------------------------*/
 /* write                                                                */
 /*----------------------------------------------------------------------*/
-/* Write to a file. libc subroutines will use this system routine for
-   output to all files, including stdout - so if you need to generate
-   any output, for example to a serial port for debugging, you should
-   make your minimal write capable of doing this. The following minimal
-   implementation is an incomplete example; it relies on a outbyte
-   subroutine (not shown; typically, you must write this in assembler
-   from examples provided by your hardware manufacturer) to actually
-   perform the output. 
-
-    int todo;
-    for ( todo = 0; todo < len; todo++ )
-      outbyte (*ptr++);
-     
-    return len; */
+/* Write to a file. */
 
 int write( int file, char* ptr, int len )
 {
-  return -1;
+  register int result     asm ("v0");
+  register int error_flag asm ("a3");
+  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
+                                  : "i"  (_MAVEN_SYSCALL_WRITE) );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+  
+  return result;
 }
 
 /*----------------------------------------------------------------------*/
 /* fstat                                                                */
 /*----------------------------------------------------------------------*/
-/* Status of an open file. For consistency with other minimal
-   implementations in these examples, all files are regarded as
-   character special devices. The sys/stat.h header file required is
+/* Status of an open file. The sys/stat.h header file required is
    distributed in the include subdirectory for this C library. */
 
 int fstat( int file, struct stat* st )
 {
-  st->st_mode = S_IFCHR;
+  register int result     asm ("v0");
+  register int error_flag asm ("a3");
+  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
+                                  : "i"  (_MAVEN_SYSCALL_FSTAT) );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+  
   return 0;
 }
 
@@ -151,7 +205,16 @@ int fstat( int file, struct stat* st )
 
 int stat( const char* file, struct stat* st )
 {
-  st->st_mode = S_IFCHR;
+  register int result     asm ("v0");
+  register int error_flag asm ("a3");
+  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
+                                  : "i"  (_MAVEN_SYSCALL_STAT) );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+  
   return 0;
 }
 
@@ -162,7 +225,17 @@ int stat( const char* file, struct stat* st )
 
 int close( int file ) 
 {
-  return -1;
+  register int result     asm ("v0");
+  register int error_flag asm ("a3");
+  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
+                                  : "i"  (_MAVEN_SYSCALL_CLOSE) );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+  
+  return 0;
 }
 
 /*----------------------------------------------------------------------*/
@@ -172,8 +245,17 @@ int close( int file )
 
 int link( char* old_name, char* new_name )
 {
-  errno = EMLINK;
-  return -1;
+  register int result     asm ("v0");
+  register int error_flag asm ("a3");
+  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
+                                  : "i"  (_MAVEN_SYSCALL_LINK) );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+  
+  return 0;
 }
 
 
@@ -184,8 +266,17 @@ int link( char* old_name, char* new_name )
 
 int unlink( char* name )
 {
-  errno = ENOENT;
-  return -1;
+  register int result     asm ("v0");
+  register int error_flag asm ("a3");
+  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
+                                  : "i"  (_MAVEN_SYSCALL_UNLINK) );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+  
+  return 0;
 }
 
 /*----------------------------------------------------------------------*/
@@ -228,7 +319,7 @@ int getpid()
 /* kill                                                                 */
 /*----------------------------------------------------------------------*/
 /* Send a signal. Minimal implementation for a system without processes
-   just causes and error. */
+   just causes an error. */
 
 int kill( int pid, int sig )
 {
@@ -240,7 +331,7 @@ int kill( int pid, int sig )
 /* wait                                                                 */
 /*----------------------------------------------------------------------*/
 /* Wait for a child process. Minimal implementation for a system without
-   processes just causes and error. */
+   processes just causes an error. */
 
 int wait( int* status )
 {
@@ -295,15 +386,14 @@ caddr_t sbrk( int incr )
 /*----------------------------------------------------------------------*/
 /* _exit                                                                */
 /*----------------------------------------------------------------------*/
-/* Exit a program without cleaning up files. Not really sure what to put
-   here yet. libnosys causes a divide by zero exception. */
+/* Exit a program without cleaning up files. */
 
-void _exit( int rc )
+void _exit( int exit_status )
 {
+  __asm__ ( "li $v0, %0; syscall" : : "i"(_MAVEN_SYSCALL_EXIT) );
 
-  __asm__ ( "li $v0, 4001; syscall" );
-
-  /* Convince GCC that this function never returns. */
+  // Convince gcc this function never returns to avoid warnings (this is
+  // from _exit in libnosys)
   for (;;)
     ;
 }
