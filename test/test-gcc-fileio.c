@@ -81,7 +81,8 @@ int test()
 
   // Test data and known good answers
 
-  char* test_file_name = "test-gcc-fileio.data";
+  char* test_file_name_0 = "test-gcc-fileio-0.data";
+  char* test_file_name_1 = "test-gcc-fileio-1.data";
 
   int n = 6;
   int vec_a[] = {  0,  1,  2,  3,  5,   8 };
@@ -89,7 +90,7 @@ int test()
 
   // Open new file, write vector of data, close file
 
-  FILE* file0 = fopen( test_file_name, "w" );
+  FILE* file0 = fopen( test_file_name_0, "w" );
 
   error_code++;
   if ( file0 == 0 )
@@ -106,7 +107,7 @@ int test()
   // Open file, read/verify vector of data, close file
 
   int vec_read_0[n];
-  FILE* file1 = fopen( test_file_name, "r" );
+  FILE* file1 = fopen( test_file_name_0, "r" );
 
   error_code++;
   if ( file1 == 0 )
@@ -128,7 +129,7 @@ int test()
 
   // Open file, append vector of data, close file
 
-  FILE* file2 = fopen( test_file_name, "a" );
+  FILE* file2 = fopen( test_file_name_0, "a" );
 
   error_code++;
   if ( file2 == 0 )
@@ -142,17 +143,29 @@ int test()
   if ( fclose(file2) )
     return error_code;
 
+  // Rename file, make sure cannot open old file name
+
+  error_code;
+  if ( rename( test_file_name_0, test_file_name_1 ) == -1 )
+    return error_code;
+
+  FILE* file3 = fopen( test_file_name_0, "r" );
+
+  error_code++;
+  if ( file3 != 0 )
+    return error_code;
+
   // Open file, read/verify vector of data, close file
 
   int vec_read_1[n];
-  FILE* file3 = fopen( test_file_name, "r" );
+  FILE* file4 = fopen( test_file_name_1, "r" );
 
   error_code++;
-  if ( file3 == 0 )
+  if ( file4 == 0 )
     return error_code;
 
   error_code++;
-  if ( !vec_read( file3, vec_read_1, n ) )
+  if ( !vec_read( file4, vec_read_1, n ) )
     return error_code;
 
   for ( int i = 0; i < n; i++ ) {
@@ -162,7 +175,7 @@ int test()
   }
 
   error_code++;
-  if ( !vec_read( file3, vec_read_1, n ) )
+  if ( !vec_read( file4, vec_read_1, n ) )
     return error_code;
 
   for ( int i = 0; i < n; i++ ) {
@@ -172,19 +185,19 @@ int test()
   }
 
   error_code++;
-  if ( fclose(file3) )
+  if ( fclose(file4) )
     return error_code;
 
   // Delete the file, try to open it and see if there is an error
 
   error_code++;
-  if ( remove( test_file_name ) != 0 )
+  if ( remove( test_file_name_1 ) != 0 )
     return error_code;
 
-  FILE* file4 = fopen( test_file_name, "r" );
+  FILE* file5 = fopen( test_file_name_1, "r" );
 
   error_code++;
-  if ( file4 != 0 )
+  if ( file5 != 0 )
     return error_code;
   
   // If all tests passed return zero
