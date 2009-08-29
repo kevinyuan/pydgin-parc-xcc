@@ -95,7 +95,7 @@ CROSS_GAS       = ./$(target_alias)-gas
 CROSS_GAS_BIN   = @cross_gas_bin@
 CROSS_GAS_FLAGS = @cross_gas_flags@
 
-$(CROSS_GAS) :
+$(CROSS_GAS) : $(CROSS_GAS_BIN)
 	$(MAKE) -C src all-gas
 	echo "#!/bin/sh" > $@
 	echo "$(CROSS_GAS_BIN) $(CROSS_GAS_FLAGS) \"\$$@\"" >> $@
@@ -110,7 +110,7 @@ CROSS_OBJDUMP       = ./$(target_alias)-objdump
 CROSS_OBJDUMP_BIN   = @cross_objdump_bin@
 CROSS_OBJDUMP_FLAGS = @cross_objdump_flags@
 
-$(CROSS_OBJDUMP) :
+$(CROSS_OBJDUMP) : $(CROSS_OBJDUMP_BIN)
 	$(MAKE) -C src all-binutils
 	echo "#!/bin/sh" > $@
 	echo "$(CROSS_OBJDUMP_BIN) $(CROSS_OBJDUMP_FLAGS) \"\$$@\"" >> $@
@@ -125,7 +125,7 @@ CROSS_GCC       = ./$(target_alias)-gcc
 CROSS_GCC_BIN   = @cross_gcc_bin@
 CROSS_GCC_FLAGS = @cross_gcc_flags@
 
-$(CROSS_GCC) :
+$(CROSS_GCC) : $(CROSS_GCC_BIN)
 	$(MAKE) -C src all-gcc
 	echo "#!/bin/sh" > $@
 	echo "$(CROSS_GCC_BIN) $(CROSS_GCC_FLAGS) \"\$$@\"" >> $@
@@ -140,7 +140,7 @@ CROSS_GXX       = ./$(target_alias)-g++
 CROSS_GXX_BIN   = @cross_gxx_bin@
 CROSS_GXX_FLAGS = @cross_gxx_flags@
 
-$(CROSS_GXX) :
+$(CROSS_GXX) : $(CROSS_GXX_BIN)
 	$(MAKE) -C src all-gcc
 	echo "#!/bin/sh" > $@
 	echo "$(CROSS_GXX_BIN) $(CROSS_GXX_FLAGS) \"\$$@\"" >> $@
@@ -167,7 +167,7 @@ CROSS_RUN_FLAGS    = @cross_run_flags@
 
 ifeq ($(cross_run_internal),yes)
 
-$(CROSS_RUN) :
+$(CROSS_RUN) : $(CROSS_RUN_BIN)
 	$(MAKE) -C src
 	echo "#!/bin/sh" > $@
 	echo "$(CROSS_RUN_BIN) $(CROSS_RUN_FLAGS) \"\$$@\"" >> $@
@@ -201,15 +201,13 @@ junk += $(test_wrappers_junk)
 
 # Test modules
 
-test_dir     = $(src_dir)/test
-test_modules = gas gcc g++
+test_dir     := $(src_dir)/test
+test_modules := gas gcc g++
 
 # Include make fragments from test directories
 
-VPATH := $(addprefix $(test_dir)/, $(test_modules))
-test_mks = \
-  $(join $(addprefix $(test_dir)/, $(test_modules)), \
-         $(patsubst %, /test-%.mk, $(test_modules)))
+VPATH    := $(test_dir)
+test_mks := $(patsubst %, $(test_dir)/test-%.mk, $(test_modules))
 
 include $(test_mks)
 
@@ -236,7 +234,7 @@ junk += $(test_junk)
 
 test_results_dir = test-results-$(project_ver)
 
-longcheck longcheck% :: 
+longcheck longcheck% :
 	-$(MAKE) -k -C src check$* RUNTESTFLAGS="--target_board=mips-sim"
 	rm -rf $(test_results_dir)
 	mkdir $(test_results_dir)
@@ -250,7 +248,7 @@ longcheck longcheck% ::
 # Installation
 #-------------------------------------------------------------------------
 
-install install% ::
+install install% :
 	$(MAKE) -C src $@ prefix=$(DESTDIR)
 ifeq ($(enable_stow),yes)
 	$(MKINSTALLDIRS) $(stow_pkg_dir)
@@ -344,8 +342,18 @@ all :
 
 # This is a last resort rule which passes any targets which we don't
 # define in this makefile down to the submake
-%::
+% :
 	$(MAKE) -C src $@
+
+#-------------------------------------------------------------------------
+# Makefile debugging
+#-------------------------------------------------------------------------
+# This handy rule will display the contents of any make variable by
+# using the target debug-<varname>. So for example, make debug-junk will
+# display the contents of the junk variable.
+
+debug-% :
+	@echo $* = $($*)
 
 #-------------------------------------------------------------------------
 # Clean up junk

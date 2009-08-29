@@ -3,8 +3,10 @@
 //========================================================================
 // This test sorts an array of strings and then assembles a new string
 // for displaying the sorted array. It acts as a primitive test to make
-// sure at least some of the STL is working. If a test fails we return a
-// number which indicates which test failed.
+// sure at least some of the STL is working. It also does dynamic memory
+// allocation and so should test the sbrk syscall. STL is pretty large
+// and apparenly somewhere it ends up calling the close syscall as well.
+// If a test fails we return a number which indicates which test failed.
 
 #include <iostream>
 #include <string>
@@ -43,8 +45,8 @@ int test()
   // Test data and known good answers
 
   typedef std::vector<int> vint;
-  vint vec_int_in  =   mk_vec( 29, 61, 18, 21, 80, 10, 67, 19, 37, 53 );
-  vint vec_int_ref =   mk_vec( 10, 18, 19, 21, 29, 37, 53, 61, 67, 80 );
+  vint vec_int_in  = mk_vec( 29, 61, 18, 21, 80, 10, 67, 19, 37, 53 );
+  vint vec_int_ref = mk_vec( 10, 18, 19, 21, 29, 37, 53, 61, 67, 80 );
   std::string vec_str_ref = "{ 10, 18, 19, 21, 29, 37, 53, 61, 67, 80 }";
 
   // Sort the input array
@@ -55,7 +57,7 @@ int test()
 
   for ( int i = 0; i < static_cast<int>(vec_int_in.size()); i++ ) {
     error_code++;
-    if ( vec_int_in[i] != vec_int_ref[i] )
+    if ( vec_int_in.at(i) != vec_int_ref.at(i) )
       return error_code;
   }
 
@@ -64,7 +66,7 @@ int test()
   std::ostringstream ost;
   ost << "{ ";
   for ( int i = 0; i < static_cast<int>(vec_int_in.size()); i++ ) {
-    ost << vec_int_in[i];
+    ost << vec_int_in.at(i);
     if ( i != static_cast<int>(vec_int_in.size())-1 )
       ost << ", ";
   }

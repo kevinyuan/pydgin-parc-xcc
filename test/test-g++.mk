@@ -5,25 +5,28 @@
 test_gxx_srcs = \
   test-g++-simple.cc \
   test-g++-gcd.cc \
+  test-g++-static-init.cc \
+  test-g++-exception.cc \
   test-g++-stl.cc \
+  test-g++-fileio.cc \
 
 #-------------------------------------------------------------------------
 # Compile tests
 #-------------------------------------------------------------------------
 
-test_gxx_O0_objs = $(patsubst %.cc, %-O0.o, $(test_gxx_srcs))
+test_gxx_O0_objs = $(patsubst %.cc, %.o, $(test_gxx_srcs))
 test_gxx_O3_objs = $(patsubst %.cc, %-O3.o, $(test_gxx_srcs))
 test_gxx_objs    = $(test_gxx_O0_objs) $(test_gxx_O3_objs)
 
-test_gxx_O0_compile_outs = $(patsubst %.cc, %-O0-compile.out, $(test_gxx_srcs))
+test_gxx_O0_compile_outs = $(patsubst %.cc, %-compile.out, $(test_gxx_srcs))
 test_gxx_O3_compile_outs = $(patsubst %.cc, %-O3-compile.out, $(test_gxx_srcs))
 test_gxx_compile_outs = \
   $(test_gxx_O0_compile_outs) $(test_gxx_O3_compile_outs)
 
-$(test_gxx_O0_objs) : %-O0.o : %.cc $(CROSS_GXX)
+$(test_gxx_O0_objs) : %.o : %.cc $(CROSS_GXX)
 	-{ $(CROSS_GXX) -c -o $@ $<; \
     echo "*** g++ compile exit = $$?"; \
-  } | tee $*-O0-compile.out
+  } | tee $*-compile.out
 
 $(test_gxx_O3_objs) : %-O3.o : %.cc $(CROSS_GXX)
 	-{ $(CROSS_GXX) -O3 -c -o $@ $<; \
@@ -44,7 +47,7 @@ test_gxx_exes      = $(patsubst %.o, %, $(test_gxx_objs))
 test_gxx_link_outs = $(patsubst %.o, %-link.out, $(test_gxx_objs))
 
 $(test_gxx_exes) : % : %.o test-g++-main.cc $(CROSS_GXX)
-	-{ $(CROSS_GXX) -o $@ $(test_dir)/g++/test-g++-main.cc $<; \
+	-{ $(CROSS_GXX) -o $@ $(test_dir)/test-g++-main.cc $<; \
     echo "*** g++ link exit = $$?"; \
   } | tee $*-link.out
 

@@ -32,7 +32,7 @@ test_gas_exes      = $(patsubst %.s, %, $(test_gas_srcs))
 test_gas_link_outs = $(patsubst %.s, %-link.out, $(test_gas_srcs))
 
 $(test_gas_exes) : % : %.o test-gas-main.c $(CROSS_GCC)
-	-{ $(CROSS_GCC) -o $@ $(test_dir)/gas/test-gas-main.c $<; \
+	-{ $(CROSS_GCC) -o $@ $(test_dir)/test-gas-main.c $<; \
     echo "*** gcc link exit = $$?"; \
   } | tee $*-link.out
 

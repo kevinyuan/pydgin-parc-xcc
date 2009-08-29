@@ -5,26 +5,29 @@
 test_gcc_srcs = \
   test-gcc-simple.c \
   test-gcc-gcd.c \
-  test-gcc-libc.c \
   test-gcc-ext-ins.c \
+  test-gcc-static-init.c \
+  test-gcc-libc.c \
+  test-gcc-malloc.c \
+  test-gcc-fileio.c \
 
 #-------------------------------------------------------------------------
 # Compile tests
 #-------------------------------------------------------------------------
 
-test_gcc_O0_objs = $(patsubst %.c, %-O0.o, $(test_gcc_srcs))
+test_gcc_O0_objs = $(patsubst %.c, %.o, $(test_gcc_srcs))
 test_gcc_O3_objs = $(patsubst %.c, %-O3.o, $(test_gcc_srcs))
 test_gcc_objs    = $(test_gcc_O0_objs) $(test_gcc_O3_objs)
 
-test_gcc_O0_compile_outs = $(patsubst %.c, %-O0-compile.out, $(test_gcc_srcs))
+test_gcc_O0_compile_outs = $(patsubst %.c, %-compile.out, $(test_gcc_srcs))
 test_gcc_O3_compile_outs = $(patsubst %.c, %-O3-compile.out, $(test_gcc_srcs))
 test_gcc_compile_outs = \
   $(test_gcc_O0_compile_outs) $(test_gcc_O3_compile_outs)
 
-$(test_gcc_O0_objs) : %-O0.o : %.c $(CROSS_GCC)
+$(test_gcc_O0_objs) : %.o : %.c $(CROSS_GCC)
 	-{ $(CROSS_GCC) -std=gnu99 -c -o $@ $<; \
     echo "*** gcc compile exit = $$?"; \
-  } | tee $*-O0-compile.out
+  } | tee $*-compile.out
 
 $(test_gcc_O3_objs) : %-O3.o : %.c $(CROSS_GCC)
 	-{ $(CROSS_GCC) -O3 -std=gnu99 -c -o $@ $<; \
@@ -45,7 +48,7 @@ test_gcc_exes      = $(patsubst %.o, %, $(test_gcc_objs))
 test_gcc_link_outs = $(patsubst %.o, %-link.out, $(test_gcc_objs))
 
 $(test_gcc_exes) : % : %.o test-gcc-main.c $(CROSS_GCC)
-	-{ $(CROSS_GCC) -o $@ $(test_dir)/gcc/test-gcc-main.c $<; \
+	-{ $(CROSS_GCC) -o $@ $(test_dir)/test-gcc-main.c $<; \
     echo "*** gcc link exit = $$?"; \
   } | tee $*-link.out
 
