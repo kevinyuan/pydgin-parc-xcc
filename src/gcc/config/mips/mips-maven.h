@@ -268,6 +268,7 @@ enum mips_code_readable_setting
 #define TARGET_MIPS7000         (mips_arch == PROCESSOR_R7000)
 #define TARGET_MIPS9000         (mips_arch == PROCESSOR_R9000)
 #define TARGET_OCTEON           (mips_arch == PROCESSOR_OCTEON)
+#define TARGET_MAVEN            (mips_arch == PROCESSOR_MAVEN)
 #define TARGET_SB1              (mips_arch == PROCESSOR_SB1         \
                                  || mips_arch == PROCESSOR_SB1A)
 #define TARGET_SR71K            (mips_arch == PROCESSOR_SR71000)
@@ -795,10 +796,8 @@ march=*: -mhard-float}"
 
 /* ISA has instructions for managing 64-bit fp and gp regs (e.g.
    mips3). */
-#define ISA_HAS_64BIT_REGS (ISA_MIPS3                                   \
-                            || ISA_MIPS4                                \
-                            || ISA_MIPS64                               \
-                            || ISA_MIPS64R2)
+#define ISA_HAS_64BIT_REGS \
+  (ISA_MIPS3 || ISA_MIPS4 || ISA_MIPS64 || ISA_MIPS64R2)
 
 /* ISA has branch likely instructions (e.g. mips2). */
 /* Disable branchlikely for tx39 until compare rewrite. They haven't
@@ -807,32 +806,22 @@ march=*: -mhard-float}"
 
 /* ISA has a three-operand multiplication instruction (usually spelt
    "mul"). */
-#define ISA_HAS_MUL3 ((TARGET_MIPS3900                                  \
-                        || TARGET_MIPS5400                              \
-                        || TARGET_MIPS5500                              \
-                        || TARGET_MIPS7000                              \
-                        || TARGET_MIPS9000                              \
-                        || TARGET_MAD                                   \
-                        || ISA_MIPS32                                   \
-                        || ISA_MIPS32R2                                 \
-                        || ISA_MIPS64                                   \
-                        || ISA_MIPS64R2)                                \
-                       && !TARGET_MIPS16)
+#define ISA_HAS_MUL3 \
+  (   (    TARGET_MIPS3900 || TARGET_MIPS5400 || TARGET_MIPS5500 \
+        || TARGET_MIPS7000 || TARGET_MIPS9000 || TARGET_MAD \
+        || ISA_MIPS32 || ISA_MIPS32R2 || ISA_MIPS64 || ISA_MIPS64R2 ) \
+    && !TARGET_MIPS16 )
 
 /* ISA has a three-operand multiplication instruction. */
-#define ISA_HAS_DMUL3 (TARGET_64BIT                                     \
-                        && TARGET_OCTEON                                \
-                        && !TARGET_MIPS16)
+#define ISA_HAS_DMUL3 \
+  ( TARGET_64BIT && TARGET_OCTEON && !TARGET_MIPS16 )
 
 /* ISA has the floating-point conditional move instructions introduced
    in mips4. */
-#define ISA_HAS_FP_CONDMOVE ((ISA_MIPS4                                 \
-                              || ISA_MIPS32                             \
-                              || ISA_MIPS32R2                           \
-                              || ISA_MIPS64                             \
-                              || ISA_MIPS64R2)                          \
-                             && !TARGET_MIPS5500                        \
-                             && !TARGET_MIPS16)
+#define ISA_HAS_FP_CONDMOVE \
+  (   (    ISA_MIPS4 || ISA_MIPS32 || ISA_MIPS32R2 \
+        || ISA_MIPS64 || ISA_MIPS64R2 ) \
+    && !TARGET_MIPS5500 && !TARGET_MIPS16 )
 
 /* ISA has the integer conditional move instructions introduced in mips4
    and ST Loongson 2E/2F. */
@@ -843,38 +832,38 @@ march=*: -mhard-float}"
 
 /* ISA has the mips4 FP condition code instructions: FP-compare to CC,
    branch on CC, and move (both FP and non-FP) on CC. */
-#define ISA_HAS_8CC (ISA_MIPS4                                          \
-                      || ISA_MIPS32                                     \
-                      || ISA_MIPS32R2                                   \
-                      || ISA_MIPS64                                     \
-                      || ISA_MIPS64R2)
+#define ISA_HAS_8CC \
+  ( ISA_MIPS4                                                           \
+  || ISA_MIPS32                                                         \
+  || ISA_MIPS32R2                                                       \
+  || ISA_MIPS64                                                         \
+  || ISA_MIPS64R2)
 
 /* This is a catch all for other mips4 instructions: indexed load, the
    FP madd and msub instructions, and the FP recip and recip sqrt
    instructions. */
-#define ISA_HAS_FP4 ((ISA_MIPS4                                         \
-                       || (ISA_MIPS32R2 && TARGET_FLOAT64)              \
-                       || ISA_MIPS64                                    \
-                       || ISA_MIPS64R2)                                 \
-                      && !TARGET_MIPS16)
+#define ISA_HAS_FP4 \
+  ((ISA_MIPS4                                                           \
+  || (ISA_MIPS32R2 && TARGET_FLOAT64)                                   \
+  || ISA_MIPS64                                                         \
+  || ISA_MIPS64R2)                                                      \
+  && !TARGET_MIPS16)
 
 /* ISA has paired-single instructions. */
 #define ISA_HAS_PAIRED_SINGLE \
-  (ISA_MIPS32R2 || ISA_MIPS64 || ISA_MIPS64R2)
+  ((ISA_MIPS32R2 || ISA_MIPS64 || ISA_MIPS64R2))
 
 /* ISA has conditional trap instructions. */
-#define ISA_HAS_COND_TRAP (!ISA_MIPS1 \
-                           && !TARGET_MIPS16)
+#define ISA_HAS_COND_TRAP \
+  ( !ISA_MIPS1 && !TARGET_MIPS16 )
 
 /* ISA has integer multiply-accumulate instructions, madd and msub. */
-#define ISA_HAS_MADD_MSUB ((ISA_MIPS32                                  \
-                            || ISA_MIPS32R2                             \
-                            || ISA_MIPS64                               \
-                            || ISA_MIPS64R2)                            \
-                           && !TARGET_MIPS16)
+#define ISA_HAS_MADD_MSUB \
+  (    (ISA_MIPS32 || ISA_MIPS32R2 || ISA_MIPS64 || ISA_MIPS64R2) \
+    && !TARGET_MIPS16 )
 
 /* Integer multiply-accumulate instructions should be generated. */
-#define GENERATE_MADD_MSUB      (ISA_HAS_MADD_MSUB && !TUNE_74K)
+#define GENERATE_MADD_MSUB (ISA_HAS_MADD_MSUB && !TUNE_74K)
 
 /* ISA has floating-point madd and msub instructions 
    'd = a * b [+-] c'. */
@@ -892,7 +881,7 @@ march=*: -mhard-float}"
     || ISA_MIPS64                                                       \
     || ISA_MIPS64R2)                                                    \
    && (!TARGET_MIPS5400 || TARGET_MAD)                                  \
-   && !TARGET_MIPS16)
+   && !TARGET_MIPS16 )
 
 /* ISA has floating-point nmadd and nmsub instructions
    'c = -((a * b) [+-] c)'. */
@@ -900,11 +889,9 @@ march=*: -mhard-float}"
   TARGET_LOONGSON_2EF
 
 /* ISA has count leading zeroes/ones instruction (not implemented). */
-#define ISA_HAS_CLZ_CLO ((ISA_MIPS32                                    \
-                           || ISA_MIPS32R2                              \
-                           || ISA_MIPS64                                \
-                           || ISA_MIPS64R2)                             \
-                          && !TARGET_MIPS16)
+#define ISA_HAS_CLZ_CLO \
+  (    (ISA_MIPS32 || ISA_MIPS32R2 || ISA_MIPS64 || ISA_MIPS64R2) \
+    && !TARGET_MIPS16 )
 
 /* ISA has three operand multiply instructions that put
    the high part in an accumulator: mulhi or mulhiu. */
@@ -942,13 +929,13 @@ march=*: -mhard-float}"
                          && !TARGET_MIPS16)
 
 /* ISA has the "ror" (rotate right) instructions. */
-#define ISA_HAS_ROR             ((ISA_MIPS32R2                          \
+#define ISA_HAS_ROR ((ISA_MIPS32R2                                      \
                        || ISA_MIPS64R2                                  \
                        || TARGET_MIPS5400                               \
                        || TARGET_MIPS5500                               \
                        || TARGET_SR71K                                  \
                        || TARGET_SMARTMIPS)                             \
-                      && !TARGET_MIPS16)
+                      && !TARGET_MIPS16 )
 
 /* ISA has data prefetch instructions. This controls use of 'pref'. */
 #define ISA_HAS_PREFETCH ((ISA_MIPS4                                    \
@@ -957,7 +944,7 @@ march=*: -mhard-float}"
                            || ISA_MIPS32R2                              \
                            || ISA_MIPS64                                \
                            || ISA_MIPS64R2)                             \
-                          && !TARGET_MIPS16)
+                          && !TARGET_MIPS16 )
 
 /* ISA has data indexed prefetch instructions. This controls use of
    'prefx', along with TARGET_HARD_FLOAT and TARGET_DOUBLE_FLOAT. (prefx
@@ -966,7 +953,7 @@ march=*: -mhard-float}"
                             || ISA_MIPS32R2                             \
                             || ISA_MIPS64                               \
                             || ISA_MIPS64R2)                            \
-                           && !TARGET_MIPS16)
+                           && !TARGET_MIPS16 )
 
 /* True if trunc.w.s and trunc.w.d are real (not synthetic)
    instructions. Both require TARGET_HARD_FLOAT, and trunc.w.d also
@@ -976,12 +963,12 @@ march=*: -mhard-float}"
 /* ISA includes the MIPS32r2 seb and seh instructions. */
 #define ISA_HAS_SEB_SEH ((ISA_MIPS32R2                                  \
                            || ISA_MIPS64R2)                             \
-                          && !TARGET_MIPS16)
+                          && !TARGET_MIPS16 && !TARGET_MAVEN )
 
 /* ISA includes the MIPS32/64 rev 2 ext and ins instructions. */
 #define ISA_HAS_EXT_INS ((ISA_MIPS32R2                                  \
                            || ISA_MIPS64R2)                             \
-                          && !TARGET_MIPS16)
+                          && !TARGET_MIPS16 )
 
 /* ISA has instructions for accessing top part of 64-bit fp regs. */
 #define ISA_HAS_MXHC1 (TARGET_FLOAT64                                   \
@@ -1034,7 +1021,7 @@ march=*: -mhard-float}"
 /* ISA includes synci, jr.hb and jalr.hb. */
 #define ISA_HAS_SYNCI ((ISA_MIPS32R2                                    \
                         || ISA_MIPS64R2)                                \
-                       && !TARGET_MIPS16)
+                       && !TARGET_MIPS16 )
 
 /* ISA includes sync. */
 #define ISA_HAS_SYNC ((mips_isa >= 2 || TARGET_MIPS3900) && !TARGET_MIPS16)
@@ -1046,10 +1033,11 @@ march=*: -mhard-float}"
 /* ISA includes ll and sc. Note that this implies ISA_HAS_SYNC
    because the expanders use both ISA_HAS_SYNC and ISA_HAS_LL_SC
    instructions. */
-#define ISA_HAS_LL_SC (mips_isa >= 2 && !TARGET_MIPS16)
+/* Maven does not have load-linked/store-conditional */
+#define ISA_HAS_LL_SC (mips_isa >= 2 && !TARGET_MIPS16 && !TARGET_MAVEN)
 #define GENERATE_LL_SC                                                  \
   (target_flags_explicit & MASK_LLSC                                    \
-   ? TARGET_LLSC && !TARGET_MIPS16                                      \
+   ? TARGET_LLSC && !TARGET_MIPS16 && !TARGET_MAVEN                     \
    : ISA_HAS_LL_SC)
 
 /* ISA includes the baddu instruction. */

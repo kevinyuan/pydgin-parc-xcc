@@ -1661,11 +1661,12 @@ mipsisa64r2-*-elf* | mipsisa64r2el-*-elf*)
 	esac
 	;;
 
-# cbatten - Add maven target (following mipsisa32r2 above)
+# cbatten - Add maven target (following mipsisa32r2 and octeon above)
 mipsmaven*-*-elf* )
 	tm_file="elfos.h mips/mips-maven.h mips/elf.h"
 	tmake_file="mips/t-maven"
 	tm_defines="${tm_defines} MIPS_ISA_DEFAULT=33"
+	tm_defines="${tm_defines} MIPS_CPU_STRING_DEFAULT=\\\"maven\\\""
 	tm_defines="${tm_defines} MIPS_ABI_DEFAULT=ABI_EABI"
 	md_file="mips/mips-maven.md"
 	out_file="mips/mips-maven.c"

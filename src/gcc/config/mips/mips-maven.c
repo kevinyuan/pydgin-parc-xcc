@@ -696,9 +696,8 @@ static const struct mips_cpu_info mips_cpu_info_table[] =
   /* MIPS64 Release 2 processors. */
   { "octeon", PROCESSOR_OCTEON, 65, PTF_AVOID_BRANCHLIKELY },
 
-  // cbatten - Add maven target, eventually customize this to
-  // PROCESSOR_MAVEN?
-  { "maven", PROCESSOR_M4K, 33, PTF_AVOID_BRANCHLIKELY }
+  // cbatten - Add maven target
+  { "maven", PROCESSOR_MAVEN, 33, PTF_AVOID_BRANCHLIKELY }
 };
 
 /* Default costs. If these are used for a processor we should look
@@ -14638,11 +14637,10 @@ mips_set_tune( const struct mips_cpu_info* info )
   }
 }
 
-/* Implement TARGET_HANDLE_OPTION. */
-
 /*----------------------------------------------------------------------*/
 /* mips_handle_option                                                   */
 /*----------------------------------------------------------------------*/
+/* Implement TARGET_HANDLE_OPTION. */
 
 static bool
 mips_handle_option( size_t code, const char* arg, 
