@@ -64,7 +64,7 @@ test_gcc_junk += $(test_gcc_exes) $(test_gcc_link_outs)
 # Run tests
 #-------------------------------------------------------------------------
 
-test_gcc_run_outs = $(patsubst %, %-run.out, $(test_gcc_exes))
+test_gcc_run_outs += $(patsubst %, %-run.out, $(test_gcc_exes))
 
 $(test_gcc_run_outs) : %-run.out : % $(cross_run_dep)
 	-{ $(CROSS_RUN) $<; \
@@ -79,6 +79,36 @@ check-gcc-run : $(test_gcc_run_outs)
 
 test_gcc_outs += $(test_gcc_run_outs)
 test_gcc_junk += $(test_gcc_run_outs)
+
+#-------------------------------------------------------------------------
+# test-gcc-main-args
+#-------------------------------------------------------------------------
+# Since we need to run test-gcc-main-args with special command line
+# arguments to actually test argc and argv we special case building and
+# running this test.
+
+test_gcc_args_src = test-gcc-main-args.c
+test_gcc_args_exe = $(patsubst %.c, %, $(test_gcc_args_src))
+
+test_gcc_args_compile_out = \
+   $(patsubst %.c, %-compile.out, $(test_gcc_args_src))
+
+test_gcc_args_run_out = \
+  $(patsubst %.c, %-run.out, $(test_gcc_args_src))
+
+$(test_gcc_args_exe) : % : %.c $(CROSS_GCC)
+	-{ $(CROSS_GCC) -std=gnu99 -o $@ $<; \
+    echo "*** gcc compile exit = $$?"; \
+  } | tee $*-compile.out
+
+$(test_gcc_args_run_out) : %-run.out : % $(cross_run_dep)
+	-{ $(CROSS_RUN) $< apple pear mango; \
+    echo "*** run exit = $$?"; \
+  } | tee $@
+
+test_gcc_run_outs += $(test_gcc_args_run_out)
+test_gcc_outs += $(test_gcc_args_compile_out) $(test_gcc_args_run_out)
+test_gcc_junk += $(test_gcc_args_exe)
 
 #-------------------------------------------------------------------------
 # Module specific targets
