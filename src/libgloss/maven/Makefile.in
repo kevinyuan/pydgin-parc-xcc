@@ -11,6 +11,7 @@
 #-------------------------------------------------------------------------
 
 crt1_asm      = crt1.S
+linker_script = maven.ld
 syscalls_hdrs = syscalls.h
 syscalls_srcs = syscalls.c
 
@@ -55,7 +56,7 @@ install_libs_dir := $(DESTDIR)$(prefix)/$(target_alias)/lib
 
 CC            := @CC@
 CFLAGS        := @CFLAGS@
-CPPFLAGS      := -I$(obj_dir) -I$(src_dir) @CPPFLAGS@
+CPPFLAGS      := -I$(obj_dir) -I$(src_dir)
 COMPILE       := $(CC) -MMD -MP $(CPPFLAGS) $(CFLAGS)
 
 # Library creation
@@ -105,6 +106,17 @@ junk += $(syscalls_deps) $(syscalls_objs)
 
 install_hdrs += $(addprefix $(src_dir)/, $(syscalls_hdrs))
 install_libs += $(syscalls_lib)
+
+#-------------------------------------------------------------------------
+# Linker Script
+#-------------------------------------------------------------------------
+# Currently we install the maven linker script in the target lib
+# directory. This should by default be part of gcc's search path, and we
+# have also changed mips-maven.h so that the default maven spec file
+# always includes -Tmaven.ld on the linker command line. There is
+# probably a better way tot handle setting up the default linker script.
+
+install_libs += $(addprefix $(src_dir)/, $(linker_script))
 
 #-------------------------------------------------------------------------
 # Autodependency files

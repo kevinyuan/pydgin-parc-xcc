@@ -90,9 +90,13 @@ Maven Customizations
 --------------------------------------------------------------------------
 
 We have modified various configure and build scripts to enable a new
-target alias called 'maven' which expands to 'mipsmavenel-ucb-elf'
-through a modified 'scripts/config.sub' and 'src/config.sub'. If you
-want to eventually add another target and need to edit any of the
+target alias called 'maven' which expands to 'mipsmaven-ucb-elf' through
+a modified 'scripts/config.sub' and 'src/config.sub'. Currently this
+produces big endian code. To change maven to use little endian by
+default simply map 'maven' to 'mipsmavenel-ucb-elf' in the two
+config.sub files.
+
+If you want to eventually add another target and need to edit any of the
 'configure.ac', 'configure.in', 'Makefile.am' files then you will need
 to make sure you are using the right version of the autoconf tools.
 Currently it seems that gcc wants you to use exactly autoconf-2.59 and
@@ -124,6 +128,24 @@ are located:
  - 'src/gcc/config/mips/predicates-maven.md'
  - 'src/gcc/config/mips/t-maven'
 
+ - 'src/libgloss/maven/configure.ac'
+ - 'src/libgloss/maven/Makefile.in'
+ - 'src/libgloss/maven/crt1.S'
+ - 'src/libgloss/maven/syscalls.h'
+ - 'src/libgloss/maven/syscalls.c'
+ - 'src/libgloss/maven/maven.ld'
+
+The 'syscalls.h' and 'maven.ld' files in 'src/libgloss/maven' are
+installed into '${sysroot}/include/machine' and '${sysroot}/lib'
+respectively. The 'syscalls.h' header contains the maven system call
+numbers and thus be used by system level software such as a proxy
+kernel. 'mips-maven.h' has been modified to use the 'maven.ld' linker
+script by default. You can still specify a different linker script on
+the gcc command line with the '-T' option. This means that the actual
+linker in binutils usees the basic mips elf emulation and doesn't really
+do anything special for maven (and the default 'ld' linker script will
+not work).
+
 --------------------------------------------------------------------------
 Testsuite
 --------------------------------------------------------------------------
@@ -148,10 +170,11 @@ tests on the ISA simulator.
  % ../configure
 
  % make all-gas
- % make check-gas
+ % make check-gas-compile
 
  % make all-gcc
- % make check-gcc check-g++
+ % make check-gcc-compile
+ % make check-g++-compile
 
  % make
  % make check

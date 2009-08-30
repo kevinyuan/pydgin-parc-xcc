@@ -1165,8 +1165,20 @@ march=*: -mhard-float}"
 /* ??? The bestGnum will never be passed to the linker, because the gcc
   driver will interpret it as a -b option. */
 
+/* cbatten - Instead of hacking the relatively complicated shell script,
+   emulation code, linker script setup in binutils, for now we just add
+   the maven linker script to the link command line through the spec
+   file. Notice that we use %{!T:-dT maven.ld} which means only use the
+   default linker script if -T is not specified on the gcc command line.
+   Thus a user can use a different linker script with the -T option to
+   gcc, and if they don't specify a linker script then we use maven.ld.
+   We use -dT instead of -T so the linker acts as if we had specified -T
+   at the end of the command line. It searches for maven.ld in the -L
+   library path. */
+
 #ifndef LINK_SPEC
 #define LINK_SPEC "                                                     \
+%{!T:-dT maven.ld}                                                      \
 %(endian_spec)                                                          \
 %{G*} %{mips1} %{mips2} %{mips3} %{mips4} %{mips32*} %{mips64*}         \
 %{bestGnum} %{shared} %{non_shared}"

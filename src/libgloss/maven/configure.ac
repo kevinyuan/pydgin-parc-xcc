@@ -14,7 +14,7 @@ AC_CONFIG_AUX_DIR([${srcdir}/../..])
 # Checks for programs
 #-------------------------------------------------------------------------
 
-AC_PROG_CC
+LIB_AC_PROG_CC
 AC_CHECK_TOOL([AR],[ar])
 AC_CHECK_TOOL([RANLIB],[ranlib])
 AC_PROG_INSTALL

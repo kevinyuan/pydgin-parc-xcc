@@ -2209,13 +2209,13 @@ case ${target} in
   mipsmaven*-*-*)
     cross_libgloss_flags=" \
       -L src/${target_alias}/libgloss/maven \
-      -T ${srcdir}/src/libgloss/maven/maven.ld"
+      -L ${srcdir}/src/libgloss/maven"
   ;;
 
   mips*-*-*)
     cross_libgloss_flags=" \
       -L src/${target_alias}/libgloss/mips \
-      -T ${srcdir}/src/libgloss/mips/idt32.ld"
+      -L ${srcdir}/src/libgloss/maven"
   ;;
 
 esac
