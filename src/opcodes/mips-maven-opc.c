@@ -26,6 +26,18 @@
    Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA
    02110-1301, USA. */
 
+/*----------------------------------------------------------------------*/
+/* Notes by cbatten                                                     */
+/*----------------------------------------------------------------------*/
+/* Eventually we should do some serious pruning of this file. There are
+   almost 2,000 entries in the opcode table, but maven only uses a
+   fraction of them. We should eliminate those which do not apply for
+   two reasons: (1) it will catch errors earlier when the compiler is
+   generating unimplemented instructions, and (2) it will make it much
+   easier to understand what is going on. We can always copy
+   instructions from mips-opc.c if we want to implement more of the full
+   mips instruction set. */
+
 #include <stdio.h>
 #include "sysdep.h"
 #include "opcode/mips-maven.h"
@@ -199,6 +211,14 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"b",              "p",         0x10000000, 0xffff0000, UBD,                          INSN2_ALIAS,    I1                }, /* beq 0,0 */
 {"b",              "p",         0x04010000, 0xffff0000, UBD,                          INSN2_ALIAS,    I1                }, /* bgez 0 */
 {"bal",            "p",         0x04110000, 0xffff0000, UBD|WR_31,                    INSN2_ALIAS,    I1                }, /* bgezal 0*/
+
+/* New maven instructions */
+
+{"setvl",          "d,s",       0x48000001, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
+{"vlw",            "t,d",       0x60000000, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+{"vsw",            "t,d",       0x68000000, 0xffe007ff, WR_d|WR_t,                    0,              INSN_MAVEN        },
+{"stop",           "",          0x9c000000, 0xffffffff, 0,                            0,              INSN_MAVEN        },
+{"vf",             "p",         0xd0000000, 0xffff0000, UBD,                          0,              INSN_MAVEN        },
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },

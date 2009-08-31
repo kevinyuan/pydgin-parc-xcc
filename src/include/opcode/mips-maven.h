@@ -608,7 +608,7 @@ static const unsigned int mips_isa_table[] =
 /* RMI Xlr instruction */
 #define INSN_XLR                  0x00000020
 /* cbatten - maven instruction (following xlr/loongson changes) */
-#define INSN_MAVEN                      0x00000400
+#define INSN_MAVEN                0x00000400
 
 /* MIPS ISA defines, use instead of hardcoding ISA level. */
 
@@ -697,6 +697,7 @@ static const unsigned int mips_isa_table[] =
    || (cpu == CPU_OCTEON                                                \
        && ((insn)->membership & INSN_OCTEON) != 0)                      \
    || (cpu == CPU_XLR && ((insn)->membership & INSN_XLR) != 0)          \
+   || (cpu == CPU_MAVEN && ((insn)->membership & INSN_MAVEN) != 0)      \
    || 0) /* Please keep this term for easier source merging. */
 
 /* This is a list of macro expanded instructions.
