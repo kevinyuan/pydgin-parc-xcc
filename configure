@@ -605,6 +605,7 @@ enable_option_checking=no
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 subdirs
+cross_run_target_board
 cross_run_flags
 cross_run_bin
 cross_run_internal
@@ -2251,6 +2252,7 @@ case ${target} in
 
   mipsmaven*-*-*)
     cross_run_internal="no"
+    cross_run_target_board="longcheck-setup"
     # Extract the first word of "$target_alias-isa-run", so it can be a program name with args.
 set dummy $target_alias-isa-run; ac_word=$2
 { $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -2351,9 +2353,11 @@ fi
     cross_run="./${target_alias}-run"
     cross_run_bin="src/sim/mips/run"
     cross_run_flags=
+    cross_run_target_board="mips-sim"
   ;;
 
 esac
+
 
 
 

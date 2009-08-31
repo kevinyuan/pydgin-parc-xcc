@@ -1,0 +1,55 @@
+#=========================================================================
+# Dejagnu Baseboard Description for cross_run_internal="no"
+#=========================================================================
+# If our top-level configure script sets cross_run_internal="yes" then
+# we use the builtin gdb simulator and associated default mips-sim
+# dejagnu target board for longcheck. If instead our top-level
+# configure script sets cross_run_external="yes" then we are using an
+# external isa simulator, and we use this file for longcheck.
+#
+# We have edited each tool's Makefile.in so that the generated
+# site.exp includes the following:
+#
+#  if ![info exists boards_dir] { set boards_dir {} }
+#  lappend boards_dir "TOP_SCRIPT_DIR"
+#
+# Where TOP_SCRIPT_DIR points to the scripts directory in the top of
+# the cross-compiler source tree (ie. where this file is located).
+# This way when we set RUNTESTFLAGS in the top-level makefile to
+# "--target_board=cross-run-external" it will load this file.
+
+#-------------------------------------------------------------------------
+# Configure Baseboard
+#-------------------------------------------------------------------------
+
+# Load the generic configuration for this board. This will define a
+# basic set of routines needed by the tool to communicate with the
+# board. This will load $DEJAGNU_PREFIX/share/dejagnu/config/sim.exp
+# where $DEJAGNU_PREFIX is the installation location of dejagnu.
+
+load_generic_config "sim"
+
+# The toplevel makefile uses RUNTESTFLAGS="CROSS_RUN=$(CROSS_RUN)"
+# which means that the CROSS_RUN variable (which is set by configure)
+# will be propagated down to here.
+
+set_board_info sim $CROSS_RUN
+
+# The compiler used to build for this board. This has nothing to do
+# with what compiler is tested if we're testing gcc. This was in the
+# original mips-sim.exp so we are keeping it here.
+
+set_board_info compiler "[find_gcc]"
+
+# Set the compiler and linker flags. This was in the original
+# mips-sim.exp so we are keeping it here.
+
+set_board_info cflags  "[libgloss_include_flags] [newlib_include_flags]"
+set_board_info ldflags "[libgloss_link_flags] [newlib_link_flags]"
+
+# Miscellaneous configuration: can't do arguments, doesn't have real
+# signals, and is a simulator
+
+set_board_info noargs 1
+set_board_info gdb,nosignals 1
+set_board_info is_simulator 1

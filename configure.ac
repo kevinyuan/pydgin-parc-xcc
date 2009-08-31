@@ -143,6 +143,7 @@ case ${target} in
 
   mipsmaven*-*-*) 
     cross_run_internal="no"
+    cross_run_target_board="longcheck-setup"
     AC_CHECK_TARGET_TOOL([cross_run],[isa-run],[no])
     AS_IF([ test ${cross_run} = "no" ],
     [
@@ -155,6 +156,7 @@ case ${target} in
     cross_run="./${target_alias}-run"
     cross_run_bin="src/sim/mips/run"
     cross_run_flags=
+    cross_run_target_board="mips-sim"
   ;;
 
 esac
@@ -163,6 +165,7 @@ AC_SUBST([cross_run_internal])
 AC_SUBST([cross_run])
 AC_SUBST([cross_run_bin])
 AC_SUBST([cross_run_flags])
+AC_SUBST([cross_run_target_board])
 
 #-------------------------------------------------------------------------
 # Other Default Configure Arguments

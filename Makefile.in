@@ -234,11 +234,19 @@ junk += $(test_junk)
 
 test_results_dir = test-results-$(project_ver)
 
+cross_run_target_board = @cross_run_target_board@
+runtest_flags = \
+  --target_board=$(cross_run_target_board) \
+  CROSS_RUN=$(CROSS_RUN) \
+  $(RUNTESTFLAGS)
+
 longcheck longcheck% :
-	-$(MAKE) -k -C src check$* RUNTESTFLAGS="--target_board=mips-sim"
+	-$(MAKE) -k -C src check$* RUNTESTFLAGS="$(runtest_flags)"
 	rm -rf $(test_results_dir)
 	mkdir $(test_results_dir)
 	find src -name "*.sum" -exec cp {} $(test_results_dir) \;
+	find src -name "*.log" -exec cp {} $(test_results_dir) \;
+	rm -rf $(test_results_dir)/config.log
 	$(scripts_dir)/longcheck-summary.rb src \
     > $(test_results_dir)/test-results-$(project_ver).txt
 
