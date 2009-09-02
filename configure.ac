@@ -37,7 +37,7 @@ AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
 # Stow-based installation
-AX_STOW_INSTALL
+AX_PROG_STOW_INSTALL
 
 #-------------------------------------------------------------------------
 # Target

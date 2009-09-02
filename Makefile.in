@@ -255,11 +255,18 @@ longcheck longcheck% :
 #-------------------------------------------------------------------------
 # Installation
 #-------------------------------------------------------------------------
+# Note that gcc insists on installing generic documentation files into
+# the info and man/man7 subdirectories which will conflict with many
+# other packages. So we delete these subdirectories in the pkg directory
+# before actually stowing. We also delete libiberty.a which does not
+# really need to be installed.
+
+prestow_cleanup = info man/man7 lib/libiberty.a
 
 install install% :
 	$(MAKE) -C src $@ prefix=$(DESTDIR)
 ifeq ($(enable_stow),yes)
-	$(MKINSTALLDIRS) $(stow_pkg_dir)
+	rm -rf $(addprefix $(DESTDIR)/, $(prestow_cleanup))
 	cd $(stow_pkg_dir) && \
     $(STOW) --delete $(project_name)-* && \
     $(STOW) $(project_name)-$(project_ver)

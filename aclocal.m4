@@ -3,7 +3,7 @@
 #=========================================================================
 
 #-------------------------------------------------------------------------
-# AX_STOW_INSTALL
+# AX_PROG_STOW_INSTALL
 #-------------------------------------------------------------------------
 # This macro will add an --enable-stow command line option to the
 # configure script. When enabled, this macro will first check to see if
@@ -36,7 +36,7 @@
 # Author : Christopher Batten
 # Date   : August 19, 2009
 
-AC_DEFUN([AX_STOW_INSTALL],
+AC_DEFUN([AX_PROG_STOW_INSTALL],
 [
 
   # Configure command line option
