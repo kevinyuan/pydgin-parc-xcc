@@ -3479,7 +3479,7 @@ subdirs="$subdirs iq2000"
 
 subdirs="$subdirs lm32"
 
-           testsuite=yes
+	   testsuite=yes
            ;;
        m32c-*-*)
 
@@ -3508,6 +3508,15 @@ subdirs="$subdirs mcore"
 
 	   testsuite=yes
 	   ;;
+
+       # cbatten - Specifically prevent maven from building
+       # mips gdb simulator
+       mipsmaven*-*-*)
+	   testsuite=no
+	   igen=no
+	   common=no
+	   ;;
+
        mips*-*-*)
 
 

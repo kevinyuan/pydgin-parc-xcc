@@ -96,6 +96,15 @@ if test "${enable_sim}" != no; then
            AC_CONFIG_SUBDIRS(mcore)
 	   testsuite=yes
 	   ;;
+
+       # cbatten - Specifically prevent maven from building
+       # mips gdb simulator
+       mipsmaven*-*-*)
+	   testsuite=no
+	   igen=no
+	   common=no
+	   ;;
+
        mips*-*-*)
            AC_CONFIG_SUBDIRS(mips)
 	   testsuite=yes
