@@ -8,18 +8,21 @@ see ONEWS.
 http://gcc.gnu.org/gcc-4.4/index.html
                            GCC 4.4 Release Series
 
-   April 21, 2008
+   July 22, 2009
 
    The [1]GNU project and the GCC developers are pleased to announce the
-   release of GCC 4.4.0.
+   release of GCC 4.4.1.
 
-   This release is a major release, containing new features (as well as
-   many other improvements) relative to GCC 4.3.x.
+   This release is a bug-fix release, containing fixes for regressions in
+   GCC 4.4.0 relative to previous releases of GCC.
 
 Release History
 
+   GCC 4.4.1
+          July 22, 2009 ([2]changes)
+
    GCC 4.4.0
-          April 21, 2008 ([2]changes)
+          April 21, 2009 ([3]changes)
 
 References and Acknowledgements
 
@@ -27,62 +30,65 @@ References and Acknowledgements
    supports several other languages aside from C, it now stands for the
    GNU Compiler Collection.
 
-   A list of [3]successful builds is updated as new information becomes
+   A list of [4]successful builds is updated as new information becomes
    available.
 
    The GCC developers would like to thank the numerous people that have
    contributed new features, improvements, bug fixes, and other changes as
-   well as test results to GCC. This [4]amazing group of volunteers is
+   well as test results to GCC. This [5]amazing group of volunteers is
    what makes GCC successful.
 
-   For additional information about GCC please refer to the [5]GCC project
-   web site or contact the [6]GCC development mailing list.
+   For additional information about GCC please refer to the [6]GCC project
+   web site or contact the [7]GCC development mailing list.
 
-   To obtain GCC please use [7]our mirror sites or [8]our SVN server.
+   To obtain GCC please use [8]our mirror sites or [9]our SVN server.
 
-   Please send FSF & GNU inquiries & questions to [9]gnu@gnu.org. There
-   are also [10]other ways to contact the FSF.
+   Please send FSF & GNU inquiries & questions to [10]gnu@gnu.org. There
+   are also [11]other ways to contact the FSF.
 
-   These pages are maintained by [11]the GCC team.
+   These pages are maintained by [12]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [12]GCC manuals. If that fails, the
-    [13]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [13]GCC manuals. If that fails, the
+    [14]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [14]gcc@gnu.org or [15]gcc@gcc.gnu.org.
-    All of our lists have [16]public archives.
+    our developer mailing list at [15]gcc@gnu.org or [16]gcc@gcc.gnu.org.
+    All of our lists have [17]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2009-04-21 [17]Valid XHTML 1.0
+   Last modified 2009-07-22 [18]Valid XHTML 1.0
 
 References
 
    1. http://www.gnu.org/
    2. http://gcc.gnu.org/gcc-4.4/changes.html
-   3. http://gcc.gnu.org/gcc-4.4/buildstat.html
-   4. http://gcc.gnu.org/onlinedocs/gcc/Contributors.html
-   5. http://gcc.gnu.org/index.html
-   6. mailto:gcc@gcc.gnu.org
-   7. http://gcc.gnu.org/mirrors.html
-   8. http://gcc.gnu.org/svn.html
-   9. mailto:gnu@gnu.org
-  10. http://www.gnu.org/home.html#ContactInfo
-  11. http://gcc.gnu.org/about.html
-  12. http://gcc.gnu.org/onlinedocs/
-  13. mailto:gcc-help@gcc.gnu.org
-  14. mailto:gcc@gnu.org
-  15. mailto:gcc@gcc.gnu.org
-  16. http://gcc.gnu.org/lists.html
-  17. http://validator.w3.org/check/referer
+   3. http://gcc.gnu.org/gcc-4.4/changes.html
+   4. http://gcc.gnu.org/gcc-4.4/buildstat.html
+   5. http://gcc.gnu.org/onlinedocs/gcc/Contributors.html
+   6. http://gcc.gnu.org/index.html
+   7. mailto:gcc@gcc.gnu.org
+   8. http://gcc.gnu.org/mirrors.html
+   9. http://gcc.gnu.org/svn.html
+  10. mailto:gnu@gnu.org
+  11. http://www.gnu.org/home.html#ContactInfo
+  12. http://gcc.gnu.org/about.html
+  13. http://gcc.gnu.org/onlinedocs/
+  14. mailto:gcc-help@gcc.gnu.org
+  15. mailto:gcc@gnu.org
+  16. mailto:gcc@gcc.gnu.org
+  17. http://gcc.gnu.org/lists.html
+  18. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.4/changes.html
                            GCC 4.4 Release Series
                       Changes, New Features, and Fixes
+
+   The latest release in the 4.4 release series is [1]GCC 4.4.1.
 
 Caveats
 
@@ -151,13 +157,13 @@ Caveats
      * The protoize and unprotoize utilities have been obsoleted and will
        be removed in GCC 4.5. These utilities have not been installed by
        default since GCC 3.0.
-     * Support has been removed for all the [1]configurations obsoleted in
+     * Support has been removed for all the [2]configurations obsoleted in
        GCC 4.3.
      * Unknown -Wno-* options are now silently ignored by GCC if no other
        diagnostics are issued. If other diagnostics are issued, then GCC
        warns about the unknown options.
      * More information on porting to GCC 4.4 from previous versions of
-       GCC can be found in the [2]porting guide for this release.
+       GCC can be found in the [3]porting guide for this release.
 
 General Optimizer Improvements
 
@@ -185,7 +191,7 @@ General Optimizer Improvements
        to use such directives in inline assembler code. The new option
        -fno-dwarf2-cfi-asm directs the compiler to not use .cfi
        directives.
-     * The [3]Graphite branch has been merged. This merge has brought in a
+     * The [4]Graphite branch has been merged. This merge has brought in a
        new framework for loop optimizations based on a polyhedral
        intermediate representation. These optimizations apply to all the
        languages supported by GCC. The following new code transformations
@@ -292,8 +298,12 @@ New warning options
 
 New Languages and Language specific improvements
 
-     * Version 3.0 of the [4]OpenMP specification is now supported for the
+     * Version 3.0 of the [5]OpenMP specification is now supported for the
        C, C++, and Fortran compilers.
+     * New character data types, per [6]TR 19769: New character types in
+       C, are now supported for the C compiler in -std=gnu99 mode, as
+       __CHAR16_TYPE__ and __CHAR32_TYPE__, and for the C++ compiler in
+       -std=c++0x and -std=gnu++0x modes, as char16_t and char32_t too.
 
   C family
 
@@ -312,14 +322,14 @@ New Languages and Language specific improvements
      * -Wparentheses now warns about expressions such as (!x | y) and (!x
        & y). Using explicit parentheses, such as in ((!x) | y), silences
        this warning.
-     * -Wsequence-points now warns within if, while,do while and for
+     * -Wsequence-point now warns within if, while,do while and for
        conditions, and within for begin/end expressions.
      * A new option -dU is available to dump definitions of preprocessor
        macros that are tested or expanded.
 
   C++
 
-     * [5]Improved experimental support for the upcoming ISO C++ standard,
+     * [7]Improved experimental support for the upcoming ISO C++ standard,
        C++0x. Including support for auto, inline namespaces, generalized
        initializer lists, defaulted and deleted functions, new character
        types, and scoped enums.
@@ -337,23 +347,34 @@ New Languages and Language specific improvements
 
     Runtime Library (libstdc++)
 
-     * Added experimental support for the upcoming ISO C++ standard,
-       C++0x. Including support for <chrono>, <condition_variable>,
-       <cstdatomic>, <forward_list>, <initializer_list>, <mutex>, <ratio>,
-       <system_error>, and <thread>. Plus unique_ptr, <algorithm>
-       additions, exception propagation, and some support for the new
-       character types. ([6]Implementation status of C++0x library)
+     * [8]Improved experimental support for the upcoming ISO C++ standard,
+       C++0x, including:
+          + Support for <chrono>, <condition_variable>, <cstdatomic>,
+            <forward_list>, <initializer_list>, <mutex>, <ratio>,
+            <system_error>, and <thread>.
+          + unique_ptr, <algorithm> additions, exception propagation, and
+            support for the new character types in <string> and <limits>.
+          + Existing facilities now exploit initializer lists, defaulted
+            and deleted functions, and the newly implemented core C++0x
+            features.
+          + Some standard containers are more efficient together with
+            stateful allocators, i.e., no allocator is constructed on the
+            fly at element construction time.
      * Experimental support for non-standard pointer types in containers.
+     * The long standing libstdc++/30928 has been fixed for targets
+       running glibc 2.10 or later.
+     * As usual, many small and larger bug fixes, in particular quite a
+       few corner cases in <locale>.
 
   Fortran
 
      * GNU Fortran now employs libcpp directly instead of using cc1 as an
-       external preprocessor. The [7]-cpp option was added to allow manual
+       external preprocessor. The [9]-cpp option was added to allow manual
        invocation of the preprocessor without relying on filename
        extensions.
-     * The [8]-Warray-temporaries option warns about array temporaries
+     * The [10]-Warray-temporaries option warns about array temporaries
        generated by the compiler, as an aid to optimization.
-     * The [9]-fcheck-array-temporaries option has been added, printing a
+     * The [11]-fcheck-array-temporaries option has been added, printing a
        notification at run time, when an array temporary had to be created
        for an function argument. Contrary to -Warray-temporaries the
        warning is only printed if the array is noncontiguous.
@@ -375,7 +396,7 @@ New Languages and Language specific improvements
      * Fortran 2003 support has been extended:
           + Wide characters (ISO 10646, UCS-4, kind=4) and UTF-8 I/O is
             now supported (except internal reads from/writes to wide
-            strings). [10]-fbackslash now supports also \unnnn and
+            strings). [12]-fbackslash now supports also \unnnn and
             \Unnnnnnnn to enter Unicode characters.
           + Asynchronous I/O (implemented as synchronous I/O) and the
             decimal=, size=, sign=, pad=, blank=, and delim= specifiers
@@ -472,6 +493,28 @@ New Targets and Target Specific Improvements
      * GCC can now utilize the SVML library for vectorizing calls to a set
        of C99 functions if -mveclibabi=svml is specified and you link to
        an SVML ABI compatible library.
+     * On x86-64, the ABI has been changed in the following cases to
+       conform to the x86-64 ABI:
+          + Passing/returning structures with flexible array member:
+  struct foo
+    {
+      int i;
+      int flex[];
+    };
+          + Passing/returning structures with complex float member:
+  struct foo
+    {
+      int i;
+      __complex__ float f;
+    };
+          + Passing/returning unions with long double member:
+  union foo
+    {
+      int x;
+      long double ld;
+    };
+       Code built with previous versions of GCC that uses any of these is
+       not compatible with code built with GCC 4.4.0 or later.
      * A new target attribute was added to allow programmers to change the
        target options like -msse2 or -march=k8 for an individual function.
        You can also change the target options via the GCC target pragma
@@ -580,47 +623,57 @@ Documentation improvements
 
 Other significant improvements
 
-   Please send FSF & GNU inquiries & questions to [11]gnu@gnu.org. There
-   are also [12]other ways to contact the FSF.
+GCC 4.4.1
 
-   These pages are maintained by [13]the GCC team.
+   This is the [13]list of problem reports (PRs) from GCC's bug tracking
+   system that are known to be fixed in the 4.4.1 release. This list might
+   not be complete (that is, it is possible that some PRs that have been
+   fixed are not listed here).
+
+   Please send FSF & GNU inquiries & questions to [14]gnu@gnu.org. There
+   are also [15]other ways to contact the FSF.
+
+   These pages are maintained by [16]the GCC team.
 
 
     For questions related to the use of GCC, please consult these web
-    pages and the [14]GCC manuals. If that fails, the
-    [15]gcc-help@gcc.gnu.org mailing list might help.
+    pages and the [17]GCC manuals. If that fails, the
+    [18]gcc-help@gcc.gnu.org mailing list might help.
     Please send comments on these web pages and the development of GCC to
-    our developer mailing list at [16]gcc@gnu.org or [17]gcc@gcc.gnu.org.
-    All of our lists have [18]public archives.
+    our developer mailing list at [19]gcc@gnu.org or [20]gcc@gcc.gnu.org.
+    All of our lists have [21]public archives.
 
    Copyright (C) Free Software Foundation, Inc., 51 Franklin St, Fifth
    Floor, Boston, MA 02110, USA.
 
    Verbatim copying and distribution of this entire article is permitted
    in any medium, provided this notice is preserved.
-   Last modified 2009-04-19 [19]Valid XHTML 1.0
+   Last modified 2009-07-22 [22]Valid XHTML 1.0
 
 References
 
-   1. http://gcc.gnu.org/gcc-4.3/changes.html#obsoleted
-   2. http://gcc.gnu.org/gcc-4.4/porting_to.html
-   3. http://gcc.gnu.org/wiki/Graphite
-   4. http://openmp.org/wp/openmp-specifications/
-   5. http://gcc.gnu.org/gcc-4.4/cxx0x_status.html
-   6. http://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#id476343
-   7. http://gcc.gnu.org/onlinedocs/gfortran/Preprocessing-Options.html
-   8. http://gcc.gnu.org/onlinedocs/gfortran/Error-and-Warning-Options.html#index-g_t_0040code_007bWarray-temporaries_007d-125
-   9. http://gcc.gnu.org/onlinedocs/gfortran/Code-Gen-Options.html#index-g_t_0040code_007bfcheck-array-temporaries_007d-221
-  10. http://gcc.gnu.org/onlinedocs/gfortran/Fortran-Dialect-Options.html#index-g_t_0040code_007bbackslash_007d-34
-  11. mailto:gnu@gnu.org
-  12. http://www.gnu.org/home.html#ContactInfo
-  13. http://gcc.gnu.org/about.html
-  14. http://gcc.gnu.org/onlinedocs/
-  15. mailto:gcc-help@gcc.gnu.org
-  16. mailto:gcc@gnu.org
-  17. mailto:gcc@gcc.gnu.org
-  18. http://gcc.gnu.org/lists.html
-  19. http://validator.w3.org/check/referer
+   1. http://gcc.gnu.org/gcc-4.4/changes.html#4.4.1
+   2. http://gcc.gnu.org/gcc-4.3/changes.html#obsoleted
+   3. http://gcc.gnu.org/gcc-4.4/porting_to.html
+   4. http://gcc.gnu.org/wiki/Graphite
+   5. http://openmp.org/wp/openmp-specifications/
+   6. http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1040.pdf
+   7. http://gcc.gnu.org/gcc-4.4/cxx0x_status.html
+   8. http://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#id476343
+   9. http://gcc.gnu.org/onlinedocs/gfortran/Preprocessing-Options.html
+  10. http://gcc.gnu.org/onlinedocs/gfortran/Error-and-Warning-Options.html#index-g_t_0040code_007bWarray-temporaries_007d-125
+  11. http://gcc.gnu.org/onlinedocs/gfortran/Code-Gen-Options.html#index-g_t_0040code_007bfcheck-array-temporaries_007d-221
+  12. http://gcc.gnu.org/onlinedocs/gfortran/Fortran-Dialect-Options.html#index-g_t_0040code_007bbackslash_007d-34
+  13. http://gcc.gnu.org/bugzilla/buglist.cgi?bug_status=RESOLVED&resolution=FIXED&target_milestone=4.4.1
+  14. mailto:gnu@gnu.org
+  15. http://www.gnu.org/home.html#ContactInfo
+  16. http://gcc.gnu.org/about.html
+  17. http://gcc.gnu.org/onlinedocs/
+  18. mailto:gcc-help@gcc.gnu.org
+  19. mailto:gcc@gnu.org
+  20. mailto:gcc@gcc.gnu.org
+  21. http://gcc.gnu.org/lists.html
+  22. http://validator.w3.org/check/referer
 ======================================================================
 http://gcc.gnu.org/gcc-4.3/index.html
                            GCC 4.3 Release Series

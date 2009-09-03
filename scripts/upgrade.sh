@@ -56,7 +56,7 @@ upgrade_dir="$1"
 swsrc_ver=2009-07-20
 gmp_ver=4.3.1
 mpfr_ver=2.4.1
-gcc_ver=4.4.0
+gcc_ver=4.4.1
 
 if ( test "$versions" = "yes" ); then
   echo "binutils (cvs) : ${swsrc_ver}"
