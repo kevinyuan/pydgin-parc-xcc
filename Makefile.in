@@ -248,7 +248,7 @@ longcheck longcheck% :
 	find src -name "*.log" -exec cp {} $(test_results_dir) \;
 	rm -rf $(test_results_dir)/config.log
 	$(scripts_dir)/longcheck-summary.rb src \
-    > $(test_results_dir)/test-results-$(project_ver).txt
+    > $(test_results_dir)/longcheck-summary.txt
 
 .PHONY : longcheck
 
