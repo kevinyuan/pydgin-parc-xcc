@@ -16,7 +16,18 @@
 # Where TOP_SCRIPT_DIR points to the scripts directory in the top of
 # the cross-compiler source tree (ie. where this file is located).
 # This way when we set RUNTESTFLAGS in the top-level makefile to
-# "--target_board=cross-run-external" it will load this file.
+# "--target_board=longcheck-setup" it will load this file.
+#
+# The makefile will set RUNTESTFLAGS to include the following two
+# variables so that this setup will work with an arbitrary cpu type:
+#
+#  CROSS_RUN              : external simulator to run tests on
+#  CROSS_LIBGLOSS_LDFLAGS : libgloss linker flags
+#
+# Eventually we might want to bring dejagnu into the unified source
+# tree so that we can just directly modify the appropriate files. We
+# would have to make sure that the unified source tree setup correctly
+# refers to the internal copy of dejagnu though.
 
 #-------------------------------------------------------------------------
 # Configure Baseboard
@@ -29,7 +40,10 @@
 
 load_generic_config "sim"
 
-# The toplevel makefile uses RUNTESTFLAGS="CROSS_RUN=$(CROSS_RUN)"
+# The top-level makefile (roughly) uses 
+#
+#  RUNTESTFLAGS="CROSS_RUN=$(CROSS_RUN)"
+#
 # which means that the CROSS_RUN variable (which is set by configure)
 # will be propagated down to here.
 
@@ -41,11 +55,26 @@ set_board_info sim $CROSS_RUN
 
 set_board_info compiler "[find_gcc]"
 
-# Set the compiler and linker flags. This was in the original
-# mips-sim.exp so we are keeping it here.
+# Set the compiler and linker flags. The original mips-sim.exp had
+# this:
+#
+#  set_board_info cflags  "[libgloss_include_flags] [newlib_include_flags]"
+#  set_board_info ldflags "[libgloss_link_flags]    [newlib_link_flags]"
+#
+# The newlib/ligbloss stuff are actually function calls to the code in
+# dejagnu's libgloss.exp file. The newlib_include_flags and
+# newlib_link_flags will work fine because the maven newlib stuff is
+# still in the mips subdirectory, but the libgloss stuff won't work.
+# libgloss.exp is hardcoded to look in libgloss/mips. So the top-level
+# makefile (roughly) uses
+#
+#  RUNTESTFLAGS="CROSS_LIBGLOSS_LDFLAGS=$(cross_libgloss_ldflags)"
+#
+# which means that the CROSS_LIBGLOSS_LDFLAGS variable (which is set
+# by configure) will be propagated down to here.
 
-set_board_info cflags  "[libgloss_include_flags] [newlib_include_flags]"
-set_board_info ldflags "[libgloss_link_flags] [newlib_link_flags]"
+set_board_info cflags  "[newlib_include_flags]"
+set_board_info ldflags "$CROSS_LIBGLOSS_LDFLAGS [newlib_link_flags]"
 
 # Miscellaneous configuration: can't do arguments, doesn't have real
 # signals, and is a simulator

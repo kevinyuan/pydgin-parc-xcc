@@ -76,7 +76,10 @@ AC_SUBST([target_alias])
 # before doing an installation. Each shell script will include a pointer
 # to the actual binary (probably deep in the build tree) and the
 # required flags. Some of these flags (like the libgloss settings and
-# the location of the simulator) are target specific.
+# the location of the simulator) are target specific. Note that the
+# libgloss ldflags are also exported to scripts/longcheck-setup.exp so
+# that dejagnu knows about maven libgloss. We might need to something
+# similar if we want a dedicated newlib maven machine directory.
 
 # cross gas
 
@@ -99,27 +102,31 @@ AC_SUBST([cross_objdump_flags])
 case ${target} in
 
   mipsmaven*-*-*) 
-    cross_libgloss_flags=" \
+    cross_libgloss_ldflags=" \
+      -B src/${target_alias}/libgloss/maven/ \
       -L src/${target_alias}/libgloss/maven \
       -L ${srcdir}/src/libgloss/maven"
   ;;
 
   mips*-*-*) 
-    cross_libgloss_flags=" \
+    cross_libgloss_ldflags=" \
+      -B src/${target_alias}/libgloss/mips/ \
       -L src/${target_alias}/libgloss/mips \
-      -L ${srcdir}/src/libgloss/maven"
+      -L ${srcdir}/src/libgloss/mips"
   ;;
 
 esac
+
+AC_SUBST([cross_libgloss_ldflags])
 
 # cross gcc
 
 cross_gcc_bin="src/gcc/xgcc"
 cross_gcc_flags=" \
-  -B src/gcc \
+  -B src/gcc/ \
   -I ${srcdir}/src/newlib/libc/include \
   -L src/${target_alias}/newlib \
-  ${cross_libgloss_flags}"
+  ${cross_libgloss_ldflags}"
 
 AC_SUBST([cross_gcc_bin])
 AC_SUBST([cross_gcc_flags])
