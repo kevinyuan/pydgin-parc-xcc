@@ -42,48 +42,8 @@ from the sourceware CVS repository. gcc usually tests against the
 sourceware CVS repository, and at least those three packages will be
 consistent, which increases the changes that a combined source tree
 build will work. We fetch gmp and mpfr from the public releases, and the
-various gcc subpackages from the standard gnu site.
-
-The 'upgrade.sh' script in the scripts subdirectory simplifies fetching
-and setting up the combined source tree build. It can be used to upgrade
-the vendor branch by simply changing the version numbers for each
-package which are hard coded into that script. Here is the full upgrade
-process. First we need to make sure our working directory is clean and
-checkout the upstream branch.
-
- % git status 
- % git checkout upstream
-
-Now we would edit scripts/upgrade.sh with upgraded package version
-numbers and then run the upgrade script. We completely replace the
-toplevel src directory with the new upgrade subdirectory - so be sure
-that all of your work is commited before doing an upgrade!
-
- % rm -rf src
- % ./scripts/upgrade.sh src
- % mkdir build-upgrade
- % cd build-upgrade
- % ../src/configure --target=mipsisa32r2el
- % make
- % make check
- % cd ..
-
-This will build the upstream source for the 'mipsisa32r2el' target and
-verify that it works by running the full gcc testsuite. If everything
-looks okay then we commit the new version, merge into the master branch,
-and check the merge.
-
- % rm -rf build-upgrade
- % git add .
- % git commit -a -m "Upgrade to gcc-x.x.x"
- % git checkout master
- % git merge upstream
-
- % mkdir build-check-merge
- % cd build-check-merge
- % make
- % make check
- % make longcheck
+various gcc subpackages from the standard gnu site. See later in this
+'README' for information on how to upgrade the upstream branch.
 
 --------------------------------------------------------------------------
 Maven Customizations
@@ -195,3 +155,146 @@ run, which is why we have included the quicker basic 'check' target. The
 scripts subdirectory which summarizes the test results and all of the
 '.sum' files are collected in a test-summary subdirectory for easy
 archiving.
+
+--------------------------------------------------------------------------
+Upgrading Upstream Branch
+--------------------------------------------------------------------------
+
+The git repository is setup to make upgrading the cross-compiler to a
+new version of gcc (or binutils, newlib, etc) relatively simple. The
+process takes quite a while though because we need to download 500MB of
+source files, and build/test the compiler four times. I used the
+following steps to upgrade from gcc-4.4.0 to gcc-4.4.1.
+
+First do a clean clone of the cross-compiler. We are going to completely
+blow away the gcc source directory so we can fetch pristine upgraded
+sources, but this means that any changes in your working directory will
+be lost - so a clean clone is probably best.
+
+ % XCCDIR=$HOME/tmp/misc/xcc
+ % mkdir -p $XCCDIR
+ % cd $XCCDIR
+ % git clone $REMOTE_GITREPOS/projects/maven/sys/xcc.git .
+
+The first thing we need to do is generate test results before we do the
+upgrade so we can compare and make sure that the upgrade doesn't break
+anything. If you already have recent test results you can skip this
+step.
+
+ % cd $XCCDIR
+ % mkdir build-master-pre
+ % cd build-master-pre
+ % ../configure
+ % make
+ % make check
+ % make longcheck
+ % mv test-results-* $XCCDIR/test-results-master-pre
+
+The 'xcc' repo contains a remote upstream branch which we will use to
+mirror the original vendor sources. So now we need to create a local
+branch (tracking the remote branch) and check it out.
+
+ % cd $XCCDIR
+ % git branch upstream origin/upstream
+ % git checkout upstream
+
+Now that we are on the upstream branch we should go ahead and generate
+test results for this as well so we can again compare and make sure the
+upgrade doesn't break anything. If you already have test results from
+the upstream branch you can skip this step. Note that we are building
+the raw gcc sources with none of the extra maven build scripts. We grab
+the 'longcheck-summary.rb' ruby script out of the master branch to help
+generate the test results.
+
+ % cd $XCCDIR
+ % mkdir build-upstream-pre
+ % cd build-upstream-pre
+ % ../src/configure --target=mipsisa32r2el --disable-multilib --with-newlib
+ % make
+ % make -k check RUNTESTFLAGS="--target_board=mips-sim"
+ % mkdir test-results-upstream-pre
+ % find . -name "*.sum" -exec cp {} test-results-upstream-pre \;
+ % find . -name "*.log" -exec cp {} test-results-upstream-pre \;
+ % git show master:scripts/longcheck-summary.rb > longcheck-summary.rb
+ % chmod a+x longcheck-summary
+ % ./longcheck-summary.rb . > test-results-upstream-pre/longcheck-summary.txt
+ % mv test-results-upstream-pre $XCCDIR
+
+Now that we have the "pre" test results we are ready to do the upgrade
+and generate the "post" test results. The 'upgrade.sh' script in the
+'scripts' subdirectory simplifies fetching and setting up the upgraded
+combined source tree build. You will need to update the version numbers
+for each package which are hard coded into that script. Notice that we
+completely remove the 'src' directory before fetching the new versions.
+If the new version has removed files then they will be correctly removed
+in our new 'src' directory.
+
+ % cd $XCCDIR
+ % sed -i.bak 's/gcc_ver=4.4.0/gcc_ver=4.4.1/' scripts/upgrade.sh
+ % rm -rf scripts/upgrade.sh.bak
+ % rm -rf src
+ % ./scripts/upgrade.sh src
+
+Now that we have the upgraded source files we rebuild and rerun the
+testsuite to make sure that the versions of binutils, newlib, gcc, mpfr,
+and gmp are all correctly working together.
+
+ % cd $XCCDIR
+ % mkdir build-upstream-post
+ % cd build-upstream-post
+ % ../src/configure --target=mipsisa32r2el --disable-multilib --with-newlib
+ % make
+ % make -k check RUNTESTFLAGS="--target_board=mips-sim"
+ % mkdir test-results-upstream-post
+ % find . -name "*.sum" -exec cp {} test-results-upstream-post \;
+ % find . -name "*.log" -exec cp {} test-results-upstream-post \;
+ % git show master:scripts/longcheck-summary.rb > longcheck-summary.rb
+ % chmod a+x longcheck-summary
+ % ./longcheck-summary.rb . > test-results-upstream-post/longcheck-summary.txt
+ % mv test-results-upstream-post $XCCDIR
+
+Compare the test results in 'test-results-upstream-pre' with those in
+'test-results-upstream-post' and make sure everything looks good.
+Assuming there are no issues we can to commit the upgrade to the
+upstream branch.
+
+ % cd $XCCDIR
+ % git add .
+ % git commit -a -m "Upgrade to gcc-4.4.1"
+
+By using both 'git add' and 'git commit -a' we make sure that we commit
+all new files as well as files which have been removed in the upgrade.
+Now merge the upstream branch into the master branch.
+
+ % cd $XCCDIR
+ % git checkout master
+ % git merge upstream
+
+Hopefully there are no conflicts but if they are fix them and commit the
+merge. Now the final step is to build the maven cross-compiler and
+compare the "post" results to the "pre" results.
+
+ % cd $XCCDIR
+ % mkdir build-master-post
+ % cd build-master-post
+ % ../configure
+ % make
+ % make check
+ % make longcheck
+ % mv test-results-* $XCCDIR/test-results-master-post
+
+Compare the test results in 'test-results-master-pre' with those in
+'test-results-master-post' and if everything looks good then push the
+changes to the centralized git repos.
+
+ % git push
+
+You should now have four test results directories which you might want
+to save somewhere to help in future upgrades.
+
+ % cd $HOME/place/to/save/results
+ % VER=`$XCCDIR/scripts/vcs-version.sh`
+ % mkdir test-results-$VER
+ % cd test-results-$VER
+ % mv $XCCDIR/test-results-* .
+
