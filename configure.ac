@@ -81,9 +81,14 @@ AC_SUBST([target_alias])
 # that dejagnu knows about maven libgloss. We might need to something
 # similar if we want a dedicated newlib maven machine directory.
 
+# absolute build and source directories
+
+abs_build_dir=`pwd`
+abs_src_dir=`cd ${srcdir} && pwd`
+
 # cross gas
 
-cross_gas_bin="src/gas/as-new"
+cross_gas_bin="${abs_build_dir}/src/gas/as-new"
 cross_gas_flags=
 
 AC_SUBST([cross_gas_bin])
@@ -91,7 +96,7 @@ AC_SUBST([cross_gas_flags])
 
 # cross objdump
 
-cross_objdump_bin="src/binutils/objdump"
+cross_objdump_bin="${abs_build_dir}/binutils/objdump"
 cross_objdump_flags=
 
 AC_SUBST([cross_objdump_bin])
@@ -103,16 +108,16 @@ case ${target} in
 
   mipsmaven*-*-*) 
     cross_libgloss_ldflags=" \
-      -B src/${target_alias}/libgloss/maven/ \
-      -L src/${target_alias}/libgloss/maven \
-      -L ${srcdir}/src/libgloss/maven"
+      -B ${abs_build_dir}/src/${target_alias}/libgloss/maven/ \
+      -L ${abs_build_dir}/src/${target_alias}/libgloss/maven \
+      -L ${abs_src_dir}/src/libgloss/maven"
   ;;
 
   mips*-*-*) 
     cross_libgloss_ldflags=" \
-      -B src/${target_alias}/libgloss/mips/ \
-      -L src/${target_alias}/libgloss/mips \
-      -L ${srcdir}/src/libgloss/mips"
+      -B ${abs_build_dir}/src/${target_alias}/libgloss/mips/ \
+      -L ${abs_build_dir}/src/${target_alias}/libgloss/mips \
+      -L ${abs_src_dir}/src/libgloss/mips"
   ;;
 
 esac
@@ -121,11 +126,11 @@ AC_SUBST([cross_libgloss_ldflags])
 
 # cross gcc
 
-cross_gcc_bin="src/gcc/xgcc"
+cross_gcc_bin="${abs_build_dir}/src/gcc/xgcc"
 cross_gcc_flags=" \
-  -B src/gcc/ \
-  -I ${srcdir}/src/newlib/libc/include \
-  -L src/${target_alias}/newlib \
+  -B ${abs_build_dir}/src/gcc/ \
+  -I ${abs_src_dir}/src/newlib/libc/include \
+  -L ${abs_build_dir}/src/${target_alias}/newlib \
   ${cross_libgloss_ldflags}"
 
 AC_SUBST([cross_gcc_bin])
@@ -133,13 +138,13 @@ AC_SUBST([cross_gcc_flags])
 
 # cross g++
 
-cross_gxx_bin="src/gcc/g++"
+cross_gxx_bin="${abs_build_dir}/src/gcc/g++"
 cross_gxx_flags=" \
   ${cross_gcc_flags} \
-  -I ${srcdir}/src/libstdc++-v3/libsupc++ \
-  -I src/${target_alias}/libstdc++-v3/include \
-  -I src/${target_alias}/libstdc++-v3/include/${target_alias} \
-  -L src/${target_alias}/libstdc++-v3/src/.libs"
+  -I ${abs_src_dir}/src/libstdc++-v3/libsupc++ \
+  -I ${abs_build_dir}/src/${target_alias}/libstdc++-v3/include \
+  -I ${abs_build_dir}/src/${target_alias}/libstdc++-v3/include/${target_alias} \
+  -L ${abs_build_dir}/src/${target_alias}/libstdc++-v3/src/.libs"
 
 AC_SUBST([cross_gxx_bin])
 AC_SUBST([cross_gxx_flags])
@@ -161,7 +166,7 @@ case ${target} in
   mips*-*-*) 
     cross_run_internal="yes"
     cross_run="./${target_alias}-run"
-    cross_run_bin="src/sim/mips/run"
+    cross_run_bin="${abs_build_dir}/src/sim/mips/run"
     cross_run_flags=
     cross_run_target_board="mips-sim"
   ;;
