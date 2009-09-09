@@ -96,7 +96,7 @@ AC_SUBST([cross_gas_flags])
 
 # cross objdump
 
-cross_objdump_bin="${abs_build_dir}/binutils/objdump"
+cross_objdump_bin="${abs_build_dir}/src/binutils/objdump"
 cross_objdump_flags=
 
 AC_SUBST([cross_objdump_bin])
