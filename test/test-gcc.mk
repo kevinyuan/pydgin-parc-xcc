@@ -10,6 +10,7 @@ test_gcc_srcs = \
   test-gcc-libc.c \
   test-gcc-malloc.c \
   test-gcc-fileio.c \
+  test-gcc-regalloc.c \
 
 #-------------------------------------------------------------------------
 # Compile tests

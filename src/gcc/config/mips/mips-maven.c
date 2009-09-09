@@ -1106,6 +1106,9 @@ static const struct mips_rtx_cost_data mips_rtx_cost_data[PROCESSOR_MAX] =
     COSTS_N_INSNS( 72 ), /* int_div_di */
     1,                   /* branch_cost */
     4                    /* memory_latency */
+  },
+  { /* Maven */
+    DEFAULT_COSTS
   }
 };
 
