@@ -6,6 +6,7 @@ test_gas_srcs = \
   test-gas-simple.s \
   test-gas-gcd.s \
   test-gas-vcmds.s \
+  test-gas-amo.s \
 
 #-------------------------------------------------------------------------
 # Compile tests
