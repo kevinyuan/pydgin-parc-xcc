@@ -220,6 +220,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"stop",           "",          0x9c000000, 0xffffffff, 0,                            0,              INSN_MAVEN        },
 {"vf",             "p",         0xd0000000, 0xffff0000, UBD,                          0,              INSN_MAVEN        },
 
+{"amo.add",        "d,v,t",     0x9c000002, 0xfc0007ff, SM|WR_d|RD_s|RD_t,            0,              INSN_MAVEN        },
+{"amo.and",        "d,v,t",     0x9c000003, 0xfc0007ff, SM|WR_d|RD_s|RD_t,            0,              INSN_MAVEN        },
+{"amo.or",         "d,v,t",     0x9c000004, 0xfc0007ff, SM|WR_d|RD_s|RD_t,            0,              INSN_MAVEN        },
+
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },
 {"abs.d",          "D,V",       0x46200005, 0xffff003f, WR_D|RD_S|FP_D,               0,              I1                },
