@@ -1670,6 +1670,8 @@ mipsmaven*-*-elf* )
 	tm_defines="${tm_defines} MIPS_ABI_DEFAULT=ABI_EABI"
 	md_file="mips/mips-maven.md"
 	out_file="mips/mips-maven.c"
+	enable_threads="yes"
+	thread_file="bthread"
 	;;
 
 mipsisa64sr71k-*-elf*)

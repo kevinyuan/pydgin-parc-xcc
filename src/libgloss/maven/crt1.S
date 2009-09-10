@@ -49,6 +49,10 @@
         
 #include <machine/regdef.h>
 
+# this constant is used to set the size of the stack available for each
+# thread/core
+#define USER_STACK_SIZE_THREAD   0x00010000
+
 #-------------------------------------------------------------------------
 # Global symbols defined elsewhere
 #-------------------------------------------------------------------------
@@ -69,6 +73,11 @@
 _start:
 
         la      gp, _gp         # Initialize global pointer
+        
+        mfc0	v0, $15, 1	# Check to see if we are core 0
+        and		v1, v0, 0xFFFF
+        bnez	v1, _notcore0
+        nop
 
         la      v0, _fbss       # Zero out uninitialized data sections
         la      v1, _end        #  (the .sbss and .bss sections). See 
@@ -92,5 +101,25 @@ _start:
         move    a0, v0          # Call exit function with return value
         jal     exit            #  from main as exit code
         nop                     #
+        
+_notcore0:
+
+		addu	v0, $0, USER_STACK_SIZE_THREAD
+		mul		v0, v0, v1		# set up stack pointer
+		subu	sp, sp, v0
+.globl _waiting
+_waiting:
+        addu    v0, $0, $0
+3:		beqz    v0, 3b
+        nop
+        jalr	v0
+        nop
+        j		_waiting
+        nop
+        
+		
+		
+
+		
 
         .end    _start

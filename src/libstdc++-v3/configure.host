@@ -103,6 +103,9 @@ case "${host_cpu}" in
   hppa*)
     try_cpu=hppa
     ;;
+  mipsmaven*)
+    try_cpu=mipsmaven
+    ;;
   mips*)
     try_cpu=mips
     ;;
