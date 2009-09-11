@@ -43,10 +43,10 @@ stripmine_loop:
 
         setvl   $s0, $t0
         
-        vlw     $t1, $a0            # vload from vec_a
-        vlw     $t2, $a1            # vload from vec_b
+        lw.v    $t1, $a0            # vload from vec_a
+        lw.v    $t2, $a1            # vload from vec_b
         vf      add_vp              # vfetch add_vp
-        vsw     $t3, $a2            # vstore to vec_out
+        sw.v    $t3, $a2            # vstore to vec_out
 
         subu    $t0, $s0            # count = count - vlen
         addu    $t1, $s1            # vec_a_ptr   = vec_a_ptr + stride
@@ -54,7 +54,8 @@ stripmine_loop:
         addu    $t3, $s1            # vec_out_ptr = vec_out_ptr + stride
                                      
         bnez    $t0, stripmine_loop
-
+        sync.l
+        
         # Verify results on control processor
 
         lw      $t0, n              # t0 = count

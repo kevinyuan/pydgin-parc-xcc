@@ -54,6 +54,8 @@
 #define TRAP    INSN_TRAP
 #define SM      INSN_STORE_MEMORY
 
+#define SY      INSN_SYNC
+
 #define WR_d    INSN_WRITE_GPR_D
 #define WR_t    INSN_WRITE_GPR_T
 #define WR_31   INSN_WRITE_GPR_31
@@ -212,17 +214,35 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"b",              "p",         0x04010000, 0xffff0000, UBD,                          INSN2_ALIAS,    I1                }, /* bgez 0 */
 {"bal",            "p",         0x04110000, 0xffff0000, UBD|WR_31,                    INSN2_ALIAS,    I1                }, /* bgezal 0*/
 
-/* New maven instructions */
+/* Maven CP/VP SMIPS Instructions - Synchronization Instructions */
+/*  SY = INSN_SYNC which should prevent gas from reording the stop, sync, amo ops */
 
-{"setvl",          "d,s",       0x48000001, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
-{"vlw",            "t,d",       0x60000000, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
-{"vsw",            "t,d",       0x68000000, 0xffe007ff, WR_d|WR_t,                    0,              INSN_MAVEN        },
-{"stop",           "",          0x9c000000, 0xffffffff, 0,                            0,              INSN_MAVEN        },
+{"stop",           "",          0x9c000000, 0xffffffff, SY,                           0,              INSN_MAVEN        },
+{"sync.l",         "",          0x9c000001, 0xffffffff, SY,                           0,              INSN_MAVEN        },
+{"amo.add",        "d,v,t",     0x9c000002, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+{"amo.and",        "d,v,t",     0x9c000003, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+{"amo.or",         "d,v,t",     0x9c000004, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+
+/* Maven Vector-Thread Instructions - VTU Configuration Instructions */
+
+{"setvl",          "d,s",       0x48000002, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
+
+/* Maven Vector-Thread Instructions - Synchronization Instructions */
+/*  SY = INSN_SYNC which should prevent gas from reording the sync ops */
+
+{"sync.l.v",       "",          0x48000005, 0xffffffff, SY,                           0,              INSN_MAVEN        },
+{"sync.g.v",       "",          0x48200005, 0xffffffff, SY,                           0,              INSN_MAVEN        }, 
+{"sync.l.cv",      "",          0x48000006, 0xffffffff, SY,                           0,              INSN_MAVEN        },
+{"sync.g.cv",      "",          0x48200006, 0xffffffff, SY,                           0,              INSN_MAVEN        },
+
+/* Maven Vector-Thread Instructions - Vector Fetch Instructions */
+
 {"vf",             "p",         0xd0000000, 0xffff0000, UBD,                          0,              INSN_MAVEN        },
 
-{"amo.add",        "d,v,t",     0x9c000002, 0xfc0007ff, SM|WR_d|RD_s|RD_t,            0,              INSN_MAVEN        },
-{"amo.and",        "d,v,t",     0x9c000003, 0xfc0007ff, SM|WR_d|RD_s|RD_t,            0,              INSN_MAVEN        },
-{"amo.or",         "d,v,t",     0x9c000004, 0xfc0007ff, SM|WR_d|RD_s|RD_t,            0,              INSN_MAVEN        },
+/* Maven Vector-Thread Instructions - Vector Memory Instructions */
+
+{"lw.v",           "t,d",       0x60000000, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+{"sw.v",           "t,d",       0x68000000, 0xffe007ff, WR_d|WR_t,                    0,              INSN_MAVEN        },
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },
@@ -1418,7 +1438,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"sync",           "",          0x0000000f, 0xffffffff, INSN_SYNC,                    0,              I2|G1             },
 {"sync",           "1",         0x0000000f, 0xfffff83f, INSN_SYNC,                    0,              I32               },
 {"sync.p",         "",          0x0000040f, 0xffffffff, INSN_SYNC,                    0,              I2                },
-{"sync.l",         "",          0x0000000f, 0xffffffff, INSN_SYNC,                    0,              I2                },
+// cbatten - we are using sync.l to mean core local sync in maven
+//{"sync.l",         "",          0x0000000f, 0xffffffff, INSN_SYNC,                    0,              I2                },
 {"synci",          "o(b)",      0x041f0000, 0xfc1f0000, SM|RD_b,                      0,              I33               },
 {"syscall",        "",          0x0000000c, 0xffffffff, TRAP,                         0,              I1                },
 {"syscall",        "B",         0x0000000c, 0xfc00003f, TRAP,                         0,              I1                },
