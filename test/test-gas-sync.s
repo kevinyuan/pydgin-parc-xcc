@@ -12,8 +12,8 @@
         .ent    test
 
 test:
-
         sync
+        sync.g
         sync.l
         sync.l.v
         sync.g.v

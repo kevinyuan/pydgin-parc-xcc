@@ -216,9 +216,11 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 /* Maven CP/VP SMIPS Instructions - Synchronization Instructions */
 /*  SY = INSN_SYNC which should prevent gas from reording the stop, sync, amo ops */
+/*  sync.g is an alias for sync */
 
 {"stop",           "",          0x9c000000, 0xffffffff, SY,                           0,              INSN_MAVEN        },
 {"sync.l",         "",          0x9c000001, 0xffffffff, SY,                           0,              INSN_MAVEN        },
+{"sync.g",         "",          0x0000000f, 0xffffffff, INSN_SYNC,                    0,              INSN_MAVEN        },
 {"amo.add",        "d,v,t",     0x9c000002, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 {"amo.and",        "d,v,t",     0x9c000003, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 {"amo.or",         "d,v,t",     0x9c000004, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
