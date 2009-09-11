@@ -1,7 +1,10 @@
 #=========================================================================
-# Basic atomic memory instruction test
+# Basic gas test atomic memory instructions
 #=========================================================================
-
+# This test does not really attempt to try and test if the amo
+# functionality works but rather tries to make sure that the assembler
+# and the ISA simulator decode is working correctly.
+        
 #-------------------------------------------------------------------------
 # Test data and known good answers
 #-------------------------------------------------------------------------

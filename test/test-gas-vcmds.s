@@ -54,7 +54,7 @@ stripmine_loop:
         addu    $t3, $s1            # vec_out_ptr = vec_out_ptr + stride
                                      
         bnez    $t0, stripmine_loop
-        sync.l
+        sync.l.cv
         
         # Verify results on control processor
 
