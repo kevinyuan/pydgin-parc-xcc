@@ -58,10 +58,10 @@ AC_DEFUN([AX_PROG_STOW_INSTALL],
 
   # Deterimine if native build and set prefix appropriately
   
-  AS_IF([ test ${enable_stow} = "yes" ],
+  AS_IF([ test "${enable_stow}" = "yes" ],
   [
     AC_CHECK_PROGS([stow],[stow],[no])  
-    AS_IF([ test ${stow} = "no" ],
+    AS_IF([ test "${stow}" = "no" ],
     [
       AC_MSG_ERROR([Cannot use --enable-stow since stow is not available])
     ])
