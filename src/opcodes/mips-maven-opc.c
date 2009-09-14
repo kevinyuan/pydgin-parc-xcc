@@ -244,7 +244,12 @@ const struct mips_opcode mips_builtin_opcodes[] =
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
 {"lw.v",           "t,d",       0x60000000, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
-{"sw.v",           "t,d",       0x68000000, 0xffe007ff, WR_d|WR_t,                    0,              INSN_MAVEN        },
+{"lh.v",           "t,d",       0x60000020, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+{"lhu.v",          "t,d",       0x600000a0, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+{"lb.v",           "t,d",       0x60000060, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+{"lbu.v",          "t,d",       0x600000e0, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+
+{"sw.v",           "t,d",       0x68000080, 0xffe007ff, WR_d|WR_t,                    0,              INSN_MAVEN        },
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },

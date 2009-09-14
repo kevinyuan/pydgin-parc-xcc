@@ -8,6 +8,7 @@ test_gas_srcs = \
   test-gas-vcmds.s \
   test-gas-sync.s \
   test-gas-amo.s \
+  test-gas-vload.s \
 
 #-------------------------------------------------------------------------
 # Compile tests
