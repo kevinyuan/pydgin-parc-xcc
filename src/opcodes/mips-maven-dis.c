@@ -22,6 +22,8 @@
    Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
    02110-1301, USA. */
 
+/* YUNSUP: changes for the Maven compiler, this port is based on MIPS. */
+
 #include "sysdep.h"
 #include "dis-asm.h"
 #include "libiberty.h"
@@ -679,8 +681,13 @@ set_default_mips_dis_options( struct disassemble_info* info )
      and numeric FPR, CP0 register, and HWR names. */
   mips_isa = ISA_MIPS3;
   mips_processor =  CPU_R3000;
-  mips_gpr_names = mips_gpr_names_oldabi;
-  mips_fpr_names = mips_fpr_names_numeric;
+  /* YUNSUP: default is eabi. we need to use mips_gpr_names_newabi */
+  /* mips_gpr_names = mips_gpr_names_oldabi; */
+  mips_gpr_names = mips_gpr_names_newabi;
+  /* YUNSUP: we need to use GPRs for floating point instructions.
+   * default is eabi. we need to use mips_gpr_names_newabi */
+  /* mips_fpr_names = mips_fpr_names_numeric; */
+  mips_fpr_names = mips_gpr_names_newabi;
   mips_cp0_names = mips_cp0_names_numeric;
   mips_cp0sel_names = NULL;
   mips_cp0sel_names_len = 0;
@@ -1407,8 +1414,11 @@ print_insn_args( const char* d,
 
       case 'M':
         (*info->fprintf_func)
-          ( info->stream, "$fcc%ld",
-            (l >> OP_SH_CCC) & OP_MASK_CCC);
+          /* YUNSUP: we need to use GPRs for floating point conditional codes. */
+          /* ( info->stream, "$fcc%ld",
+            (l >> OP_SH_CCC) & OP_MASK_CCC); */
+          ( info->stream, "%s",
+            mips_gpr_names[(l >> OP_SH_CCC) & OP_MASK_CCC]);
         break;
 
       case 'P':

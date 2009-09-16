@@ -23,6 +23,8 @@
    Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA
    02110-1301, USA. */
 
+/* YUNSUP: changes for the Maven compiler, this port is based on MIPS. */
+
 #ifndef _MIPS_MAVEN_H_
 #define _MIPS_MAVEN_H_
 
@@ -88,8 +90,12 @@
 #define OP_SH_FS                11
 #define OP_MASK_PREFX           0x1f
 #define OP_SH_PREFX             11
-#define OP_MASK_CCC             0x7
-#define OP_SH_CCC               8
+/* YUNSUP: to accomodate GPRs for floating point conditional codes, we need
+ * two more bits. these changes make that. */
+/* #define OP_MASK_CCC             0x7 */
+/* #define OP_SH_CCC               8 */
+#define OP_MASK_CCC             0x1f
+#define OP_SH_CCC               6
 #define OP_MASK_CODE20          0xfffff  /* 20b syscall/break code. */
 #define OP_SH_CODE20            6
 #define OP_MASK_SHAMT           0x1f

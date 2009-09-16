@@ -9864,7 +9864,9 @@ do_msbd:
         case 'R': /* floating point source register */
         case 'V':
         case 'W':
-          rtype = RTYPE_FPU;
+          /* YUNSUP: search GPRs rather than FPRs */
+          /* rtype = RTYPE_FPU; */
+          rtype = RTYPE_NUM | RTYPE_GP;
           if ( is_mdmx
                || ( mips_opts.ase_mdmx
                     && ( ip->insn_mo->pinfo & FP_D )
@@ -10252,7 +10254,9 @@ do_msbd:
         case 'M': /* 3 bit compare condition code */
           rtype = RTYPE_CCC;
           if ( ip->insn_mo->pinfo & ( FP_D | FP_S ) )
-            rtype |= RTYPE_FCC;
+            /* YUNSUP: search GPRs rather than FCCs */
+            /* rtype |= RTYPE_FCC; */
+            rtype |= RTYPE_NUM | RTYPE_GP;
           if ( !reg_lookup( &s, rtype, &regno ) )
             break;
           if (( strcmp( str + strlen( str ) - 3, ".ps" ) == 0
