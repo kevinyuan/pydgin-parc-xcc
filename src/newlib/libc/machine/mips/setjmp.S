@@ -22,7 +22,9 @@
 
 #define NUM_GPRS_SAVED 11
 
-#ifdef __mips_hard_float
+/* YUNSUP: no FPRs anymore */
+/* #ifdef __mips_hard_float */
+#if 0
 #define FPR_LAYOUT		\
 	FPR_OFFSET ($f20, 0);	\
 	FPR_OFFSET ($f21, 1);	\
