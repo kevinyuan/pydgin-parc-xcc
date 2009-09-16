@@ -5059,9 +5059,13 @@
          (pc)))]
   "TARGET_HARD_FLOAT"
 {
+/* YUNSUP: since we don't save the conditional codes in $fccs, we should
+ * use integer branches. */
   return mips_output_conditional_branch (insn, operands,
-                                         MIPS_BRANCH ("b%F0", "%Z2%1"),
-                                         MIPS_BRANCH ("b%W0", "%Z2%1"));
+                                         /* MIPS_BRANCH ("b%F0", "%Z2%1"), */
+                                         /* MIPS_BRANCH ("b%W0", "%Z2%1")); */
+                                         MIPS_BRANCH ("b%C0", "%Z2$0,%1"),
+                                         MIPS_BRANCH ("b%N0", "%Z2$0,%1"));
 }
   [(set_attr "type" "branch")
    (set_attr "mode" "none")])
@@ -5076,9 +5080,13 @@
          (label_ref (match_operand 1 "" ""))))]
   "TARGET_HARD_FLOAT"
 {
+/* YUNSUP: since we don't save the conditional codes in $fccs, we should
+ * use integer branches. */
   return mips_output_conditional_branch (insn, operands,
-                                         MIPS_BRANCH ("b%W0", "%Z2%1"),
-                                         MIPS_BRANCH ("b%F0", "%Z2%1"));
+                                         /* MIPS_BRANCH ("b%W0", "%Z2%1"), */
+                                         /* MIPS_BRANCH ("b%F0", "%Z2%1")); */
+                                         MIPS_BRANCH ("b%N0", "%Z2$0,%1"),
+                                         MIPS_BRANCH ("b%C0", "%Z2$0,%1"));
 }
   [(set_attr "type" "branch")
    (set_attr "mode" "none")])

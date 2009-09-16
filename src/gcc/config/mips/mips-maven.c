@@ -25,6 +25,12 @@
    <http://www.gnu.org/licenses/>. */
 
 /* YUNSUP: changes for the Maven compiler, this port is based on MIPS. */
+/* key point is to be careful of the register aliasing between GPRs and
+ * FPRs.  now the hard register numbers for GPRs, FPRs, and STRs are the
+ * same.  go through the following macros carefully,
+ *  - FP_REGS, ST_REGS
+ *  - FP_REG_P, ST_REG_P
+ *  - FP_REG_RTX_P, ST_REG_RTX_P */
 
 #include "config.h"
 #include "system.h"
@@ -4018,6 +4024,7 @@ mips_subword( rtx op, bool high_p )
   else
     byte = 0;
 
+  /* YUNSUP: i don't know exactly, but this needs to be here. */
   if ( FP_REG_RTX_P( op ) ) {
     /* Paired FPRs are always ordered little-endian. */
     offset = ( UNITS_PER_WORD < UNITS_PER_HWFPVALUE ? high_p : byte != 0 );
@@ -4036,24 +4043,29 @@ mips_subword( rtx op, bool high_p )
 /* Return true if a 64-bit move from SRC to DEST should be split into
    two. */
 
+/* YUNSUP: dest, src are unused. */
 bool
-mips_split_64bit_move_p( rtx dest, rtx src )
+mips_split_64bit_move_p( rtx dest ATTRIBUTE_UNUSED, rtx src ATTRIBUTE_UNUSED )
 {
   if ( TARGET_64BIT )
     return false;
 
   /* FPR-to-FPR moves can be done in a single instruction, if they're
      allowed at all. */
-  if ( FP_REG_RTX_P(src) && FP_REG_RTX_P(dest) )
-    return false;
+  /* YUNSUP: since we don't have FPR-to-FPR move inst we don't need this. */
+  /* if ( FP_REG_RTX_P(src) && FP_REG_RTX_P(dest) ) */
+  // if ( 0 )
+  //   return false;
 
   /* Check for floating-point loads and stores. */
-  if ( ISA_HAS_LDC1_SDC1 ) {
-    if ( FP_REG_RTX_P(dest) && MEM_P(src) )
-      return false;
-    if ( FP_REG_RTX_P(src) && MEM_P(dest) )
-      return false;
-  }
+  /* YUNSUP: since we don't have LDC1 & SDC1 we don't need this. */
+  /* if ( ISA_HAS_LDC1_SDC1 ) { */
+  // if ( 0 ) {
+  //   if ( FP_REG_RTX_P(dest) && MEM_P(src) )
+  //     return false;
+  //   if ( FP_REG_RTX_P(src) && MEM_P(dest) )
+  //     return false;
+  // }
   return true;
 }
 
@@ -4069,34 +4081,37 @@ mips_split_doubleword_move( rtx dest, rtx src )
 {
   rtx low_dest;
 
-  if ( FP_REG_RTX_P(dest) || FP_REG_RTX_P(src) ) {
+  /* YUNSUP: since we don't have FPRs inst we don't need this. */
+  /* if ( FP_REG_RTX_P(dest) || FP_REG_RTX_P(src) ) { */
+  // if ( 0 ) {
 
-    if ( !TARGET_64BIT && GET_MODE(dest) == DImode )
-      emit_insn( gen_move_doubleword_fprdi( dest, src ) );
+  //   if ( !TARGET_64BIT && GET_MODE(dest) == DImode )
+  //     emit_insn( gen_move_doubleword_fprdi( dest, src ) );
 
-    else if ( !TARGET_64BIT && GET_MODE(dest) == DFmode )
-      emit_insn( gen_move_doubleword_fprdf( dest, src ) );
+  //   else if ( !TARGET_64BIT && GET_MODE(dest) == DFmode )
+  //     emit_insn( gen_move_doubleword_fprdf( dest, src ) );
 
-    else if ( !TARGET_64BIT && GET_MODE(dest) == V2SFmode )
-      emit_insn( gen_move_doubleword_fprv2sf( dest, src ) );
+  //   else if ( !TARGET_64BIT && GET_MODE(dest) == V2SFmode )
+  //     emit_insn( gen_move_doubleword_fprv2sf( dest, src ) );
 
-    else if ( !TARGET_64BIT && GET_MODE(dest) == V2SImode )
-      emit_insn( gen_move_doubleword_fprv2si( dest, src ) );
+  //   else if ( !TARGET_64BIT && GET_MODE(dest) == V2SImode )
+  //     emit_insn( gen_move_doubleword_fprv2si( dest, src ) );
 
-    else if ( !TARGET_64BIT && GET_MODE(dest) == V4HImode )
-      emit_insn( gen_move_doubleword_fprv4hi( dest, src ) );
+  //   else if ( !TARGET_64BIT && GET_MODE(dest) == V4HImode )
+  //     emit_insn( gen_move_doubleword_fprv4hi( dest, src ) );
 
-    else if ( !TARGET_64BIT && GET_MODE(dest) == V8QImode )
-      emit_insn( gen_move_doubleword_fprv8qi( dest, src ) );
+  //   else if ( !TARGET_64BIT && GET_MODE(dest) == V8QImode )
+  //     emit_insn( gen_move_doubleword_fprv8qi( dest, src ) );
 
-    else if ( TARGET_64BIT && GET_MODE(dest) == TFmode )
-      emit_insn( gen_move_doubleword_fprtf( dest, src ) );
+  //   else if ( TARGET_64BIT && GET_MODE(dest) == TFmode )
+  //     emit_insn( gen_move_doubleword_fprtf( dest, src ) );
 
-    else
-      gcc_unreachable();
+  //   else
+  //     gcc_unreachable();
 
-  }
-  else if ( REG_P(dest) && REGNO(dest) == MD_REG_FIRST ) {
+  // }
+  /* else if ( REG_P(dest) && REGNO(dest) == MD_REG_FIRST ) { */
+  if ( REG_P(dest) && REGNO(dest) == MD_REG_FIRST ) {
 
     low_dest = mips_subword( dest, false );
     mips_emit_move( low_dest, mips_subword( src, false ) );
@@ -4180,8 +4195,10 @@ mips_output_move( rtx dest, rtx src )
         return retval;
       }
 
-      if ( FP_REG_P( REGNO(dest) ) )
-        return dbl_p ? "dmtc1\t%z1,%0" : "mtc1\t%z1,%0";
+      /* YUNSUP: since we don't have FPRs inst we don't need this. */
+      /* if ( FP_REG_P( REGNO(dest) ) ) */
+      // if ( 0 )
+      //   return dbl_p ? "dmtc1\t%z1,%0" : "mtc1\t%z1,%0";
 
       if ( ALL_COP_REG_P( REGNO(dest) ) ) {
         static char retval[] = "dmtc_\t%z1,%0";
@@ -4222,8 +4239,10 @@ mips_output_move( rtx dest, rtx src )
         return retval;
       }
 
-      if ( FP_REG_P( REGNO(src) ) )
-        return dbl_p ? "dmfc1\t%0,%1" : "mfc1\t%0,%1";
+      /* YUNSUP: since we don't have FPRs inst we don't need this. */
+      /* if ( FP_REG_P( REGNO(src) ) ) */
+      // if ( 0 )
+      //   return dbl_p ? "dmfc1\t%0,%1" : "mfc1\t%0,%1";
 
       if ( ALL_COP_REG_P( REGNO(src) ) ) {
         static char retval[] = "dmfc_\t%0,%1";
@@ -4232,8 +4251,10 @@ mips_output_move( rtx dest, rtx src )
         return dbl_p ? retval : retval + 1;
       }
 
-      if ( ST_REG_P( REGNO(src) ) && ISA_HAS_8CC )
-        return "lui\t%0,0x3f80\n\tmovf\t%0,%.,%1";
+      /* YUNSUP: since we don't have STRs inst we don't need this. */
+      /* if ( ST_REG_P( REGNO(src) ) && ISA_HAS_8CC ) */
+      // if ( 0 )
+      //   return "lui\t%0,0x3f80\n\tmovf\t%0,%.,%1";
     }
 
     if ( src_code == MEM )
@@ -4283,21 +4304,24 @@ mips_output_move( rtx dest, rtx src )
       return dbl_p ? "dla\t%0,%1" : "la\t%0,%1";
     }
   }
-  if ( src_code == REG && FP_REG_P( REGNO(src) ) ) {
-    if ( dest_code == REG && FP_REG_P( REGNO(dest) ) ) {
-      if ( GET_MODE(dest) == V2SFmode )
-        return "mov.ps\t%0,%1";
-      else
-        return dbl_p ? "mov.d\t%0,%1" : "mov.s\t%0,%1";
-    }
+  /* YUNSUP: since we don't have FPRs inst we don't need this. */
+  /* if ( src_code == REG && FP_REG_P( REGNO(src) ) ) { */
+  // if ( 0 ) {
+  //   if ( dest_code == REG && FP_REG_P( REGNO(dest) ) ) {
+  //     if ( GET_MODE(dest) == V2SFmode )
+  //       return "mov.ps\t%0,%1";
+  //     else
+  //       return dbl_p ? "mov.d\t%0,%1" : "mov.s\t%0,%1";
+  //   }
 
-    if ( dest_code == MEM )
-      return dbl_p ? "sdc1\t%1,%0" : "swc1\t%1,%0";
-  }
-  if ( dest_code == REG && FP_REG_P( REGNO(dest) ) ) {
-    if ( src_code == MEM )
-      return dbl_p ? "ldc1\t%0,%1" : "lwc1\t%0,%1";
-  }
+  //   if ( dest_code == MEM )
+  //     return dbl_p ? "sdc1\t%1,%0" : "swc1\t%1,%0";
+  // }
+  /* if ( dest_code == REG && FP_REG_P( REGNO(dest) ) ) { */
+  // if ( 0 ) {
+  //   if ( src_code == MEM )
+  //     return dbl_p ? "ldc1\t%0,%1" : "lwc1\t%0,%1";
+  // }
   if ( dest_code == REG && ALL_COP_REG_P( REGNO(dest) ) && src_code == MEM ) {
     static char retval[] = "l_c_\t%0,%1";
 
@@ -4536,7 +4560,9 @@ mips_emit_compare( enum rtx_code *code, rtx *op0, rtx *op1, bool need_eq_ne_p )
        *CODE to the code that the branch or move should use. */
     cmp_code = *code;
     *code = mips_reversed_fp_cond( &cmp_code ) ? EQ : NE;
-    *op0 = ( ISA_HAS_8CC
+    /* YUNSUP: we use GPRs for conditional codes */
+    /* *op0 = ( ISA_HAS_8CC */
+    *op0 = ( 1
              ? gen_reg_rtx( CCmode )
              : gen_rtx_REG( CCmode, FPSW_REGNUM ) );
     *op1 = const0_rtx;
@@ -7711,7 +7737,9 @@ mips_print_operand( FILE *file, rtx op, int letter )
       break;
 
     case 'Z':
-      if ( ISA_HAS_8CC ) {
+      /* YUNSUP: we use GPRs for conditional codes */
+      /* if ( ISA_HAS_8CC ) { */
+      if ( 1 ) {
         mips_print_operand( file, op, 0 );
         fputc( ',', file );
       }
@@ -8104,22 +8132,25 @@ mips_output_dwarf_dtprel( FILE *file, int size, rtx x )
 static rtx
 mips_dwarf_register_span( rtx reg )
 {
-  rtx high, low;
+  /* YUNSUP: unused variables. */
+  /* rtx high, low; */
   enum machine_mode mode;
 
   /* By default, GCC maps increasing register numbers to increasing
      memory locations, but paired FPRs are always little-endian,
      regardless of the prevailing endianness. */
   mode = GET_MODE( reg );
-  if ( FP_REG_P( REGNO( reg ) )
+  /* YUNSUP: cleaning up FP_REG_P. */
+  /* if ( FP_REG_P( REGNO( reg ) )
        && TARGET_BIG_ENDIAN
        && MAX_FPRS_PER_FMT > 1
-       && GET_MODE_SIZE(mode) > UNITS_PER_FPREG ) {
-    gcc_assert( GET_MODE_SIZE(mode) == UNITS_PER_HWFPVALUE );
-    high = mips_subword( reg, true );
-    low = mips_subword( reg, false );
-    return gen_rtx_PARALLEL( VOIDmode, gen_rtvec( 2, high, low ) );
-  }
+       && GET_MODE_SIZE(mode) > UNITS_PER_FPREG ) { */
+  // if ( 0 ) {
+  //   gcc_assert( GET_MODE_SIZE(mode) == UNITS_PER_HWFPVALUE );
+  //   high = mips_subword( reg, true );
+  //   low = mips_subword( reg, false );
+  //   return gen_rtx_PARALLEL( VOIDmode, gen_rtvec( 2, high, low ) );
+  // }
 
   return NULL_RTX;
 }
@@ -9256,18 +9287,20 @@ mips_compute_frame_info( void )
 
   /* Find out which FPRs we need to save. This loop must iterate over
      the same space as its companion in mips_for_each_saved_reg. */
-  if ( TARGET_HARD_FLOAT )
-  {
-    for ( regno = FP_REG_FIRST; 
-          regno <= FP_REG_LAST; regno += MAX_FPRS_PER_FMT )
-    {
-      if ( mips_save_reg_p( regno ) ) {
-        frame->num_fp += MAX_FPRS_PER_FMT;
-        frame->fmask |= ~( ~0 << MAX_FPRS_PER_FMT )
-          << ( regno - FP_REG_FIRST );
-      }
-    }
-  }
+  /* YUNSUP: since we don't have seperate FPRs. */
+  /* if ( TARGET_HARD_FLOAT ) */
+  // if ( 0 )
+  // {
+  //   for ( regno = FP_REG_FIRST; 
+  //         regno <= FP_REG_LAST; regno += MAX_FPRS_PER_FMT )
+  //   {
+  //     if ( mips_save_reg_p( regno ) ) {
+  //       frame->num_fp += MAX_FPRS_PER_FMT;
+  //       frame->fmask |= ~( ~0 << MAX_FPRS_PER_FMT )
+  //         << ( regno - FP_REG_FIRST );
+  //     }
+  //   }
+  // }
 
   /* Move above the FPR save area. */
   if ( frame->num_fp > 0 ) {
@@ -9519,7 +9552,8 @@ mips_save_restore_reg( enum machine_mode mode, int regno,
 static void
 mips_for_each_saved_reg( HOST_WIDE_INT sp_offset, mips_save_restore_fn fn )
 {
-  enum machine_mode fpr_mode;
+  /* YUNSUP: fpr_mode is unused. */
+  /* enum machine_mode fpr_mode; */
   HOST_WIDE_INT offset;
   int regno;
 
@@ -9536,6 +9570,8 @@ mips_for_each_saved_reg( HOST_WIDE_INT sp_offset, mips_save_restore_fn fn )
 
   /* This loop must iterate over the same space as its companion in
      mips_compute_frame_info. */
+  /* YUNSUP: since we don't have seperate FPRs. */
+  /*
   offset = cfun->machine->frame.fp_sp_offset - sp_offset;
   fpr_mode = ( TARGET_SINGLE_FLOAT ? SFmode : DFmode );
   for ( regno = FP_REG_LAST - MAX_FPRS_PER_FMT + 1;
@@ -9545,6 +9581,7 @@ mips_for_each_saved_reg( HOST_WIDE_INT sp_offset, mips_save_restore_fn fn )
       mips_save_restore_reg( fpr_mode, regno, offset, fn );
       offset -= GET_MODE_SIZE( fpr_mode );
     }
+  */
 }
 
 /*----------------------------------------------------------------------*/
@@ -10160,8 +10197,10 @@ mips_hard_regno_mode_ok_p( unsigned int regno, enum machine_mode mode )
              && ( regno - ST_REG_FIRST ) % 4 == 0 );
 
   if ( mode == CCmode ) {
-    if ( !ISA_HAS_8CC )
-      return regno == FPSW_REGNUM;
+    /* YUNSUP: we use GPRs for conditional codes */
+    /* if ( !ISA_HAS_8CC ) */
+    // if ( 0 )
+    //   return regno == FPSW_REGNUM;
 
     return ( ST_REG_P( regno )
              || GP_REG_P( regno )
@@ -10174,35 +10213,37 @@ mips_hard_regno_mode_ok_p( unsigned int regno, enum machine_mode mode )
   if ( GP_REG_P( regno ) )
     return (( regno - GP_REG_FIRST ) & 1 ) == 0 || size <= UNITS_PER_WORD;
 
-  if ( FP_REG_P( regno )
+  /* YUNSUP: cleaning up FP_REG_P. */
+  /* if ( FP_REG_P( regno )
        && ((( regno - FP_REG_FIRST ) % MAX_FPRS_PER_FMT ) == 0
-           || ( MIN_FPRS_PER_FMT == 1 && size <= UNITS_PER_FPREG ) ) ) 
-  {
+           || ( MIN_FPRS_PER_FMT == 1 && size <= UNITS_PER_FPREG ) ) ) */
+  // if ( 0 )
+  // {
 
-    /* Allow TFmode for CCmode reloads. */
-    if ( mode == TFmode && ISA_HAS_8CC )
-      return true;
+  //   /* Allow TFmode for CCmode reloads. */
+  //   if ( mode == TFmode && ISA_HAS_8CC )
+  //     return true;
 
-    /* Allow 64-bit vector modes for Loongson-2E/2F. */
-    if ( TARGET_LOONGSON_VECTORS
-         && ( mode == V2SImode
-              || mode == V4HImode
-              || mode == V8QImode
-              || mode == DImode ) )
-      return true;
+  //   /* Allow 64-bit vector modes for Loongson-2E/2F. */
+  //   if ( TARGET_LOONGSON_VECTORS
+  //        && ( mode == V2SImode
+  //             || mode == V4HImode
+  //             || mode == V8QImode
+  //             || mode == DImode ) )
+  //     return true;
 
-    if ( mclass == MODE_FLOAT
-         || mclass == MODE_COMPLEX_FLOAT
-         || mclass == MODE_VECTOR_FLOAT )
-      return size <= UNITS_PER_FPVALUE;
+  //   if ( mclass == MODE_FLOAT
+  //        || mclass == MODE_COMPLEX_FLOAT
+  //        || mclass == MODE_VECTOR_FLOAT )
+  //     return size <= UNITS_PER_FPVALUE;
 
-    /* Allow integer modes that fit into a single register. We need to
-       put integers into FPRs when using instructions like CVT and
-       TRUNC. There's no point allowing sizes smaller than a word,
-       because the FPU has no appropriate load/store instructions. */
-    if ( mclass == MODE_INT )
-      return size >= MIN_UNITS_PER_WORD && size <= UNITS_PER_FPREG;
-  }
+  //   /* Allow integer modes that fit into a single register. We need to
+  //      put integers into FPRs when using instructions like CVT and
+  //      TRUNC. There's no point allowing sizes smaller than a word,
+  //      because the FPU has no appropriate load/store instructions. */
+  //   if ( mclass == MODE_INT )
+  //     return size >= MIN_UNITS_PER_WORD && size <= UNITS_PER_FPREG;
+  // }
 
   if ( ACC_REG_P( regno )
        && ( INTEGRAL_MODE_P(mode) || ALL_FIXED_POINT_MODE_P(mode) ) ) 
@@ -10247,17 +10288,22 @@ mips_hard_regno_mode_ok_p( unsigned int regno, enum machine_mode mode )
 /*----------------------------------------------------------------------*/
 /* Implement HARD_REGNO_NREGS. */
 
+/* YUNSUP: regno is unused. */
 unsigned int
-mips_hard_regno_nregs( int regno, enum machine_mode mode )
+mips_hard_regno_nregs( int regno ATTRIBUTE_UNUSED, enum machine_mode mode )
 {
-  if ( ST_REG_P( regno ) )
-    /* The size of FP status registers is always 4, because they only
-       hold CCmode values, and CCmode is always considered to be 4 bytes
-       wide. */
-    return ( GET_MODE_SIZE(mode) + 3 ) / 4;
+  /* YUNSUP: cleaning up ST_REG_P and FP_REG_P. we don't need this part because
+   * we are saving STRs and FPRs in GPRs. */
+  /* if ( ST_REG_P( regno ) ) */
+  // if ( 0 )
+  //   /* The size of FP status registers is always 4, because they only
+  //      hold CCmode values, and CCmode is always considered to be 4 bytes
+  //      wide. */
+  //   return ( GET_MODE_SIZE(mode) + 3 ) / 4;
 
-  if ( FP_REG_P( regno ) )
-    return ( GET_MODE_SIZE(mode) + UNITS_PER_FPREG - 1 ) / UNITS_PER_FPREG;
+  /* if ( FP_REG_P( regno ) ) */
+  // if ( 0 )
+  //   return ( GET_MODE_SIZE(mode) + UNITS_PER_FPREG - 1 ) / UNITS_PER_FPREG;
 
   /* All other registers are word-sized. */
   return ( GET_MODE_SIZE(mode) + UNITS_PER_WORD - 1 ) / UNITS_PER_WORD;
@@ -10298,7 +10344,9 @@ mips_class_max_nregs( enum reg_class rclass, enum machine_mode mode )
 bool
 mips_cannot_change_mode_class( enum machine_mode from ATTRIBUTE_UNUSED,
                                enum machine_mode to ATTRIBUTE_UNUSED,
-                               enum reg_class rclass )
+                               /* YUNSUP: we're not using anything here. */
+                               /* enum reg_class rclass ) */
+                               enum reg_class rclass ATTRIBUTE_UNUSED)
 {
   /* There are several problems with changing the modes of values in
      floating-point registers:
@@ -10321,7 +10369,9 @@ mips_cannot_change_mode_class( enum machine_mode from ATTRIBUTE_UNUSED,
        not ask it to treat the value as having a different format.
 
      We therefore disallow all mode changes involving FPRs. */
-  return reg_classes_intersect_p( FP_REGS, rclass );
+  /* YUNSUP: since we don't have a seperate FP_REGS class */
+  /* return reg_classes_intersect_p( FP_REGS, rclass ); */
+  return false;
 }
 
 /*----------------------------------------------------------------------*/
@@ -10546,13 +10596,19 @@ mips_ira_cover_classes( void )
 {
   static const enum reg_class acc_classes[] =
   {
-    GR_AND_ACC_REGS, FP_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
-    ST_REGS, LIM_REG_CLASSES
+    /* YUNSUP: since we don't have a seperate FP_REGS class */
+    /* GR_AND_ACC_REGS, FP_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
+    ST_REGS, LIM_REG_CLASSES */
+    GR_AND_ACC_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
+    LIM_REG_CLASSES
   };
   static const enum reg_class no_acc_classes[] =
   {
-    GR_REGS, FP_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
-    ST_REGS, LIM_REG_CLASSES
+    /* YUNSUP: since we don't have a seperate FP_REGS class */
+    /* GR_REGS, FP_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
+    ST_REGS, LIM_REG_CLASSES */
+    GR_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
+    LIM_REG_CLASSES
   };
 
   /* Don't allow the register allocators to use LO and HI in MIPS16
@@ -10572,9 +10628,11 @@ mips_ira_cover_classes( void )
    mode MODE. X is the source of the move if IN_P, otherwise it is the
    destination. Return NO_REGS if no secondary register is needed. */
 
+/* YUNSUP: mode and in_p is unused. */
 enum reg_class
 mips_secondary_reload_class( enum reg_class rclass,
-                             enum machine_mode mode, rtx x, bool in_p )
+                             enum machine_mode mode ATTRIBUTE_UNUSED, rtx x, 
+                             bool in_p ATTRIBUTE_UNUSED )
 {
   int regno;
 
@@ -10604,43 +10662,48 @@ mips_secondary_reload_class( enum reg_class rclass,
      floating-point register, and even then we require a scratch
      floating-point register. We can only copy a value out of a
      condition-code register into a general register. */
-  if ( reg_class_subset_p( rclass, ST_REGS ) ) {
-    if ( in_p )
-      return FP_REGS;
-    return GP_REG_P( regno ) ? NO_REGS : GR_REGS;
-  }
-  if ( ST_REG_P( regno ) ) {
-    if ( !in_p )
-      return FP_REGS;
-    return reg_class_subset_p( rclass, GR_REGS ) ? NO_REGS : GR_REGS;
-  }
+  /* YUNSUP: cleaning up ST_REGS, FP_REGS, ST_REG_P, and FP_REG_P */
+  /* if ( reg_class_subset_p( rclass, ST_REGS ) ) { */
+  // if ( 0 ) {
+  //   if ( in_p )
+  //     return FP_REGS;
+  //   return GP_REG_P( regno ) ? NO_REGS : GR_REGS;
+  // }
+  /* if ( ST_REG_P( regno ) ) { */
+  // if ( 0 ) {
+  //   if ( !in_p )
+  //     return FP_REGS;
+  //   return reg_class_subset_p( rclass, GR_REGS ) ? NO_REGS : GR_REGS;
+  // }
 
-  if ( reg_class_subset_p( rclass, FP_REGS ) ) {
-    if ( MEM_P( x )
-         && ( GET_MODE_SIZE(mode) == 4 || GET_MODE_SIZE(mode) == 8 ) )
-      /* In this case we can use lwc1, swc1, ldc1 or sdc1. We'll use
-         pairs of lwc1s and swc1s if ldc1 and sdc1 are not supported. */
-      return NO_REGS;
+  /* if ( reg_class_subset_p( rclass, FP_REGS ) ) { */
+  // if ( 0 ) {
+  //   if ( MEM_P( x )
+  //        && ( GET_MODE_SIZE(mode) == 4 || GET_MODE_SIZE(mode) == 8 ) )
+  //     /* In this case we can use lwc1, swc1, ldc1 or sdc1. We'll use
+  //        pairs of lwc1s and swc1s if ldc1 and sdc1 are not supported. */
+  //     return NO_REGS;
 
-    if ( GP_REG_P( regno ) || x == CONST0_RTX(mode) )
-      /* In this case we can use mtc1, mfc1, dmtc1 or dmfc1. */
-      return NO_REGS;
+  //   if ( GP_REG_P( regno ) || x == CONST0_RTX(mode) )
+  //     /* In this case we can use mtc1, mfc1, dmtc1 or dmfc1. */
+  //     return NO_REGS;
 
-    if ( CONSTANT_P( x ) && !targetm.cannot_force_const_mem( x ) )
-      /* We can force the constant to memory and use lwc1
-         and ldc1. As above, we will use pairs of lwc1s if
-         ldc1 is not supported. */
-      return NO_REGS;
+  //   if ( CONSTANT_P( x ) && !targetm.cannot_force_const_mem( x ) )
+  //     /* We can force the constant to memory and use lwc1
+  //        and ldc1. As above, we will use pairs of lwc1s if
+  //        ldc1 is not supported. */
+  //     return NO_REGS;
 
-    if ( FP_REG_P( regno ) && mips_mode_ok_for_mov_fmt_p(mode) )
-      /* In this case we can use mov.fmt. */
-      return NO_REGS;
+  //   if ( FP_REG_P( regno ) && mips_mode_ok_for_mov_fmt_p(mode) )
+  //     /* In this case we can use mov.fmt. */
+  //     return NO_REGS;
 
-    /* Otherwise, we need to reload through an integer register. */
-    return GR_REGS;
-  }
-  if ( FP_REG_P( regno ) )
-    return reg_class_subset_p( rclass, GR_REGS ) ? NO_REGS : GR_REGS;
+  //   /* Otherwise, we need to reload through an integer register. */
+  //   return GR_REGS;
+  // }
+  /* if ( FP_REG_P( regno ) ) */
+  // if ( 0 )
+  //   return reg_class_subset_p( rclass, GR_REGS ) ? NO_REGS : GR_REGS;
 
   return NO_REGS;
 }
@@ -14771,6 +14834,18 @@ mips_override_options( void )
   if ( mips_tune_info == 0 )
     mips_set_tune( mips_arch_info );
 
+  /* YUNSUP: maven specific options goes here. */
+
+  if ( TARGET_MAVEN ) {
+    if ( mips_abi != ABI_EABI )
+      error( "unsupported combination: maven only supports eabi" );
+    if ( ( target_flags_explicit & MASK_SINGLE_FLOAT ) != 0  && TARGET_DOUBLE_FLOAT )
+      error( "unsupported combination: maven only supports single float" );
+
+    /* YUNSUP: make -msingle-float default */
+    target_flags |= MASK_SINGLE_FLOAT;
+  }
+
   if (( target_flags_explicit & MASK_64BIT ) != 0 ) {
     /* The user specified the size of the integer registers. Make sure
       it agrees with the ABI and ISA. */
@@ -15104,22 +15179,26 @@ mips_conditional_register_usage( void )
   }
 
   if ( !TARGET_HARD_FLOAT ) {
-    int regno;
+    /* YUNSUP: unused variable. */
+    /* int regno; */
 
-    for ( regno = FP_REG_FIRST; regno <= FP_REG_LAST; regno++ )
+    /* YUNSUP: FPRs and STRs overlap GPRs. we shouldn't do this anymore. */
+    /* for ( regno = FP_REG_FIRST; regno <= FP_REG_LAST; regno++ )
       fixed_regs[regno] = call_used_regs[regno] = 1;
     for ( regno = ST_REG_FIRST; regno <= ST_REG_LAST; regno++ )
-      fixed_regs[regno] = call_used_regs[regno] = 1;
+      fixed_regs[regno] = call_used_regs[regno] = 1; */
   }
-  else if ( ! ISA_HAS_8CC ) {
-    int regno;
+  /* YUNSUP: we use GPRs for conditional codes */
+  /* else if ( ! ISA_HAS_8CC ) { */
+  // else if ( 0 ) {
+  //   int regno;
 
-    /* We only have a single condition-code register. We implement this
-       by fixing all the condition-code registers and generating RTL
-       that refers directly to ST_REG_FIRST. */
-    for ( regno = ST_REG_FIRST; regno <= ST_REG_LAST; regno++ )
-      fixed_regs[regno] = call_used_regs[regno] = 1;
-  }
+  //   /* We only have a single condition-code register. We implement this
+  //      by fixing all the condition-code registers and generating RTL
+  //      that refers directly to ST_REG_FIRST. */
+  //   for ( regno = ST_REG_FIRST; regno <= ST_REG_LAST; regno++ )
+  //     fixed_regs[regno] = call_used_regs[regno] = 1;
+  // }
 
   /* In MIPS16 mode, we permit the $t temporary registers to be used for
      reload. We prohibit the unused $s registers, since they are

@@ -19,6 +19,8 @@
 ;; along with GCC; see the file COPYING3. If not see
 ;; <http://www.gnu.org/licenses/>.
 
+;; YUNSUP: changes for the Maven compiler, this port is based on MIPS
+
 ;;------------------------------------------------------------------------
 ;; Register constraints
 ;;------------------------------------------------------------------------
@@ -30,7 +32,10 @@
 (define_register_constraint "t" "T_REG"
   "@internal")
 
-(define_register_constraint "f" "TARGET_HARD_FLOAT ? FP_REGS : NO_REGS"
+;; YUNSUP: changed the f constraint to use general purpose registers
+;; (define_register_constraint "f" "TARGET_HARD_FLOAT ? FP_REGS : NO_REGS"
+;;   "A floating-point register (if available).")
+(define_register_constraint "f" "GR_REGS"
   "A floating-point register (if available).")
 
 (define_register_constraint "h" "NO_REGS"
@@ -72,7 +77,10 @@
 (define_register_constraint "y" "GR_REGS"
   "Equivalent to @code{r}; retained for backwards compatibility.")
 
-(define_register_constraint "z" "ST_REGS"
+;; YUNSUP: changed the z contraint to use general purpose registers
+;; (define_register_constraint "z" "ST_REGS"
+;;   "A floating-point condition code register.")
+(define_register_constraint "z" "GR_REGS"
   "A floating-point condition code register.")
 
 (define_register_constraint "A" "DSP_ACC_REGS"

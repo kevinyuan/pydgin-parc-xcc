@@ -33,6 +33,8 @@
    just an R3000. The elements of the enumeration must match exactly the
    cpu attribute in the mips.md machine description. */
 
+/* YUNSUP: changes for the Maven compiler, this port is based on MIPS. */
+
 enum processor_type 
 {
   PROCESSOR_R3000,
@@ -1644,8 +1646,11 @@ march=*: -mhard-float}"
 #define GP_REG_NUM   (GP_REG_LAST - GP_REG_FIRST + 1)
 #define GP_DBX_FIRST 0
 
-#define FP_REG_FIRST 32
-#define FP_REG_LAST  63
+/* YUNSUP: floating point hack to map fprs to gprs. */
+/* #define FP_REG_FIRST 32 */
+/* #define FP_REG_LAST  63 */
+#define FP_REG_FIRST 0
+#define FP_REG_LAST  31
 #define FP_REG_NUM   (FP_REG_LAST - FP_REG_FIRST + 1)
 #define FP_DBX_FIRST ((write_symbols == DBX_DEBUG) ? 38 : 32)
 
@@ -1660,8 +1665,11 @@ march=*: -mhard-float}"
    handled by the DWARF unwinder. */
 #define DWARF_ALT_FRAME_RETURN_COLUMN 66
 
-#define ST_REG_FIRST 67
-#define ST_REG_LAST  74
+/* YUNSUP: floating point conditional code hack to map fccs to gprs. */
+/* #define ST_REG_FIRST 67 */
+/* #define ST_REG_LAST  74 */
+#define ST_REG_FIRST 0
+#define ST_REG_LAST  31
 #define ST_REG_NUM   (ST_REG_LAST - ST_REG_FIRST + 1)
 
 
@@ -1914,14 +1922,18 @@ enum reg_class
     { 0x00000008, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* V1_REG */            \
     { 0xfdffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* LEA_REGS */          \
     { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* GR_REGS */           \
-    { 0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* FP_REGS */           \
+    /* YUNSUP: change fpr mapping for FP_REGS. */ \
+    /* { 0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* FP_REGS */           \
+    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* FP_REGS */           \
     { 0x00000000, 0x00000000, 0x00000001, 0x00000000, 0x00000000, 0x00000000 }, /* MD0_REG */           \
     { 0x00000000, 0x00000000, 0x00000002, 0x00000000, 0x00000000, 0x00000000 }, /* MD1_REG */           \
     { 0x00000000, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000000 }, /* MD_REGS */           \
     { 0x00000000, 0x00000000, 0xffff0000, 0x0000ffff, 0x00000000, 0x00000000 }, /* COP0_REGS */         \
     { 0x00000000, 0x00000000, 0x00000000, 0xffff0000, 0x0000ffff, 0x00000000 }, /* COP2_REGS */         \
     { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xffff0000, 0x0000ffff }, /* COP3_REGS */         \
-    { 0x00000000, 0x00000000, 0x000007f8, 0x00000000, 0x00000000, 0x00000000 }, /* ST_REGS */           \
+    /* YUNSUP: change fcc mapping for ST_REGS. */ \
+    /* { 0x00000000, 0x00000000, 0x000007f8, 0x00000000, 0x00000000, 0x00000000 }, */ /* ST_REGS */           \
+    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* ST_REGS */           \
     { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x003f0000 }, /* DSP_ACC_REGS */      \
     { 0x00000000, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x003f0000 }, /* ACC_REGS */          \
     { 0x00000000, 0x00000000, 0x00006000, 0x00000000, 0x00000000, 0x00000000 }, /* FRAME_REGS */        \
@@ -1929,7 +1941,8 @@ enum reg_class
     { 0xffffffff, 0x00000000, 0x00000002, 0x00000000, 0x00000000, 0x00000000 }, /* GR_AND_MD1_REGS */   \
     { 0xffffffff, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000000 }, /* GR_AND_MD_REGS */    \
     { 0xffffffff, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x003f0000 }, /* GR_AND_ACC_REGS */   \
-    { 0xffffffff, 0xffffffff, 0xffff67ff, 0xffffffff, 0xffffffff, 0x0fffffff }  /* ALL_REGS */          \
+    /* { 0xffffffff, 0xffffffff, 0xffff67ff, 0xffffffff, 0xffffffff, 0x0fffffff } */ /* ALL_REGS */          \
+    { 0xffffffff, 0x00000000, 0xffff6003, 0xffffffff, 0xffffffff, 0x0fffffff }  /* ALL_REGS */          \
   }
 
 
@@ -2166,7 +2179,9 @@ enum reg_class
    point values. */
 
 #define GP_RETURN (GP_REG_FIRST + 2)
-#define FP_RETURN ((TARGET_SOFT_FLOAT) ? GP_RETURN : (FP_REG_FIRST + 0))
+/* YUNSUP: change fpr mapping for FP_REGS */
+/* #define FP_RETURN ((TARGET_SOFT_FLOAT) ? GP_RETURN : (FP_REG_FIRST + 0)) */
+#define FP_RETURN GP_RETURN
 
 #define MAX_ARGS_IN_REGISTERS (TARGET_OLDABI ? 4 : 8)
 
@@ -2174,8 +2189,11 @@ enum reg_class
 
 #define GP_ARG_FIRST (GP_REG_FIRST + 4)
 #define GP_ARG_LAST  (GP_ARG_FIRST + MAX_ARGS_IN_REGISTERS - 1)
-#define FP_ARG_FIRST (FP_REG_FIRST + 12)
-#define FP_ARG_LAST  (FP_ARG_FIRST + MAX_ARGS_IN_REGISTERS - 1)
+/* YUNSUP: change fpr mapping for FP_REGS */
+/* #define FP_ARG_FIRST (FP_REG_FIRST + 12) */
+/* #define FP_ARG_LAST  (FP_ARG_FIRST + MAX_ARGS_IN_REGISTERS - 1) */
+#define FP_ARG_FIRST GP_ARG_FIRST
+#define FP_ARG_LAST  GP_ARG_LAST
 
 #define LIBCALL_VALUE(MODE)                                             \
   mips_function_value (NULL_TREE, MODE)
