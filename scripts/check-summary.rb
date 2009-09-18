@@ -4,7 +4,7 @@
 #=========================================================================
 #
 #  -h --help          Display this message
-#  -v --[no-]verbose  Verbose mode 
+#  -v --[no-]verbose  Verbose mode
 #
 # Creates a summary of the cross-compiler simple test results. Assumes
 # .out files have -compile.out, -link.out, -run.out suffixes as
@@ -154,11 +154,21 @@ def main()
 
   # Display results of test cases
 
+  any_fail = false
+  test_module = ""
   puts ""
   for test in tests do
 
     plist = []
     flist = []
+
+    test =~ /test-([^-]+)-.*/
+    if ( $1 != test_module )
+      test_module = $1
+      puts "" if ( any_fail )
+      any_fail = false
+      puts " Test Module : #{test_module}"
+    end
 
     case ( results[test].compile_result )
       when :passed then plist.push("compile")
@@ -177,12 +187,13 @@ def main()
 
     # Output final summary
 
-    if ( !plist.empty? )
-      puts " [ passed ] #{test} (#{plist.join(",")})"
-    end
+    # if ( !plist.empty? )
+    #   puts "  [ passed ] #{test} (#{plist.join(",")})"
+    # end
 
     if ( !flist.empty? )
-      puts " [ FAILED ] #{test} (#{flist.join(",")})"
+      puts "  [ FAILED ] #{test} (#{flist.join(",")})"
+      any_fail = true
     end
 
   end
