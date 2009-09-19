@@ -102,6 +102,17 @@ cross_objdump_flags=
 AC_SUBST([cross_objdump_bin])
 AC_SUBST([cross_objdump_flags])
 
+# newlib (target specific)
+
+case ${target} in
+  mipsmaven*-*-*) 
+    cross_newlib_cppflags=" \
+      -I ${abs_src_dir}/src/newlib/libc/machine/maven"
+  ;;
+esac
+
+AC_SUBST([cross_newlib_cppflags])
+
 # libgloss (target specific)
 
 case ${target} in
@@ -129,9 +140,10 @@ AC_SUBST([cross_libgloss_ldflags])
 cross_gcc_bin="${abs_build_dir}/src/gcc/xgcc"
 cross_gcc_flags=" \
   -B ${abs_build_dir}/src/gcc/ \
+  ${cross_libgloss_ldflags} \
+  ${cross_newlib_cppflags} \
   -I ${abs_src_dir}/src/newlib/libc/include \
-  -L ${abs_build_dir}/src/${target_alias}/newlib \
-  ${cross_libgloss_ldflags}"
+  -L ${abs_build_dir}/src/${target_alias}/newlib"
 
 AC_SUBST([cross_gcc_bin])
 AC_SUBST([cross_gcc_flags])

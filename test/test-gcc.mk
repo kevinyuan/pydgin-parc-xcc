@@ -7,6 +7,7 @@ test_gcc_srcs = \
   test-gcc-gcd.c \
   test-gcc-ext-ins.c \
   test-gcc-static-init.c \
+  test-gcc-setjmp.c \
   test-gcc-libc.c \
   test-gcc-malloc.c \
   test-gcc-fileio.c \

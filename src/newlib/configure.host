@@ -196,6 +196,9 @@ case "${host_cpu}" in
   mep)
 	machine_dir=mep
 	;;
+  mipsmaven*)
+	machine_dir=maven
+	;;
   mips*)
 	machine_dir=mips
 	;;
