@@ -2600,6 +2600,10 @@ case " $target_configdirs " in
 	FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -L$$r/$(TARGET_SUBDIR)/libgloss/libnosys'
 	# Most targets have the linker script in the source directory.
 	FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -L$$s/libgloss/'"$libgloss_dir"
+	# cbatten - we also add libgloss to the include path in case
+	# there are any configuration headers (ie. machine/syscfg
+	# maven) in this target's libgloss.
+	FLAGS_FOR_TARGET=$FLAGS_FOR_TARGET' -I$$s/libgloss/'"$libgloss_dir"
 	;;
       esac
       ;;

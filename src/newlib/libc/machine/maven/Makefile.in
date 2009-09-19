@@ -19,6 +19,7 @@
 maven_hdrs = \
   machine/regdef.h \
   machine/setjmp.h \
+  machine/time.h \
 
 maven_srcs = \
   setjmp.S \
@@ -74,6 +75,7 @@ RANLIB        := @RANLIB@
 
 # Installation
 
+MKINSTALLDIRS := $(src_dir)/mk-install-dirs.sh
 INSTALL       := @INSTALL@
 INSTALL_HDR   := $(INSTALL) -m 444
 INSTALL_LIB   := $(INSTALL) -m 644
@@ -135,11 +137,13 @@ deps : $(deps)
 
 install_hdrs_wdir += $(addprefix $(src_dir)/, $(maven_hdrs))
 install-hdrs : $(install_hdrs_wdir)
+	$(MKINSTALLDIRS) $(install_hdrs_dir)
 	for file in $^; do \
     $(INSTALL_HDR) $$file $(install_hdrs_dir); \
   done
 
 install-libs : $(install_libs)
+	$(MKINSTALLDIRS) $(install_libs_dir)
 	for file in $^; do \
     $(INSTALL_LIB) $$file $(install_libs_dir); \
   done

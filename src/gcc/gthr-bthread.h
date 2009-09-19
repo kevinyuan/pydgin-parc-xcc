@@ -3,6 +3,7 @@
 
 #define __GTHREADS 1
 
+#include <machine/syscfg.h>
 //#include <bthread.h>
 // manually including bthread.h
 
@@ -19,15 +20,6 @@ typedef unsigned int __bthread_t;
 typedef unsigned int __bthread_key_t;
 typedef unsigned int __bthread_once_t;
 typedef unsigned int __bthread_mutex_t;
-
-// this should be included from somewhere else
-#define MAVEN_SYSCALL_numcores 4200
-
-#define MAVEN_SYSCALL_bthread_once            4300
-#define MAVEN_SYSCALL_bthread_key_create      4301
-#define MAVEN_SYSCALL_bthread_key_delete      4302
-#define MAVEN_SYSCALL_bthread_key_setspecific 4303
-#define MAVEN_SYSCALL_bthread_key_getspecific 4304
 
 static inline int __bthread_syscall(int num, int arg0, int arg1, int arg2)
 {
@@ -52,8 +44,8 @@ static inline int __bthread_syscall(int num, int arg0, int arg1, int arg2)
 static inline __bthread_t __bthread_self()
 {
   unsigned int procid;
-  __asm__ __volatile__ ("mfc0 %0, $15, 1" : "=r"(procid));
-  procid = procid & 0x000003FF;
+  __asm__ ( "mfc0 %0, $%1" : "=r"(procid) 
+                           : "i"(MAVEN_SYSCFG_REGDEF_COP0_CORE_ID) );
   return procid;
 }
 
@@ -61,7 +53,7 @@ static inline __bthread_t __bthread_self()
 static inline int __bthread_threading()
 {
   unsigned int temp;
-  temp = __bthread_syscall(MAVEN_SYSCALL_numcores, 0, 0, 0);
+  temp = __bthread_syscall( MAVEN_SYSCFG_SYSCALL_NUMCORES, 0, 0, 0 );
 
   return (temp > 1);
 }
@@ -87,36 +79,46 @@ static inline int __bthread_mutex_unlock(__bthread_mutex_t* lock)
   return 0;
 }
 
-static inline int __bthread_once(__bthread_once_t *__once, void (*__func)(void))
+static inline int 
+__bthread_once( __bthread_once_t* __once, void (*__func)(void) )
 {
   int ret;
-  ret = __bthread_syscall(MAVEN_SYSCALL_bthread_once, (int)__once, 0, 0);
-  if (ret == 0)
-  {
-      __func();
-  }
+  ret = __bthread_syscall( MAVEN_SYSCFG_SYSCALL_BTHREAD_ONCE, 
+                          (int)__once, 0, 0 );
+  if ( ret == 0 )
+    __func();
   return 0;
   
 }
 
-static inline int __bthread_key_create(__bthread_key_t *__key, void (*__dtor) (void *))
+static inline int 
+__bthread_key_create( __bthread_key_t* __key, void (*__dtor) (void*) )
+                                        
 {
-  return __bthread_syscall(MAVEN_SYSCALL_bthread_key_create, (int)__key, (int)__dtor, 0);
+  return __bthread_syscall( MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_CREATE, 
+                            (int)__key, (int)__dtor, 0);
 }
 
-static inline int __bthread_key_delete(__bthread_key_t __key)
+static inline int
+__bthread_key_delete( __bthread_key_t __key )
 {
-  return __bthread_syscall(MAVEN_SYSCALL_bthread_key_delete, (int)__key, 0, 0);
+  return __bthread_syscall( MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_DELETE, 
+                            (int)__key, 0, 0);
 }
 
-static inline int __bthread_setspecific(__bthread_key_t __key, const void *__ptr)
+static inline int
+__bthread_setspecific( __bthread_key_t __key, const void* __ptr )
 {
-  return __bthread_syscall(MAVEN_SYSCALL_bthread_key_setspecific, (int)__key, (int)__ptr, (int)__bthread_self());
+  return __bthread_syscall(
+           MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_SETSPECIFIC, 
+           (int)__key, (int)__ptr, (int)__bthread_self());
 }
 
-static inline void* __bthread_getspecific(__bthread_key_t __key)
+static inline void* 
+__bthread_getspecific( __bthread_key_t __key )
 {
-  return (void *) __bthread_syscall(MAVEN_SYSCALL_bthread_key_getspecific, (int)__key, __bthread_self(), 0);
+  return (void *) __bthread_syscall( MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_GETSPECIFIC, 
+                                     (int)__key, __bthread_self(), 0);
 }
 
 #ifdef __cplusplus

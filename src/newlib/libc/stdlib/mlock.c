@@ -1,11 +1,13 @@
+
 #include <sys/lock.h>
+#include <machine/syscfg.h>
 
 #pragma weak hart_self
 int hart_self()
 {
-  int procid;
-  __asm__ __volatile__ ("mfc0 %0, $15, 1" : "=r"(procid));
-  procid = procid & 0x000003FF;
+  unsigned int procid;
+  __asm__ ( "mfc0 %0, $%1" : "=r"(procid) 
+                           : "i"(MAVEN_SYSCFG_REGDEF_COP0_CORE_ID) );
   return procid;
 }
 

@@ -234,12 +234,14 @@ junk += $(test_junk)
 
 test_results_dir = test-results-$(project_ver)
 
-cross_run_target_board = @cross_run_target_board@
-cross_libgloss_ldflags = @cross_libgloss_ldflags@
+cross_run_target_board  = @cross_run_target_board@
+cross_libgloss_cppflags = @cross_libgloss_cppflags@
+cross_libgloss_ldflags  = @cross_libgloss_ldflags@
 
 longcheck longcheck% :
 	-$(MAKE) -k -C src check$* \
     RUNTESTFLAGS="--target_board=$(cross_run_target_board) \
+      CROSS_LIBGLOSS_CPPFLAGS='$(cross_libgloss_cppflags)' \
       CROSS_LIBGLOSS_LDFLAGS='$(cross_libgloss_ldflags)' \
       CROSS_RUN=$(CROSS_RUN) \
       $(RUNTESTFLAGS)"

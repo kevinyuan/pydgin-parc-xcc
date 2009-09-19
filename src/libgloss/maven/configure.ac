@@ -3,10 +3,19 @@
 #=========================================================================
 
 #-------------------------------------------------------------------------
+# Project metadata
+#-------------------------------------------------------------------------
+
+m4_define( proj_name,         [Maven libgloss])
+m4_define( proj_version,      [?])
+m4_define( proj_maintainer,   [Christopher Batten])
+m4_define( proj_abbreviation, [maven-libgloss])
+
+#-------------------------------------------------------------------------
 # Setup
 #-------------------------------------------------------------------------
 
-AC_INIT([Maven libgloss],[?],[Christopher Batten],[maven-libgloss])
+AC_INIT([proj_name],[proj_version],[proj_maintainer],[proj_abbreviation])
 AC_CONFIG_SRCDIR([crt1.S])
 AC_CONFIG_AUX_DIR([${srcdir}/../..])
 

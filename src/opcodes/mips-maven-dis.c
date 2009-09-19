@@ -386,6 +386,20 @@ static const char* const mips_hwr_names_mips3264r2[32] =
   "$24",  "$25",  "$26",  "$27",  "$28",  "$29",  "$30",  "$31"
 };
 
+/* Maven symbolic coprocessor registers */
+
+static const char* const mips_cp0_names_maven[32] =
+{
+  "$0",         "$1",         "$2",         "$3",    
+  "$4",         "$5",         "$6",         "$7",
+  "$8",         "c0_count",   "$10",        "$11",  
+  "$12",        "$13",        "$14",        "$15",
+  "$16",        "c0_coreid",  "$18",        "$19",
+  "$20",        "$21",        "$22",        "$23",
+  "$24",        "$25",        "$26",        "$27",
+  "$28",        "$29",        "$30",        "$31"
+};
+
 struct mips_abi_choice 
 {
   const char* name;
@@ -525,9 +539,9 @@ const struct mips_arch_choice mips_arch_choices[] =
   // cbatten - Add maven target (following xlr/loongson changes)
   { "maven", 1, bfd_mach_mips_maven, CPU_MAVEN,
     ISA_MIPS32R2 | INSN_MAVEN,
-    mips_cp0_names_mips3264r2,
-    mips_cp0sel_names_mips3264r2, ARRAY_SIZE(mips_cp0sel_names_mips3264r2),
-    mips_hwr_names_mips3264r2 },
+    mips_cp0_names_maven,
+    NULL, 0,
+    mips_hwr_names_numeric },
 
   /* This entry, mips16, is here only for ISA/processor selection; do
      not print its name. */
