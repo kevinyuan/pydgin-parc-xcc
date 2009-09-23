@@ -1,7 +1,7 @@
 ==========================================================================
 Maven Cross-Compiler
 ==========================================================================
-# Author  : Yunsup Lee, Christopher Batten
+# Author  : Yunsup Lee, Christopher Batten, Rimas Avizienis, Chris Celio
 # Date    : August 10, 2009
 # Version : (under version control)
 
@@ -11,8 +11,9 @@ build steps are as follows:
 
  % mkdir build
  % cd build
- % ../configure
+ % ../configure --enable-stow
  % make
+ % make install
 
 --------------------------------------------------------------------------
 Combined Source Tree Build
@@ -91,20 +92,44 @@ are located:
  - 'src/libgloss/maven/configure.ac'
  - 'src/libgloss/maven/Makefile.in'
  - 'src/libgloss/maven/crt1.S'
- - 'src/libgloss/maven/syscalls.h'
  - 'src/libgloss/maven/syscalls.c'
  - 'src/libgloss/maven/maven.ld'
+ - 'src/libgloss/maven/machine/syscfg.h'
+ - 'src/libgloss/maven/machine/*'
 
-The 'syscalls.h' and 'maven.ld' files in 'src/libgloss/maven' are
-installed into '${sysroot}/include/machine' and '${sysroot}/lib'
-respectively. The 'syscalls.h' header contains the maven system call
-numbers and thus be used by system level software such as a proxy
-kernel. 'mips-maven.h' has been modified to use the 'maven.ld' linker
-script by default. You can still specify a different linker script on
-the gcc command line with the '-T' option. This means that the actual
-linker in binutils usees the basic mips elf emulation and doesn't really
-do anything special for maven (and the default 'ld' linker script will
-not work).
+All maven specific code for newlib and libstdc++ (or at least as much as
+possible) should be kept in the libgloss maven subdirectory.
+Miscellaneous files like 'crt1.S' (C/C++ startup file), 'syscalls.c'
+(implementation of narrow newlib OS interface), and 'maven.ld' (default
+maven linker script) are kept at the top-level of the maven libgloss
+maven subdirectory. The rest of the newlib and libstdc++ customizations
+should be in the machine subdirectory. These customized headers can then
+be referenced throughout the gcc build process (and by user programs) as
+'<machine/header.h>'. One particularly important header is 'syscfg.h'
+(ie. '<machine/syscfg.h>'). This header file should include all global
+preprocessor defines which are specific to the maven setup. Examples
+include maven syscall numbers, coprocessor 0 register numbers, thread
+statck sizes, clock frequency, etc. This header should be manually kept
+in sync with the 'syscfg.h' header in the simulator directories. All of
+the headers in the 'libgloss/maven/machine' are installed into
+'${sysroot}/include/machine'.
+
+To add some maven specific code to newlib/libstdc++ we simply add a new
+'#include <machine/header.h>' somewhere in 'xcc/src/newlib/libc/include'
+and then we provide a default "place-holder" header in
+'xcc/src/newlib/libc/include/machine'. We put our customized machine
+header in 'xcc/src/libgloss/maven/machine' and then when libgloss is
+installed it will overwrite the default header. We should use this
+technique as much as possibly since it cleanly separates the maven
+specific code into one place (namely libgloss).
+
+The linker script (ie. 'maven.ld') is installed into '${sysroot}/lib'.
+'mips-maven.h' has been modified to use the 'maven.ld' linker script by
+default. You can still specify a different linker script on the gcc
+command line with the '-T' option. This means that the actual linker in
+binutils usees the basic mips elf emulation and doesn't really do
+anything special for maven (and the default 'ld' linker script will not
+work).
 
 --------------------------------------------------------------------------
 Testsuite
