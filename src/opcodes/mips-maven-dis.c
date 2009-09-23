@@ -643,6 +643,14 @@ is_newabi( Elf_Internal_Ehdr *header )
   if (( header->e_flags & EF_MIPS_ABI2 ) != 0 )
     return 1;
 
+  /* cbatten - EABI is also a new ABI. Well I think technically it is
+     different from the new ABI's but the is_newabi function is only
+     used in one place in the next fuction to determine the symbolic
+     register names. That aspect is the same so for now we just return
+     true if this is a EABI binary. */
+  if (( header->e_flags & E_MIPS_ABI_EABI32 ) != 0 )
+    return 1;
+
   return 0;
 }
 

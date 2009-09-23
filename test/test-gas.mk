@@ -9,6 +9,7 @@ test_gas_srcs = \
   test-gas-sync.s \
   test-gas-amo.s \
   test-gas-vload.s \
+  test-gas-regnames.s \
 
 #-------------------------------------------------------------------------
 # Compile tests

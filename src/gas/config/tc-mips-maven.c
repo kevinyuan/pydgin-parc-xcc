@@ -2030,7 +2030,9 @@ md_begin( void )
     symbol_table_insert( symbol_new( reg_names[i].name, reg_section,
                                      reg_names[i].num, /* & RNUM_MASK, */
                                      &zero_address_frag ) );
-  if ( HAVE_NEWABI )
+
+  /* cbatten - We want EABI to use the NEWABI symbolic register names. */
+  if ( HAVE_NEWABI || (mips_abi == EABI_ABI) )
     for ( i = 0; reg_names_n32n64[i].name; i++ )
       symbol_table_insert( symbol_new( reg_names_n32n64[i].name, reg_section,
                                        reg_names_n32n64[i].num, /* & RNUM_MASK, */

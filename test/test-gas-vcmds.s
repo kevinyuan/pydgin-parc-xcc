@@ -43,10 +43,10 @@ stripmine_loop:
 
         setvl   $s0, $t0
         
-        lw.v    $t1, $a0            # vload from vec_a
-        lw.v    $t2, $a1            # vload from vec_b
+        lw.v    $a0, $t1            # vload from vec_a
+        lw.v    $a1, $t2            # vload from vec_b
         vf      add_vp              # vfetch add_vp
-        sw.v    $t3, $a2            # vstore to vec_out
+        sw.v    $a2, $t3            # vstore to vec_out
 
         subu    $t0, $s0            # count = count - vlen
         addu    $t1, $s1            # vec_a_ptr   = vec_a_ptr + stride
@@ -65,8 +65,8 @@ stripmine_loop:
 verify_loop:
 
         lw      $t3, ($t1)          # t3 = *vec_out_ptr
-        lw      $t4, ($t2)          # t4 = *vec_ref_ptr
-        bne     $t3, $t4, fail      # if ( t3 != t4 ) goto fail
+        lw      $t8, ($t2)          # t8 = *vec_ref_ptr
+        bne     $t3, $t8, fail      # if ( t3 != t8 ) goto fail
         
         subu    $t0, 1              # count = count - 1
         addu    $t1, 4              # vec_out_ptr = vec_out_ptr + 4
@@ -77,8 +77,8 @@ verify_loop:
 
         # Pass/fail exit code
 fail:                                
-        lw      $t4, n              # return index of failure
-        subu    $v0, $t4, $t0        
+        lw      $t8, n              # return index of failure
+        subu    $v0, $t8, $t0        
         addu    $v0, 1          
         jr      $ra                  
                                      

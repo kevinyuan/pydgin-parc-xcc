@@ -2742,6 +2742,9 @@ typedef struct mips_args
 /* List the "software" names for each register. Also list the numerical
    names for $fp and $sp. */
 
+/* cbatten - Maven uses EABI whic has a4-a7,t0-t3,t8-t9 and no t4-t7.
+   For now we just hard code this changes into the names below. */
+
 #define ADDITIONAL_REGISTER_NAMES                                       \
   {                                                                     \
     { "$29",    29 + GP_REG_FIRST },                                    \
@@ -2753,14 +2756,14 @@ typedef struct mips_args
     { "a1",      5 + GP_REG_FIRST },                                    \
     { "a2",      6 + GP_REG_FIRST },                                    \
     { "a3",      7 + GP_REG_FIRST },                                    \
-    { "t0",      8 + GP_REG_FIRST },                                    \
-    { "t1",      9 + GP_REG_FIRST },                                    \
-    { "t2",     10 + GP_REG_FIRST },                                    \
-    { "t3",     11 + GP_REG_FIRST },                                    \
-    { "t4",     12 + GP_REG_FIRST },                                    \
-    { "t5",     13 + GP_REG_FIRST },                                    \
-    { "t6",     14 + GP_REG_FIRST },                                    \
-    { "t7",     15 + GP_REG_FIRST },                                    \
+    { "a4",      8 + GP_REG_FIRST },                                    \
+    { "a5",      9 + GP_REG_FIRST },                                    \
+    { "a6",     10 + GP_REG_FIRST },                                    \
+    { "a7",     11 + GP_REG_FIRST },                                    \
+    { "t0",     12 + GP_REG_FIRST },                                    \
+    { "t1",     13 + GP_REG_FIRST },                                    \
+    { "t2",     14 + GP_REG_FIRST },                                    \
+    { "t3",     15 + GP_REG_FIRST },                                    \
     { "s0",     16 + GP_REG_FIRST },                                    \
     { "s1",     17 + GP_REG_FIRST },                                    \
     { "s2",     18 + GP_REG_FIRST },                                    \

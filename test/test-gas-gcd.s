@@ -81,8 +81,8 @@ loop:
         jal     gcd_itr_sub         # v0 = gcd_itr_sub( a0, a1 )
         lw      $ra, 0($sp)         # 
                                      
-        lw      $t4, ($t3)          # t4 = *vec_ref_ptr
-        bne     $v0, $t4, fail      # if ( v0 != t4 ) goto fail
+        lw      $t8, ($t3)          # t4 = *vec_ref_ptr
+        bne     $v0, $t8, fail      # if ( v0 != t4 ) goto fail
                                      
         subu    $t0, $t0, 1         # count = count - 1
         addu    $t1, $t1, 4         # vec_a_ptr   = vec_a_ptr + 4
@@ -93,8 +93,8 @@ loop:
                                      
 fail:                                
                                      
-        lw      $t4, n              # return index of failure
-        subu    $v0, $t4, $t0        
+        lw      $t8, n              # return index of failure
+        subu    $v0, $t8, $t0        
         addu    $v0, $v0, 1          
         jr      $ra                  
                                      
