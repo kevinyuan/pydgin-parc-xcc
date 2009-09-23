@@ -1,19 +1,35 @@
 #=========================================================================
-# Makefile for maven libgloss and crt1
+# Makefile for maven libgloss
 #=========================================================================
-# This makefile builds a maven version of libgloss which includes an
-# implementation of the narrow operating system interface for newlib. It
-# also builds a simple crt1.o. Currently there is no support for
+# This makefile builds a maven version of the narrow operating system
+# interface for newlib, as well as any other maven specific system
+# headers and sources. It also builds a simple crt1.o and installs the
+# included maven linker script. Currently there is no support for
 # multilib.
 
 #-------------------------------------------------------------------------
 # Source files
 #-------------------------------------------------------------------------
 
+gloss_hdrs = \
+  machine/syscfg.h \
+  machine/syscall.h \
+  machine/types.h \
+  machine/setjmp.h \
+  machine/time.h \
+  machine/timex.h \
+  machine/resource.h \
+
+gloss_srcs = \
+  syscalls.c \
+  machine/resource.c \
+  machine/setjmp.S \
+  machine/timex.c \
+
+# Extra files
+
 crt1_asm      = crt1.S
 linker_script = maven.ld
-syscalls_srcs = syscalls.c
-install_hdrs  = machine/syscfg.h 
 
 #-------------------------------------------------------------------------
 # Basic setup
@@ -38,7 +54,7 @@ default : all
 
 obj_dir := .
 src_dir := @srcdir@
-VPATH   := $(src_dir)
+VPATH   := $(src_dir) $(src_dir)/machine
 
 # Installation directories
 
@@ -72,6 +88,50 @@ INSTALL_HDR   := $(INSTALL) -m 444
 INSTALL_LIB   := $(INSTALL) -m 644
 
 #-------------------------------------------------------------------------
+# Build Object Files from C Source
+#-------------------------------------------------------------------------
+
+gloss_c_srcs = $(filter %.c, $(gloss_srcs))
+gloss_c_objs = $(patsubst %.c, %.o, $(notdir $(gloss_c_srcs)))
+gloss_c_deps = $(patsubst %.c, %.d, $(notdir $(gloss_c_srcs)))
+
+$(gloss_c_objs) : %.o : %.c
+	$(COMPILE) -c $<
+
+objs += $(gloss_c_objs)
+deps += $(gloss_c_deps)
+junk += $(gloss_c_deps) $(gloss_c_objs)
+
+#-------------------------------------------------------------------------
+# Build Object Files from Assembly Source
+#-------------------------------------------------------------------------
+
+gloss_asm_srcs = $(filter %.S, $(gloss_srcs))
+gloss_asm_objs = $(patsubst %.S, %.o, $(notdir $(gloss_asm_srcs)))
+gloss_asm_deps = $(patsubst %.S, %.d, $(notdir $(gloss_asm_srcs)))
+
+$(gloss_asm_objs) : %.o : %.S
+	$(COMPILE) -c $<
+
+objs += $(gloss_asm_objs)
+deps += $(gloss_asm_deps)
+junk += $(gloss_asm_deps) $(gloss_asm_objs)
+
+#-------------------------------------------------------------------------
+# Build libgloss.a
+#-------------------------------------------------------------------------
+
+gloss_lib  = libgloss.a
+$(gloss_lib) : $(objs)
+	$(AR) rcv $@ $^
+	$(RANLIB) $@
+
+junk += $(gloss_libs)
+
+install_hdrs += $(gloss_hdrs)
+install_libs += $(gloss_lib)
+
+#-------------------------------------------------------------------------
 # Build crt1.o
 #-------------------------------------------------------------------------
 
@@ -87,34 +147,13 @@ junk += $(crt1_deps) $(crt1_obj)
 install_libs += $(crt1_obj)
 
 #-------------------------------------------------------------------------
-# Build libsyscalls.a
-#-------------------------------------------------------------------------
-
-syscalls_lib  = libsyscalls.a
-syscalls_objs = $(patsubst %.c, %.o, $(syscalls_srcs))
-syscalls_deps = $(patsubst %.c, %.d, $(syscalls_srcs))
-
-$(syscalls_objs) : %.o : %.c
-	$(COMPILE) -c $<
-
-$(syscalls_lib) : $(syscalls_objs)
-	$(AR) rcv $@ $^
-	$(RANLIB) $@
-
-libs += $(syscalls_lib)
-deps += $(syscalls_deps)
-junk += $(syscalls_deps) $(syscalls_objs)
-
-install_libs += $(syscalls_lib)
-
-#-------------------------------------------------------------------------
 # Linker Script
 #-------------------------------------------------------------------------
 # Currently we install the maven linker script in the target lib
 # directory. This should by default be part of gcc's search path, and we
 # have also changed mips-maven.h so that the default maven spec file
 # always includes -Tmaven.ld on the linker command line. There is
-# probably a better way tot handle setting up the default linker script.
+# probably a better way to handle setting up the default linker script.
 
 install_libs += $(addprefix $(src_dir)/, $(linker_script))
 

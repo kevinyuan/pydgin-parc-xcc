@@ -11,12 +11,20 @@
 // for the sigsetjmp and siglongjmp functions. Since we don't currently
 // support processes and signals we don't need these functions.
 
-#ifndef _SETJMP_H
-#define _SETJMP_H
+#ifndef _MAVEN_SETJMP_H
+#define _MAVEN_SETJMP_H
+
+// Make sure we can use the same lib in both C and C++ programs
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define _JBTYPE int
 #define _JBLEN  23
 
 typedef _JBTYPE jmp_buf[_JBLEN];
 
+#ifdef __cplusplus
+}
 #endif
+#endif /* MAVEN_SETJUMP_H */

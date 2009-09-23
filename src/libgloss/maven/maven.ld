@@ -31,7 +31,7 @@ ENTRY( _start )
    idt32.ld includes it explicitly here and I was seeing link errors
    without it. */
 
-GROUP( -lc -lsyscalls -lgcc )
+GROUP( -lc -lgloss -lgcc )
 
 /* The STARTUP command specifes any additional startup files which
    should be always linked _first_ into the executable. */

@@ -2,6 +2,7 @@
 #define _SYS_RESOURCE_H_
 
 #include <sys/time.h>
+#include <machine/resource.h>
 
 #define	RUSAGE_SELF	0		/* calling process */
 #define	RUSAGE_CHILDREN	-1		/* terminated child processes */

@@ -52,24 +52,24 @@
 // Coprocessor 0 Control Registers
 //------------------------------------------------------------------------
 
-#define MAVEN_SYSCFG_REGDEF_COP0_COUNT    9
-#define MAVEN_SYSCFG_REGDEF_COP0_CORE_ID 17
+#define MAVEN_SYSCFG_REGDEF_COP0_COUNT      9
+#define MAVEN_SYSCFG_REGDEF_COP0_COUNT_LO   9
+#define MAVEN_SYSCFG_REGDEF_COP0_COUNT_HI  25
+
+#define MAVEN_SYSCFG_REGDEF_COP0_CORE_ID   17
 
 //------------------------------------------------------------------------
-// Cycles per clock 
+// Timing
 //------------------------------------------------------------------------
-// This macro specifies how many cycles are in a clock tick (as returned
-// by the clock function). We assume Maven runs at a gigahertz and that
-// CLOCKS_PER_SEC is set to 1000000.
 
-#define MAVEN_SYSCFG_CYCLES_PER_CLOCK 1000
+// How many processor cycles per second. Assume maven runs at 1 GHz.
+#define MAVEN_SYSCFG_CYCLES_PER_SEC 1000000000
 
 //------------------------------------------------------------------------
-// Thread stack size
+// Threads
 //------------------------------------------------------------------------
-// This macro specifies the size of the stack available for each hard
-// thread in bytes.
 
+// Size of the stack available for each hard thread in bytes
 #define MAVEN_SYSCFG_THREAD_STACK_SIZE 0x00010000
 
 #endif /* MAVEN_SYSCFG_H */

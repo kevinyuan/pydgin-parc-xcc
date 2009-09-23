@@ -4,7 +4,9 @@
 // This is the maven implementation of the narrow newlib operating
 // system interface. It is based on the minimum stubs in the newlib
 // documentation, the error stubs in libnosys, and the previous scale
-// implementation.
+// implementation. Please do not include any additional system calls or
+// other functions in this file. Additional header and source files
+// should be in the machine subdirectory.
 //
 // Here is a list of the functions which make up the operating system
 // interface. The file management instructions execute syscall assembly
@@ -36,31 +38,34 @@
 //     + sbrk   : (v) increase program data space
 //     + _exit  : (-) exit program without cleaning up files
 //
-// The current implementation of these functions assumes the following
-// mips syscall instruction interface:
-//
-//  - a0 : syscall argument 0
-//  - a1 : syscall argument 1
-//  - a2 : syscall argument 2
-//  - a3 : error flag (0 = success, 1 = failure)
-//  - v0 : syscall id, then return value from system call
-// 
 // There are two types of system calls. Those which return a value when
 // everything is okay (marked with (v) in above list) and those which
 // return a zero when everything is okay (marked with (z) in above
 // list). On an error (ie. when the error flag is 1) the return value is
 // always an errno which should correspond to the numbers in
-// newlib/libc/include/sys/errno.h The implementations currently assume
-// that syscall arguments stay in a0-a2 which they should unless of
-// course one of the functions are inlined. So keep that in mind if you
-// wanted to call one function from another function.
+// newlib/libc/include/sys/errno.h 
+//
+// Note that really I think we are supposed to define versions of these
+// functions with an underscore prefix (eg. _open). This is what some of
+// the newlib documentation says, and all the newlib code calls the
+// underscore version. This is because technically I don't think we are
+// supposed to pollute the namespace with these function names. If you
+// define MISSING_SYSCALL_NAMES in xcc/src/newlib/configure.host
+// then xcc/src/newlib/libc/include/_syslist.h will essentially define
+// all of the underscore versions to be equal to the non-underscore
+// versions. I tried not defining MISSING_SYSCALL_NAMES, and newlib
+// compiled fine but libstdc++ complained about not being able to fine
+// write, read, etc. So for now we do not use underscores (and we do
+// define MISSING_SYSCALL_NAMES).
 //
 // See the newlib documentation for more information 
 // http://sourceware.org/newlib/libc.html#Syscalls
 
-#include <machine/syscfg.h>
+#include <machine/syscall.h>
 #include <sys/stat.h>
+#include <sys/timex.h>
 #include <sys/times.h>
+#include <sys/time.h>
 #include <errno.h>
 
 //------------------------------------------------------------------------
@@ -96,7 +101,7 @@ extern int errno;
 
 char* __env[1] = { 0 };
 char** environ = __env;
-
+              
 //------------------------------------------------------------------------
 // open                                                                 
 //------------------------------------------------------------------------
@@ -104,10 +109,8 @@ char** environ = __env;
 
 int open( const char* name, int flags, int mode )
 {
-  register int result     asm ("v0");
-  register int error_flag asm ("a3");
-  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
-                                  : "i"  (MAVEN_SYSCFG_SYSCALL_OPEN) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG3( OPEN, result, error_flag, name, flags, mode );
 
   if ( error_flag == 1 ) {
     errno = result;
@@ -124,10 +127,8 @@ int open( const char* name, int flags, int mode )
 
 int lseek( int file, int ptr, int dir )
 {
-  register int result     asm ("v0");
-  register int error_flag asm ("a3");
-  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
-                                  : "i"  (MAVEN_SYSCFG_SYSCALL_LSEEK) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG3( LSEEK, result, error_flag, file, ptr, dir );
 
   if ( error_flag == 1 ) {
     errno = result;
@@ -144,10 +145,8 @@ int lseek( int file, int ptr, int dir )
 
 int read( int file, char* ptr, int len )
 {
-  register int result     asm ("v0");
-  register int error_flag asm ("a3");
-  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
-                                  : "i"  (MAVEN_SYSCFG_SYSCALL_READ) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG3( READ, result, error_flag, file, ptr, len );
 
   if ( error_flag == 1 ) {
     errno = result;
@@ -164,10 +163,8 @@ int read( int file, char* ptr, int len )
 
 int write( int file, char* ptr, int len )
 {
-  register int result     asm ("v0");
-  register int error_flag asm ("a3");
-  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
-                                  : "i"  (MAVEN_SYSCFG_SYSCALL_WRITE) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG3( WRITE, result, error_flag, file, ptr, len );
 
   if ( error_flag == 1 ) {
     errno = result;
@@ -185,10 +182,8 @@ int write( int file, char* ptr, int len )
 
 int fstat( int file, struct stat* st )
 {
-  register int result     asm ("v0");
-  register int error_flag asm ("a3");
-  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
-                                  : "i"  (MAVEN_SYSCFG_SYSCALL_FSTAT) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG2( FSTAT, result, error_flag, file, st );
 
   if ( error_flag == 1 ) {
     errno = result;
@@ -205,10 +200,8 @@ int fstat( int file, struct stat* st )
 
 int stat( const char* file, struct stat* st )
 {
-  register int result     asm ("v0");
-  register int error_flag asm ("a3");
-  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
-                                  : "i"  (MAVEN_SYSCFG_SYSCALL_STAT) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG2( STAT, result, error_flag, file, st );
 
   if ( error_flag == 1 ) {
     errno = result;
@@ -225,10 +218,8 @@ int stat( const char* file, struct stat* st )
 
 int close( int file ) 
 {
-  register int result     asm ("v0");
-  register int error_flag asm ("a3");
-  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
-                                  : "i"  (MAVEN_SYSCFG_SYSCALL_CLOSE) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG1( CLOSE, result, error_flag, file );
 
   if ( error_flag == 1 ) {
     errno = result;
@@ -245,10 +236,8 @@ int close( int file )
 
 int link( char* old_name, char* new_name )
 {
-  register int result     asm ("v0");
-  register int error_flag asm ("a3");
-  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
-                                  : "i"  (MAVEN_SYSCFG_SYSCALL_LINK) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG2( LINK, result, error_flag, old_name, new_name );
 
   if ( error_flag == 1 ) {
     errno = result;
@@ -265,10 +254,8 @@ int link( char* old_name, char* new_name )
 
 int unlink( char* name )
 {
-  register int result     asm ("v0");
-  register int error_flag asm ("a3");
-  __asm__ ( "li $v0, %2; syscall" : "=r" (result), "=r" (error_flag)
-                                  : "i"  (MAVEN_SYSCFG_SYSCALL_UNLINK) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG1( UNLINK, result, error_flag, name );
 
   if ( error_flag == 1 ) {
     errno = result;
@@ -356,31 +343,25 @@ int isatty( int file )
 // Timing information for current process. From
 // newlib/libc/include/sys/times.h the tms struct fields are as follows:
 //
-//  - clock_t tms_utime  : user time
-//  - clock_t tms_stime  : system time
-//  - clock_t tms_cutime : children's user time
-//  - clock_t tms_cstime : children's system time
+//  - clock_t tms_utime  : user clock ticks
+//  - clock_t tms_stime  : system clock ticks
+//  - clock_t tms_cutime : children's user clock ticks
+//  - clock_t tms_cstime : children's system clock ticks
 //
 // Since maven does not currently support processes we set both of the
 // children's times to zero. Eventually we might want to separately
 // account for user vs system time, but for now we just return the total
-// clock ticks since starting the program.
-//
-// We want microsecond resolution, so we will use the count control
-// register from COP0. We use the macros in
-// newlib/libc/machine/maven/machine/time.h to convert cycles into clock
-// ticks.
+// number of cycles since starting the program.
 
 clock_t times( struct tms* buf )
 {
-  int count;
-  __asm__ ( "mfc0 %0, $%1" : "=r"(count) 
-                           : "i"(MAVEN_SYSCFG_REGDEF_COP0_COUNT) );
+  cycles_t cycles_per_clock = get_cycles_per_sec() / CLOCKS_PER_SEC;
 
-  buf->tms_utime  = count / MAVEN_SYSCFG_CYCLES_PER_CLOCK;
+  buf->tms_utime = get_cycles() / cycles_per_clock;
   buf->tms_stime  = 0;
   buf->tms_cutime = 0;
   buf->tms_cstime = 0;
+
   return 0;
 }
 
@@ -413,7 +394,8 @@ caddr_t sbrk( int incr )
 
 void _exit( int exit_status )
 {
-  __asm__ ( "li $v0, %0; syscall" : : "i"(MAVEN_SYSCFG_SYSCALL_EXIT) );
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG0( EXIT, result, error_flag );
 
   // Convince gcc this function never returns to avoid warnings (this is
   // from _exit in libnosys)

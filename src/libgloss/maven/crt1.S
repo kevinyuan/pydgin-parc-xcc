@@ -81,7 +81,6 @@
 #
 
 #include <machine/syscfg.h>
-#include <machine/regdef.h>
 
 # We define some shorter macro names for use in this file
 
@@ -107,40 +106,40 @@
         .ent    _start
 _start:
 
-        la      gp, _gp         # Initialize global pointer
+        la      $gp, _gp        # Initialize global pointer
         
-        mfc0    v0, $c0_coreid  # Check to see if we are core 0
-        bnez    v1, _notcore0   #  COP0 register 15 has core id
+        mfc0    $v0, $c0_coreid # Check to see if we are core 0
+        bnez    $v1, _notcore0  #  COP0 register 15 has core id
 
-        la      v0, _fbss       # Zero out uninitialized data sections
-        la      v1, _end        #  (the .sbss and .bss sections). See 
-1:      sw      zero, 0(v0)     #  linker script for how _fbss and
-        addiu   v0, v0, 4       #  _end are defined.
-        bltu    v0, v1, 1b      #
+        la      $v0, _fbss      # Zero out uninitialized data sections
+        la      $v1, _end       #  (the .sbss and .bss sections). See 
+1:      sw      $0,  0($v0)    #  linker script for how _fbss and
+        addiu   $v0, $v0, 4     #  _end are defined.
+        bltu    $v0, $v1, 1b    #
 
         jal     _init           # Run global initialization functions
 
-        la      a0, _fini       # Register global termination functions
+        la      $a0, _fini      # Register global termination functions
         jal     atexit          #  to be called upon exit
 
-        lw      a0, 0(sp)       # Start the program, setup args
-        addiu   a1, sp, 4       #  a0 = argc
+        lw      $a0, 0($sp)     # Start the program, setup args
+        addiu   $a1, $sp, 4     #  a0 = argc
         jal     main            #  a1 = argv
         
-        move    a0, v0          # Call exit function with return value
+        move    $a0, $v0        # Call exit function with return value
         jal     exit            #  from main as exit code
         
 _notcore0:
 
-        li      v0, tstack_sz   # Set up stack pointer for each thread 
-        mul     v0, v1          #  v1 still has core id
-        subu    sp, v0          #
+        li      $v0, tstack_sz  # Set up stack pointer for each thread 
+        mul     $v0, $v1        #  v1 still has core id
+        subu    $sp, $v0        #
 
 _waiting:
 
-        li      v0, 0           # Wait until v0 is changed magically
-1:      beqz    v0, 1b          #  by simulator, then jump to the value
-        jalr    v0              #  in v0. When we return keep waiting 
-        j        _waiting       #  for v0 to be set again.
+        move    $v0, $0         # Wait until v0 is changed magically
+1:      beqz    $v0, 1b         #  by simulator, then jump to the value
+        jalr    $v0             #  in v0. When we return keep waiting 
+        j       _waiting        #  for v0 to be set again.
 
         .end    _start
