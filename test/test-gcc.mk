@@ -29,12 +29,12 @@ test_gcc_compile_outs = \
 $(test_gcc_O0_objs) : %.o : %.c $(CROSS_GCC)
 	-{ $(CROSS_GCC) -std=gnu99 -c -o $@ $<; \
     echo "*** gcc compile exit = $$?"; \
-  } | tee $*-compile.out
+  } 2>&1 | tee $*-compile.out
 
 $(test_gcc_O3_objs) : %-O3.o : %.c $(CROSS_GCC)
 	-{ $(CROSS_GCC) -O3 -std=gnu99 -c -o $@ $<; \
     echo "*** gcc compile exit = $$?"; \
-  } | tee $*-O3-compile.out
+  } 2>&1 | tee $*-O3-compile.out
 
 check-gcc-compile : $(test_gcc_objs)
 	$(scripts_dir)/check-summary.rb $(test_gcc_compile_outs)
@@ -52,7 +52,7 @@ test_gcc_link_outs = $(patsubst %.o, %-link.out, $(test_gcc_objs))
 $(test_gcc_exes) : % : %.o test-gcc-main.c $(CROSS_GCC)
 	-{ $(CROSS_GCC) -o $@ $(test_dir)/test-gcc-main.c $<; \
     echo "*** gcc link exit = $$?"; \
-  } | tee $*-link.out
+  } 2>&1 | tee $*-link.out
 
 check-gcc-link : $(test_gcc_exes)
 	$(scripts_dir)/check-summary.rb \
@@ -71,7 +71,7 @@ test_gcc_run_outs += $(patsubst %, %-run.out, $(test_gcc_exes))
 $(test_gcc_run_outs) : %-run.out : % $(cross_run_dep)
 	-{ $(CROSS_RUN) $<; \
     echo "*** run exit = $$?"; \
-  } | tee $@
+  } 2>&1 | tee $@
 
 check-gcc-run : $(test_gcc_run_outs)
 	$(scripts_dir)/check-summary.rb \
@@ -101,12 +101,12 @@ test_gcc_args_run_out = \
 $(test_gcc_args_exe) : % : %.c $(CROSS_GCC)
 	-{ $(CROSS_GCC) -std=gnu99 -o $@ $<; \
     echo "*** gcc compile exit = $$?"; \
-  } | tee $*-compile.out
+  } 2>&1 | tee $*-compile.out
 
 $(test_gcc_args_run_out) : %-run.out : % $(cross_run_dep)
 	-{ $(CROSS_RUN) $< apple pear mango; \
     echo "*** run exit = $$?"; \
-  } | tee $@
+  } 2>&1 | tee $@
 
 test_gcc_run_outs += $(test_gcc_args_run_out)
 test_gcc_outs += $(test_gcc_args_compile_out) $(test_gcc_args_run_out)

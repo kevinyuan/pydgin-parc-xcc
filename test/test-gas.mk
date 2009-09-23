@@ -20,7 +20,7 @@ test_gas_compile_outs = $(patsubst %.s, %-compile.out, $(test_gas_srcs))
 $(test_gas_objs) : %.o : %.s $(CROSS_GAS)
 	-{ $(CROSS_GAS) -o $@ $<; \
     echo "*** gas compile exit = $$?"; \
-  } | tee $*-compile.out
+  } 2>&1 | tee $*-compile.out
 
 check-gas-compile : $(test_gas_objs)
 	$(scripts_dir)/check-summary.rb $(test_gas_compile_outs)
@@ -38,7 +38,7 @@ test_gas_link_outs = $(patsubst %.s, %-link.out, $(test_gas_srcs))
 $(test_gas_exes) : % : %.o test-gas-main.c $(CROSS_GCC)
 	-{ $(CROSS_GCC) -o $@ $(test_dir)/test-gas-main.c $<; \
     echo "*** gcc link exit = $$?"; \
-  } | tee $*-link.out
+  } 2>&1 | tee $*-link.out
 
 check-gas-link : $(test_gas_exes)
 	$(scripts_dir)/check-summary.rb \
@@ -57,7 +57,7 @@ test_gas_run_outs = $(patsubst %, %-run.out, $(test_gas_exes))
 $(test_gas_run_outs) : %-run.out : % $(cross_run_dep)
 	-{ $(CROSS_RUN) $<; \
     echo "*** run exit = $$?"; \
-  } | tee $@
+  } 2>&1 | tee $@
 
 check-gas-run : $(test_gas_run_outs)
 	$(scripts_dir)/check-summary.rb \

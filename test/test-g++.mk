@@ -26,12 +26,12 @@ test_gxx_compile_outs = \
 $(test_gxx_O0_objs) : %.o : %.cc $(CROSS_GXX)
 	-{ $(CROSS_GXX) -c -o $@ $<; \
     echo "*** g++ compile exit = $$?"; \
-  } | tee $*-compile.out
+  } 2>&1 | tee $*-compile.out
 
 $(test_gxx_O3_objs) : %-O3.o : %.cc $(CROSS_GXX)
 	-{ $(CROSS_GXX) -O3 -c -o $@ $<; \
     echo "*** g++ compile exit = $$?"; \
-  } | tee $*-O3-compile.out
+  } 2>&1 | tee $*-O3-compile.out
 
 check-g++-compile : $(test_gxx_objs)
 	$(scripts_dir)/check-summary.rb $(test_gxx_compile_outs)
@@ -49,7 +49,7 @@ test_gxx_link_outs = $(patsubst %.o, %-link.out, $(test_gxx_objs))
 $(test_gxx_exes) : % : %.o test-g++-main.cc $(CROSS_GXX)
 	-{ $(CROSS_GXX) -o $@ $(test_dir)/test-g++-main.cc $<; \
     echo "*** g++ link exit = $$?"; \
-  } | tee $*-link.out
+  } 2>&1 | tee $*-link.out
 
 check-g++-link : $(test_gxx_exes)
 	$(scripts_dir)/check-summary.rb \
@@ -68,7 +68,7 @@ test_gxx_run_outs = $(patsubst %, %-run.out, $(test_gxx_exes))
 $(test_gxx_run_outs) : %-run.out : % $(cross_run_dep)
 	-{ $(CROSS_RUN) $<; \
     echo "*** run exit = $$?"; \
-  } | tee $@
+  } 2>&1 | tee $@
 
 check-g++-run : $(test_gxx_run_outs)
 	$(scripts_dir)/check-summary.rb \
