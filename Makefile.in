@@ -264,7 +264,7 @@ longcheck longcheck% :
 # before actually stowing. We also delete libiberty.a which does not
 # really need to be installed.
 
-prestow_cleanup = info man/man7 lib/libiberty.a
+prestow_cleanup = info man/man7 lib/libiberty.a lib64/libiberty.a
 
 install install% :
 	$(MAKE) -C src $@ prefix=$(DESTDIR)
