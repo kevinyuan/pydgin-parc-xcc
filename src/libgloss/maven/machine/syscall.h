@@ -99,3 +99,4 @@
       "i"(MAVEN_SYSCFG_SYSCALL_ ## sys_) );                             \
   res_   = res_ ## _;                                                   \
   eflag_ = eflag_ ## _;                                                 \
+
