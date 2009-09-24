@@ -386,7 +386,17 @@ static const char* const mips_hwr_names_mips3264r2[32] =
   "$24",  "$25",  "$26",  "$27",  "$28",  "$29",  "$30",  "$31"
 };
 
-/* Maven symbolic coprocessor registers */
+/* Maven symbolic general-purpose register names */
+
+static const char* const mips_gpr_names_maven[32] =
+{
+  "zero", "at",   "v0",   "v1",   "a0",   "a1",   "a2",   "a3",
+  "a4",   "a5",   "a6",   "a7",   "t4",   "t5",   "t6",   "t7",
+  "s0",   "s1",   "s2",   "s3",   "s4",   "s5",   "s6",   "s7",
+  "t8",   "t9",   "k0",   "k1",   "gp",   "sp",   "s8",   "ra"
+};
+
+/* Maven symbolic coprocessor register names */
 
 static const char* const mips_cp0_names_maven[32] =
 {
@@ -643,14 +653,6 @@ is_newabi( Elf_Internal_Ehdr *header )
   if (( header->e_flags & EF_MIPS_ABI2 ) != 0 )
     return 1;
 
-  /* cbatten - EABI is also a new ABI. Well I think technically it is
-     different from the new ABI's but the is_newabi function is only
-     used in one place in the next fuction to determine the symbolic
-     register names. That aspect is the same so for now we just return
-     true if this is a EABI binary. */
-  if (( header->e_flags & E_MIPS_ABI_EABI32 ) != 0 )
-    return 1;
-
   return 0;
 }
 
@@ -699,6 +701,13 @@ set_default_mips_dis_options( struct disassemble_info* info )
     mips_cp0sel_names = chosen_arch->cp0sel_names;
     mips_cp0sel_names_len = chosen_arch->cp0sel_names_len;
     mips_hwr_names = chosen_arch->hwr_names;
+
+    /* cbatten - Maven uses EABI, but EABI does not currently
+       disassemble a4-a7 correctly. So we do a custom check here and set
+       the symbolic names to our own set if this is a maven binary. */
+    if ( mips_processor == CPU_MAVEN )
+      mips_gpr_names = mips_gpr_names_maven;
+
   }
 #endif
 }
