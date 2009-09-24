@@ -13159,7 +13159,7 @@ s_mipsset( int x ATTRIBUTE_UNUSED )
   else if ( strcmp( name, "push" ) == 0 ) {
     struct mips_option_stack* s;
 
-    s = ( struct mips_option_stack* ) xmalloc( sizeof   s );
+    s = ( struct mips_option_stack* ) xmalloc( sizeof(*s) );
     s->next = mips_opts_stack;
     s->options = mips_opts;
     mips_opts_stack = s;
@@ -14807,7 +14807,7 @@ mips_define_label( symbolS *sym )
   struct insn_label_list* l;
 
   if ( free_insn_labels == NULL )
-    l = ( struct insn_label_list* ) xmalloc( sizeof   l );
+    l = ( struct insn_label_list* ) xmalloc( sizeof(*l) );
   else {
     l = free_insn_labels;
     free_insn_labels = l->next;
