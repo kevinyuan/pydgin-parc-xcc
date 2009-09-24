@@ -97,10 +97,13 @@ extern int errno;
 // environment                                                          
 //------------------------------------------------------------------------
 // A pointer to a list of environment variables and their values. For a
-// minimal environment, this empty list is adequate. */
-
-char* __env[1] = { 0 };
-char** environ = __env;
+// minimal environment, this empty list is adequate. We used to define
+// environ here but it is already defined in
+// xcc/src/newlib/libc/stdlib/environ.c so to avoid multiple definition
+// errors we have commented this out for now.
+//
+// char* __env[1] = { 0 };
+// char** environ = __env;
               
 //------------------------------------------------------------------------
 // open                                                                 
@@ -375,9 +378,9 @@ clock_t times( struct tms* buf )
 
 caddr_t sbrk( int incr )
 {
-  extern char _end; // Defined by linker
-  static char* heap_end;
-  char* prev_heap_end;
+  extern unsigned char _end; // Defined by linker
+  static unsigned char* heap_end;
+  unsigned char* prev_heap_end;
 
   if ( heap_end == 0 )
     heap_end = &_end;

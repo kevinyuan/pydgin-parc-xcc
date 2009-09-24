@@ -22,7 +22,6 @@ gloss_hdrs = \
   machine/resource.h \
 
 gloss_srcs = \
-  syscalls.c \
   machine/resource.c \
   machine/setjmp.S \
   machine/timex.c \
@@ -31,6 +30,7 @@ gloss_srcs = \
 
 crt1_asm      = crt1.S
 linker_script = maven.ld
+syscalls_src  = syscalls.c
 
 #-------------------------------------------------------------------------
 # Basic setup
@@ -87,6 +87,23 @@ MKINSTALLDIRS := $(src_dir)/mk-install-dirs.sh
 INSTALL       := @INSTALL@
 INSTALL_HDR   := $(INSTALL) -m 444
 INSTALL_LIB   := $(INSTALL) -m 644
+
+#-------------------------------------------------------------------------
+# Build Object File from Syscalls Source
+#-------------------------------------------------------------------------
+# We special case compiling syscalls.c since we want to make sure that
+# we compile with -G0. This prevents the compiler from using gp relative
+# addressing when loading the _end pointer in sbrk.
+
+syscalls_objs = $(patsubst %.c, %.o, $(syscalls_src))
+syscalls_deps = $(patsubst %.c, %.d, $(syscalls_src))
+
+$(syscalls_objs) : %.o : %.c
+	$(COMPILE) -G0 -c $<
+
+objs += $(syscalls_objs)
+deps += $(syscalls_deps)
+junk += $(syscalls_deps) $(syscalls_objs)
 
 #-------------------------------------------------------------------------
 # Build Object Files from C Source
