@@ -12,6 +12,7 @@ test_gcc_srcs = \
   test-gcc-malloc.c \
   test-gcc-fileio.c \
   test-gcc-regalloc.c \
+  test-gcc-regnames.c \
 
 #-------------------------------------------------------------------------
 # Compile tests

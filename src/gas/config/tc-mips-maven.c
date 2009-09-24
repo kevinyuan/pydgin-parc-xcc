@@ -1709,6 +1709,20 @@ struct regname
   {"$ta2",      RTYPE_GP | 14}, /* alias for $t6 */                     \
   {"$ta3",      RTYPE_GP | 15}  /* alias for $t7 */
 
+#define EABI_SYMBOLIC_REGISTER_NAMES                                    \
+  {"$a4",       RTYPE_GP | 8},                                          \
+  {"$a5",       RTYPE_GP | 9},                                          \
+  {"$a6",       RTYPE_GP | 10},                                         \
+  {"$a7",       RTYPE_GP | 11},                                         \
+  {"$t0",       RTYPE_GP | 8},  /* alias for $a4 */                     \
+  {"$t1",       RTYPE_GP | 9},  /* alias for $a5 */                     \
+  {"$t2",       RTYPE_GP | 10}, /* alias for $a6 */                     \
+  {"$t3",       RTYPE_GP | 11}, /* alias for $a7 */                     \
+  {"$t4",       RTYPE_GP | 12},                                         \
+  {"$t5",       RTYPE_GP | 13},                                         \
+  {"$t6",       RTYPE_GP | 14},                                         \
+  {"$t7",       RTYPE_GP | 15}
+
 /* Remaining symbolic register names */
 #define SYMBOLIC_REGISTER_NAMES                                         \
   {"$zero",     RTYPE_GP | 0},                                          \
@@ -1811,6 +1825,12 @@ static const struct regname reg_names_o32[] =
 static const struct regname reg_names_n32n64[] =
 {
   N32N64_SYMBOLIC_REGISTER_NAMES,
+  {0, 0}
+};
+
+static const struct regname reg_names_eabi[] =
+{
+  EABI_SYMBOLIC_REGISTER_NAMES,
   {0, 0}
 };
 
@@ -2027,21 +2047,32 @@ md_begin( void )
   /* We add all the general register names to the symbol table. This
      helps us detect invalid uses of them. */
   for ( i = 0; reg_names[i].name; i++ )
-    symbol_table_insert( symbol_new( reg_names[i].name, reg_section,
-                                     reg_names[i].num, /* & RNUM_MASK, */
-                                     &zero_address_frag ) );
+    symbol_table_insert(
+      symbol_new( reg_names[i].name, reg_section,
+                  reg_names[i].num, /* & RNUM_MASK, */
+                  &zero_address_frag ) );
 
-  /* cbatten - We want EABI to use the NEWABI symbolic register names. */
-  if ( HAVE_NEWABI || (mips_abi == EABI_ABI) )
+  if ( HAVE_NEWABI )
     for ( i = 0; reg_names_n32n64[i].name; i++ )
-      symbol_table_insert( symbol_new( reg_names_n32n64[i].name, reg_section,
-                                       reg_names_n32n64[i].num, /* & RNUM_MASK, */
-                                       &zero_address_frag ) );
+      symbol_table_insert(
+        symbol_new( reg_names_n32n64[i].name, reg_section,
+                    reg_names_n32n64[i].num, /* & RNUM_MASK, */
+                    &zero_address_frag ) );
+
+  /* cbatten - We want EABI to allow a4-a7 symbolic register names. */
+  else if ( mips_abi == EABI_ABI )
+    for ( i = 0; reg_names_eabi[i].name; i++ )
+      symbol_table_insert(
+        symbol_new( reg_names_eabi[i].name, reg_section,
+                    reg_names_eabi[i].num, /* & RNUM_MASK, */
+                    &zero_address_frag ) );
+
   else
     for ( i = 0; reg_names_o32[i].name; i++ )
-      symbol_table_insert( symbol_new( reg_names_o32[i].name, reg_section,
-                                       reg_names_o32[i].num, /* & RNUM_MASK, */
-                                       &zero_address_frag ) );
+      symbol_table_insert(
+        symbol_new( reg_names_o32[i].name, reg_section,
+                    reg_names_o32[i].num, /* & RNUM_MASK, */
+                    &zero_address_frag ) );
 
   mips_no_prev_insn();
 

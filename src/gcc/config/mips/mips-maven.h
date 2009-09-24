@@ -2760,10 +2760,14 @@ typedef struct mips_args
     { "a5",      9 + GP_REG_FIRST },                                    \
     { "a6",     10 + GP_REG_FIRST },                                    \
     { "a7",     11 + GP_REG_FIRST },                                    \
-    { "t0",     12 + GP_REG_FIRST },                                    \
-    { "t1",     13 + GP_REG_FIRST },                                    \
-    { "t2",     14 + GP_REG_FIRST },                                    \
-    { "t3",     15 + GP_REG_FIRST },                                    \
+    { "t0",      8 + GP_REG_FIRST },                                    \
+    { "t1",      9 + GP_REG_FIRST },                                    \
+    { "t2",     10 + GP_REG_FIRST },                                    \
+    { "t3",     11 + GP_REG_FIRST },                                    \
+    { "t4",     12 + GP_REG_FIRST },                                    \
+    { "t5",     13 + GP_REG_FIRST },                                    \
+    { "t6",     14 + GP_REG_FIRST },                                    \
+    { "t7",     15 + GP_REG_FIRST },                                    \
     { "s0",     16 + GP_REG_FIRST },                                    \
     { "s1",     17 + GP_REG_FIRST },                                    \
     { "s2",     18 + GP_REG_FIRST },                                    \

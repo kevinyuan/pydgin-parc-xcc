@@ -65,8 +65,8 @@ stripmine_loop:
 verify_loop:
 
         lw      $t3, ($t1)          # t3 = *vec_out_ptr
-        lw      $t8, ($t2)          # t8 = *vec_ref_ptr
-        bne     $t3, $t8, fail      # if ( t3 != t8 ) goto fail
+        lw      $t4, ($t2)          # t4 = *vec_ref_ptr
+        bne     $t3, $t4, fail      # if ( t3 != t4 ) goto fail
         
         subu    $t0, 1              # count = count - 1
         addu    $t1, 4              # vec_out_ptr = vec_out_ptr + 4
@@ -77,8 +77,8 @@ verify_loop:
 
         # Pass/fail exit code
 fail:                                
-        lw      $t8, n              # return index of failure
-        subu    $v0, $t8, $t0        
+        lw      $t4, n              # return index of failure
+        subu    $v0, $t4, $t0        
         addu    $v0, 1          
         jr      $ra                  
                                      

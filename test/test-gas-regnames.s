@@ -26,7 +26,7 @@ test:
 
         li      $v0, 0
         
-        # Test standard argument registers
+        # Test standard argument registers (a0-a3)
 
         addiu   $v0, 1
         move    $a0, $v0
@@ -44,7 +44,7 @@ test:
         move    $a3, $v0
         bne     $a3, $7, fail
 
-        # Test extended argument registers
+        # Test extended argument registers (a4-a7)
 
         addiu   $v0, 1
         move    $a4, $v0
@@ -62,25 +62,43 @@ test:
         move    $a7, $v0
         bne     $a7, $11, fail
         
-        # Test temporary registers
+        # Test temporary registers (t0-t3, aliases for a4-a7)
 
         addiu   $v0, 1
         move    $t0, $v0
-        bne     $t0, $12, fail
+        bne     $t0, $8, fail
 
         addiu   $v0, 1
         move    $t1, $v0
-        bne     $t1, $13, fail
+        bne     $t1, $9, fail
 
         addiu   $v0, 1
         move    $t2, $v0
-        bne     $t2, $14, fail
+        bne     $t2, $10, fail
 
         addiu   $v0, 1
         move    $t3, $v0
-        bne     $t3, $15, fail
+        bne     $t3, $11, fail
 
-        # Test extra temporary registers
+        # Test temporary registers (t4-t7)
+
+        addiu   $v0, 1
+        move    $t4, $v0
+        bne     $t4, $12, fail
+
+        addiu   $v0, 1
+        move    $t5, $v0
+        bne     $t5, $13, fail
+
+        addiu   $v0, 1
+        move    $t6, $v0
+        bne     $t6, $14, fail
+
+        addiu   $v0, 1
+        move    $t7, $v0
+        bne     $t7, $15, fail
+
+        # Test extra temporary registers (t8-t9)
         
         addiu   $v0, 1
         move    $t8, $v0
