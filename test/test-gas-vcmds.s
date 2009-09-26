@@ -27,7 +27,7 @@ vec_out:  .word 0, 0,  0,  0,  0,  0,  0
         .globl  test
         .type   test,@function
         .ent    test
-
+        
 test:
         # Do vector-vector add with stripmine loop
         
@@ -43,10 +43,10 @@ stripmine_loop:
 
         setvl   $s0, $t0
         
-        lw.v    $a0, $t1            # vload from vec_a
-        lw.v    $a1, $t2            # vload from vec_b
+        lw.v    $va0, $t1           # vload from vec_a
+        lw.v    $va1, $t2           # vload from vec_b
         vf      add_vp              # vfetch add_vp
-        sw.v    $a2, $t3            # vstore to vec_out
+        sw.v    $va2, $t3           # vstore to vec_out
 
         subu    $t0, $s0            # count = count - vlen
         addu    $t1, $s1            # vec_a_ptr   = vec_a_ptr + stride
@@ -88,7 +88,7 @@ pass:
 
         # Add VP code
 add_vp:
-        addu    $a2, $a0, $a1
+        addu    $a2, $a1, $a0
         stop
         
         .end    test

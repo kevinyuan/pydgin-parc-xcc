@@ -29,11 +29,11 @@ value:  .word 0x77777777
 test:
         la        $t0, value      # t0 = value_ptr
 
-        lw.v      $t2, $t0        # t2 = *value_ptr
-        lh.v      $t2, $t0
-        lhu.v     $t2, $t0
-        lb.v      $t2, $t0
-        lbu.v     $t2, $t0
+        lw.v      $vt2, $t0        # t2 = *value_ptr
+        lh.v      $vt2, $t0
+        lhu.v     $vt2, $t0
+        lb.v      $vt2, $t0
+        lbu.v     $vt2, $t0
         
         li        $v0, 0
         j         done

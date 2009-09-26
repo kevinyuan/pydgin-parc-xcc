@@ -2743,7 +2743,11 @@ typedef struct mips_args
    names for $fp and $sp. */
 
 /* cbatten - Maven uses EABI whic has a4-a7,t0-t3,t8-t9 and no t4-t7.
-   For now we just hard code this changes into the names below. */
+   For now we just hard code this changes into the names below. We also
+   add the names for vector registers and vp registers, but note that
+   these are just aliases for now. The compiled doesn't do anything
+   special with vector registers - it just thinks they are scalar
+   registers. */
 
 #define ADDITIONAL_REGISTER_NAMES                                       \
   {                                                                     \
@@ -2782,8 +2786,45 @@ typedef struct mips_args
     { "k1",     27 + GP_REG_FIRST },                                    \
     { "gp",     28 + GP_REG_FIRST },                                    \
     { "sp",     29 + GP_REG_FIRST },                                    \
+    { "s8",     30 + GP_REG_FIRST },                                    \
     { "fp",     30 + GP_REG_FIRST },                                    \
     { "ra",     31 + GP_REG_FIRST },                                    \
+    { "vat",     1 + GP_REG_FIRST },                                    \
+    { "vv0",     2 + GP_REG_FIRST },                                    \
+    { "vv1",     3 + GP_REG_FIRST },                                    \
+    { "va0",     4 + GP_REG_FIRST },                                    \
+    { "va1",     5 + GP_REG_FIRST },                                    \
+    { "va2",     6 + GP_REG_FIRST },                                    \
+    { "va3",     7 + GP_REG_FIRST },                                    \
+    { "va4",     8 + GP_REG_FIRST },                                    \
+    { "va5",     9 + GP_REG_FIRST },                                    \
+    { "va6",    10 + GP_REG_FIRST },                                    \
+    { "va7",    11 + GP_REG_FIRST },                                    \
+    { "vt0",     8 + GP_REG_FIRST },                                    \
+    { "vt1",     9 + GP_REG_FIRST },                                    \
+    { "vt2",    10 + GP_REG_FIRST },                                    \
+    { "vt3",    11 + GP_REG_FIRST },                                    \
+    { "vt4",    12 + GP_REG_FIRST },                                    \
+    { "vt5",    13 + GP_REG_FIRST },                                    \
+    { "vt6",    14 + GP_REG_FIRST },                                    \
+    { "vt7",    15 + GP_REG_FIRST },                                    \
+    { "vs0",    16 + GP_REG_FIRST },                                    \
+    { "vs1",    17 + GP_REG_FIRST },                                    \
+    { "vs2",    18 + GP_REG_FIRST },                                    \
+    { "vs3",    19 + GP_REG_FIRST },                                    \
+    { "vs4",    20 + GP_REG_FIRST },                                    \
+    { "vs5",    21 + GP_REG_FIRST },                                    \
+    { "vs6",    22 + GP_REG_FIRST },                                    \
+    { "vs7",    23 + GP_REG_FIRST },                                    \
+    { "vt8",    24 + GP_REG_FIRST },                                    \
+    { "vt9",    25 + GP_REG_FIRST },                                    \
+    { "vk0",    26 + GP_REG_FIRST },                                    \
+    { "vk1",    27 + GP_REG_FIRST },                                    \
+    { "vgp",    28 + GP_REG_FIRST },                                    \
+    { "vsp",    29 + GP_REG_FIRST },                                    \
+    { "vs8",    30 + GP_REG_FIRST },                                    \
+    { "vfp",    30 + GP_REG_FIRST },                                    \
+    { "vra",    31 + GP_REG_FIRST },                                    \
     ALL_COP_ADDITIONAL_REGISTER_NAMES                                   \
   }
 

@@ -396,6 +396,16 @@ static const char* const mips_gpr_names_maven[32] =
   "t8",   "t9",   "k0",   "k1",   "gp",   "sp",   "s8",   "ra"
 };
 
+/* Maven symbolic vector register names */
+
+static const char* const mips_vreg_names_maven[32] =
+{
+  "vzero", "vat",  "vv0",  "vv1",  "va0",  "va1",  "va2",  "va3",
+  "va4",   "va5",  "va6",  "va7",  "vt4",  "vt5",  "vt6",  "vt7",
+  "vs0",   "vs1",  "vs2",  "vs3",  "vs4",  "vs5",  "vs6",  "vs7",
+  "vt8",   "vt9",  "vk0",  "vk1",  "vgp",  "vsp",  "vs8",  "vra"
+};
+
 /* Maven symbolic coprocessor register names */
 
 static const char* const mips_cp0_names_maven[32] =
@@ -886,6 +896,17 @@ print_insn_args( const char* d,
 
   for ( ; *d != '\0'; d++ ) {
     switch ( *d ) {
+
+      case '#':
+        switch ( *++d ) {
+          case 'v':
+            (*info->fprintf_func)
+              ( info->stream, "%s",
+                mips_vreg_names_maven[(l >> OP_SH_RD) & OP_MASK_RD]);
+            break;
+        }
+        break;
+
       case ',':
       case '(':
       case ')':

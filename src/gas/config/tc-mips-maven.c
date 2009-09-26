@@ -1580,7 +1580,7 @@ struct regname
   unsigned int num;
 };
 
-#define RTYPE_MASK      0x1ff00
+#define RTYPE_MASK      0x3ff00
 #define RTYPE_NUM       0x00100
 #define RTYPE_FPU       0x00200
 #define RTYPE_FCC       0x00400
@@ -1590,6 +1590,7 @@ struct regname
 #define RTYPE_PC        0x04000
 #define RTYPE_ACC       0x08000
 #define RTYPE_CCC       0x10000
+#define RTYPE_VREG      0x20000
 #define RNUM_MASK       0x000ff
 #define RWARN           0x80000
 
@@ -1709,20 +1710,6 @@ struct regname
   {"$ta2",      RTYPE_GP | 14}, /* alias for $t6 */                     \
   {"$ta3",      RTYPE_GP | 15}  /* alias for $t7 */
 
-#define EABI_SYMBOLIC_REGISTER_NAMES                                    \
-  {"$a4",       RTYPE_GP | 8},                                          \
-  {"$a5",       RTYPE_GP | 9},                                          \
-  {"$a6",       RTYPE_GP | 10},                                         \
-  {"$a7",       RTYPE_GP | 11},                                         \
-  {"$t0",       RTYPE_GP | 8},  /* alias for $a4 */                     \
-  {"$t1",       RTYPE_GP | 9},  /* alias for $a5 */                     \
-  {"$t2",       RTYPE_GP | 10}, /* alias for $a6 */                     \
-  {"$t3",       RTYPE_GP | 11}, /* alias for $a7 */                     \
-  {"$t4",       RTYPE_GP | 12},                                         \
-  {"$t5",       RTYPE_GP | 13},                                         \
-  {"$t6",       RTYPE_GP | 14},                                         \
-  {"$t7",       RTYPE_GP | 15}
-
 /* Remaining symbolic register names */
 #define SYMBOLIC_REGISTER_NAMES                                         \
   {"$zero",     RTYPE_GP | 0},                                          \
@@ -1828,9 +1815,76 @@ static const struct regname reg_names_n32n64[] =
   {0, 0}
 };
 
-static const struct regname reg_names_eabi[] =
+/*----------------------------------------------------------------------*/
+/* Maven symbolic register names                                        */
+/*----------------------------------------------------------------------*/
+
+static const struct regname reg_names_maven[] =
 {
-  EABI_SYMBOLIC_REGISTER_NAMES,
+  /* Maven uses EABI and has eight argument registers */
+
+  {"$a4",       RTYPE_GP | 8},
+  {"$a5",       RTYPE_GP | 9},
+  {"$a6",       RTYPE_GP | 10},
+  {"$a7",       RTYPE_GP | 11},
+
+  /* We alias the temporary registers t0-t3 so o32 code works fine */
+
+  {"$t0",       RTYPE_GP | 8},  /* alias for $a4 */
+  {"$t1",       RTYPE_GP | 9},  /* alias for $a5 */
+  {"$t2",       RTYPE_GP | 10}, /* alias for $a6 */
+  {"$t3",       RTYPE_GP | 11}, /* alias for $a7 */
+  {"$t4",       RTYPE_GP | 12},
+  {"$t5",       RTYPE_GP | 13},
+  {"$t6",       RTYPE_GP | 14},
+  {"$t7",       RTYPE_GP | 15},
+
+  /* Vector registers - these are in allocation order */
+
+  {"$vzero",    RTYPE_VREG | 0}, 
+  {"$vat",      RTYPE_VREG | 1},  
+
+  {"$va0",      RTYPE_VREG | 4},  
+  {"$va1",      RTYPE_VREG | 5},  
+  {"$va2",      RTYPE_VREG | 6},  
+  {"$va3",      RTYPE_VREG | 7},  
+  {"$va4",      RTYPE_VREG | 8},  
+  {"$va5",      RTYPE_VREG | 9},  
+  {"$va6",      RTYPE_VREG | 10}, 
+  {"$va7",      RTYPE_VREG | 11}, 
+
+  {"$vt0",      RTYPE_VREG | 8},  /* alias for $va4 */
+  {"$vt1",      RTYPE_VREG | 9},  /* alias for $va5 */
+  {"$vt2",      RTYPE_VREG | 10}, /* alias for $va6 */
+  {"$vt3",      RTYPE_VREG | 11}, /* alias for $va7 */
+
+  {"$vv0",      RTYPE_VREG | 2},  
+  {"$vv1",      RTYPE_VREG | 3},  
+  {"$vt4",      RTYPE_VREG | 12}, 
+  {"$vgp",      RTYPE_VREG | 28}, 
+  {"$vsp",      RTYPE_VREG | 29}, 
+  {"$vra",      RTYPE_VREG | 31}, 
+
+  {"$vt5",      RTYPE_VREG | 13}, 
+  {"$vt6",      RTYPE_VREG | 14}, 
+  {"$vt7",      RTYPE_VREG | 15}, 
+  {"$vt8",      RTYPE_VREG | 24}, 
+  {"$vt9",      RTYPE_VREG | 25}, 
+
+  {"$vs0",      RTYPE_VREG | 16}, 
+  {"$vs1",      RTYPE_VREG | 17}, 
+  {"$vs2",      RTYPE_VREG | 18}, 
+  {"$vs3",      RTYPE_VREG | 19}, 
+  {"$vs4",      RTYPE_VREG | 20}, 
+  {"$vs5",      RTYPE_VREG | 21}, 
+  {"$vs6",      RTYPE_VREG | 22}, 
+  {"$vs7",      RTYPE_VREG | 23}, 
+
+  {"$vs8",      RTYPE_VREG | 30}, 
+  {"$vfp",      RTYPE_VREG | 30}, 
+  {"$vk0",      RTYPE_VREG | 26}, 
+  {"$vk1",      RTYPE_VREG | 27}, 
+
   {0, 0}
 };
 
@@ -2059,12 +2113,12 @@ md_begin( void )
                     reg_names_n32n64[i].num, /* & RNUM_MASK, */
                     &zero_address_frag ) );
 
-  /* cbatten - We want EABI to allow a4-a7 symbolic register names. */
-  else if ( mips_abi == EABI_ABI )
-    for ( i = 0; reg_names_eabi[i].name; i++ )
+  /* cbatten - Use maven symbolic register names. */
+  else if ( mips_opts.arch == CPU_MAVEN )
+    for ( i = 0; reg_names_maven[i].name; i++ )
       symbol_table_insert(
-        symbol_new( reg_names_eabi[i].name, reg_section,
-                    reg_names_eabi[i].num, /* & RNUM_MASK, */
+        symbol_new( reg_names_maven[i].name, reg_section,
+                    reg_names_maven[i].num, /* & RNUM_MASK, */
                     &zero_address_frag ) );
 
   else
@@ -3722,6 +3776,17 @@ macro_build( expressionS *ep, const char* name, const char* fmt, ... )
     switch ( *fmt++ ) {
       case '\0':
         break;
+
+      /* cbatten - support for maven vector register specifiers */
+      case '#':
+        switch ( *fmt++ ) {
+          case 'v':
+            INSERT_OPERAND( RD, insn, va_arg( args, int ) );
+            continue;
+          default:
+            internalError();
+        }
+        continue;
 
       case ',':
       case '(':
@@ -8484,6 +8549,18 @@ validate_mips_insn( const struct mips_opcode* opc )
 #define USE_BITS(mask,shift)    (used_bits |= ((mask) << (shift)))
   while ( *p )
     switch ( c = *p++ ) {
+
+      /* cbatten - support for maven vector register specifiers */
+      case '#':
+        switch ( c = *p++ ) {
+          case 'v':
+            USE_BITS( OP_MASK_RD, OP_SH_RD );
+            break;
+          default:
+            internalError();
+        }
+        break;
+
       case ',':
         break;
       case '(':
@@ -8960,6 +9037,20 @@ mips_ip( char* str, struct mips_cl_insn* ip )
           if ( *s == '\0' )
             return;
           break;
+
+        /* cbatten - support for maven vector register specifiers */
+        case '#':
+          switch ( *++args ) {
+            case 'v':
+              ok = reg_lookup( &s, RTYPE_NUM|RTYPE_VREG, &regno );
+              if ( !ok )
+                as_bad( _( "Invalid vector register" ) );
+              INSERT_OPERAND( RD, *ip, regno );
+              continue;
+            default:
+              internalError();
+          }
+          continue;
 
         case '2': /* dsp 2-bit unsigned immediate in bit 11 */
           my_getExpression( &imm_expr, s );
