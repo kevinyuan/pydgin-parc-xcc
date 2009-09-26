@@ -8,6 +8,7 @@
 #
 #  - default   : build the entire cross-compiler
 #  - check     : run simple gcc testsuite and generate summary
+#  - vcheck    : run simple gcc testsuite and generate summary (verbose)
 #  - longcheck : run full gcc testsuite and generate summary
 #  - clean     : remove all generated content (except autoconf files)
 #  - dist      : make a source tarball
@@ -218,6 +219,9 @@ include $(test_mks)
 
 check : $(test_objs) $(test_exes) $(test_run_outs)
 	$(scripts_dir)/check-summary.rb $(test_outs)
+
+vcheck : $(test_objs) $(test_exes) $(test_run_outs)
+	$(scripts_dir)/check-summary.rb -v $(test_outs)
 
 clean-check : 
 	rm -rf $(test_junk)

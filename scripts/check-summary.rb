@@ -187,9 +187,9 @@ def main()
 
     # Output final summary
 
-    # if ( !plist.empty? )
-    #   puts "  [ passed ] #{test} (#{plist.join(",")})"
-    # end
+     if ( !plist.empty? && $opts[:verbose] )
+       puts "  [ passed ] #{test} (#{plist.join(",")})"
+     end
 
     if ( !flist.empty? )
       puts "  [ FAILED ] #{test} (#{flist.join(",")})"
