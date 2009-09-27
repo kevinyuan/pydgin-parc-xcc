@@ -27,6 +27,8 @@
 ;; along with GCC; see the file COPYING3. If not see
 ;; <http://www.gnu.org/licenses/>.
 
+;; YUNSUP: changes for the Maven compiler, this port is based on MIPS
+
 (define_constants
   [(UNSPEC_LOAD_LOW              0)
    (UNSPEC_LOAD_HIGH             1)
@@ -622,7 +624,9 @@
   (if_then_else (and (eq_attr "type" "!branch,call,jump")
                      (and (eq_attr "hazard" "none")
                           (eq_attr "single_insn" "yes")))
-                (const_string "yes")
+;; YUNSUP: no branch-delay slots.
+;;                 (const_string "yes")
+                (const_string "no")
                 (const_string "no")))
 
 ;; Attribute defining whether or not we can use the branch-likely
@@ -922,31 +926,32 @@
 ;; Branch, call and jump delay slots
 ;;------------------------------------------------------------------------
 
-(define_delay (and (eq_attr "type" "branch")
-                   (eq (symbol_ref "TARGET_MIPS16") (const_int 0))
-                   (eq_attr "branch_likely" "yes"))
-  [(eq_attr "can_delay" "yes")
-   (nil)
-   (eq_attr "can_delay" "yes")])
+;; YUNSUP: nothing should have delay slots
+;; (define_delay (and (eq_attr "type" "branch")
+;;                    (eq (symbol_ref "TARGET_MIPS16") (const_int 0))
+;;                    (eq_attr "branch_likely" "yes"))
+;;   [(eq_attr "can_delay" "yes")
+;;    (nil)
+;;    (eq_attr "can_delay" "yes")])
 
 ;; Branches that don't have likely variants do not annul on false.
-(define_delay (and (eq_attr "type" "branch")
-                   (eq (symbol_ref "TARGET_MIPS16") (const_int 0))
-                   (eq_attr "branch_likely" "no"))
-  [(eq_attr "can_delay" "yes")
-   (nil)
-   (nil)])
+;; (define_delay (and (eq_attr "type" "branch")
+;;                    (eq (symbol_ref "TARGET_MIPS16") (const_int 0))
+;;                    (eq_attr "branch_likely" "no"))
+;;   [(eq_attr "can_delay" "yes")
+;;    (nil)
+;;    (nil)])
 
-(define_delay (eq_attr "type" "jump")
-  [(eq_attr "can_delay" "yes")
-   (nil)
-   (nil)])
+;; (define_delay (eq_attr "type" "jump")
+;;   [(eq_attr "can_delay" "yes")
+;;    (nil)
+;;    (nil)])
 
-(define_delay (and (eq_attr "type" "call")
-                   (eq_attr "jal_macro" "no"))
-  [(eq_attr "can_delay" "yes")
-   (nil)
-   (nil)])
+;; (define_delay (and (eq_attr "type" "call")
+;;                    (eq_attr "jal_macro" "no"))
+;;   [(eq_attr "can_delay" "yes")
+;;    (nil)
+;;    (nil)])
 
 ;;------------------------------------------------------------------------
 ;; Pipeline descriptions

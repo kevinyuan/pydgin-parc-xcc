@@ -25,6 +25,8 @@
    Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA
    02110-1301, USA. */
 
+/* YUNSUP: changes for the Maven compiler, this port is based on MIPS. */
+
 #include "as.h"
 #include "config.h"
 #include "subsegs.h"
@@ -291,11 +293,14 @@ static struct mips_set_options mips_opts =
   -1,          /* ase_dspr2 */         
   -1,          /* ase_mt */            
   -1,          /* mips16 */            
-   0,          /* noreorder */         
+  /* YUNSUP: set default noreorder to 1 */
+  1,           /* noreorder */         
   ATREG,       /* at */                
   0,           /* warn_about_macros */ 
-  0,           /* nomove */            
-  0,           /* nobopt */            
+  /* YUNSUP: set default nomove to 1 */
+  1,           /* nomove */            
+  /* YUNSUP: set default nobopt to 1 */
+  1,           /* nobopt */            
   0,           /* noautoextend */      
   0,           /* gp32 */              
   0,           /* fp32 */              
@@ -679,7 +684,9 @@ static int mips_frame_reg_valid = 0;
    unneeded NOPs and swap branch instructions when possible. A value of
    1 means to not swap branches. A value of 0 means to always insert
    NOPs. */
-static int mips_optimize = 2;
+/* YUNSUP: no branch-delay slots. */
+/* static int mips_optimize = 2; */
+static int mips_optimize = 0;
 
 /* Debugging level. -g sets this to 2. -gN sets this to N. -g0 is
    equivalent to seeing no -g option at all. */
@@ -3568,43 +3575,46 @@ mips_emit_delays( void )
 static void
 start_noreorder( void )
 {
-  if ( mips_opts.noreorder == 0 ) {
-    unsigned int i;
-    int nops;
+  /* YUNSUP: always noreorder */
+  return;
 
-    /* None of the instructions before the .set noreorder can be moved. */
-    for ( i = 0; i < ARRAY_SIZE( history ); i++ )
-      history[i].fixed_p = 1;
+  // if ( mips_opts.noreorder == 0 ) {
+  //   unsigned int i;
+  //   int nops;
 
-    /* Insert any nops that might be needed between the .set noreorder
-    block and the previous instructions. We will later remove any
-    nops that turn out not to be needed. */
-    nops = nops_for_insn( history, NULL );
-    if ( nops > 0 ) {
-      if ( mips_optimize != 0 ) {
-        /* Record the frag which holds the nop instructions, so
-                 that we can remove them if we don't need them. */
-        frag_grow( mips_opts.mips16 ? nops * 2 : nops * 4 );
-        prev_nop_frag = frag_now;
-        prev_nop_frag_holds = nops;
-        prev_nop_frag_required = 0;
-        prev_nop_frag_since = 0;
-      }
+  //   /* None of the instructions before the .set noreorder can be moved. */
+  //   for ( i = 0; i < ARRAY_SIZE( history ); i++ )
+  //     history[i].fixed_p = 1;
 
-      for ( ; nops > 0; --nops )
-        add_fixed_insn( NOP_INSN );
+  //   /* Insert any nops that might be needed between the .set noreorder
+  //   block and the previous instructions. We will later remove any
+  //   nops that turn out not to be needed. */
+  //   nops = nops_for_insn( history, NULL );
+  //   if ( nops > 0 ) {
+  //     if ( mips_optimize != 0 ) {
+  //       /* Record the frag which holds the nop instructions, so
+  //                that we can remove them if we don't need them. */
+  //       frag_grow( mips_opts.mips16 ? nops * 2 : nops * 4 );
+  //       prev_nop_frag = frag_now;
+  //       prev_nop_frag_holds = nops;
+  //       prev_nop_frag_required = 0;
+  //       prev_nop_frag_since = 0;
+  //     }
 
-      /* Move on to a new frag, so that it is safe to simply
-         decrease the size of prev_nop_frag. */
-      frag_wane( frag_now );
-      frag_new( 0 );
-      mips_move_labels();
-    }
-    mips16_mark_labels();
-    mips_clear_insn_labels();
-  }
-  mips_opts.noreorder++;
-  mips_any_noreorder = 1;
+  //     for ( ; nops > 0; --nops )
+  //       add_fixed_insn( NOP_INSN );
+
+  //     /* Move on to a new frag, so that it is safe to simply
+  //        decrease the size of prev_nop_frag. */
+  //     frag_wane( frag_now );
+  //     frag_new( 0 );
+  //     mips_move_labels();
+  //   }
+  //   mips16_mark_labels();
+  //   mips_clear_insn_labels();
+  // }
+  // mips_opts.noreorder++;
+  // mips_any_noreorder = 1;
 }
 
 /*----------------------------------------------------------------------*/
@@ -3615,21 +3625,23 @@ start_noreorder( void )
 static void
 end_noreorder( void )
 {
+  /* YUNSUP: always noreorder */
+  return;
 
-  mips_opts.noreorder--;
-  if ( mips_opts.noreorder == 0 && prev_nop_frag != NULL ) {
+  // mips_opts.noreorder--;
+  // if ( mips_opts.noreorder == 0 && prev_nop_frag != NULL ) {
 
-    /* Commit to inserting prev_nop_frag_required nops and go back to
-    handling nop insertion the .set reorder way. */
-    prev_nop_frag->fr_fix -= (( prev_nop_frag_holds - prev_nop_frag_required )
-                              * ( mips_opts.mips16 ? 2 : 4 ) );
+  //   /* Commit to inserting prev_nop_frag_required nops and go back to
+  //   handling nop insertion the .set reorder way. */
+  //   prev_nop_frag->fr_fix -= (( prev_nop_frag_holds - prev_nop_frag_required )
+  //                             * ( mips_opts.mips16 ? 2 : 4 ) );
 
-    insert_into_history( prev_nop_frag_since,
-                         prev_nop_frag_required, NOP_INSN );
+  //   insert_into_history( prev_nop_frag_since,
+  //                        prev_nop_frag_required, NOP_INSN );
 
-    prev_nop_frag = NULL;
+  //   prev_nop_frag = NULL;
 
-  }
+  // }
 }
 
 /*----------------------------------------------------------------------*/
@@ -11613,14 +11625,15 @@ md_parse_option( int c, char* arg )
       break;
 
     case 'O':
-      if ( arg == NULL )
+      /* YUNSUP: no branch-delay slots. */
+      /* if ( arg == NULL )
         mips_optimize = 1;
       else if ( arg[0] == '0' )
         mips_optimize = 0;
       else if ( arg[0] == '1' )
         mips_optimize = 1;
       else
-        mips_optimize = 2;
+        mips_optimize = 2; */
       break;
 
     case 'g':
@@ -13090,16 +13103,20 @@ s_mipsset( int x ATTRIBUTE_UNUSED )
     mips_opts.warn_about_macros = 1;
   }
   else if ( strcmp( name, "move" ) == 0 || strcmp( name, "novolatile" ) == 0 ) {
-    mips_opts.nomove = 0;
+    /* YUNSUP: always nomove */
+    /* mips_opts.nomove = 0; */
   }
   else if ( strcmp( name, "nomove" ) == 0 || strcmp( name, "volatile" ) == 0 ) {
-    mips_opts.nomove = 1;
+    /* YUNSUP: always nomove */
+    /* mips_opts.nomove = 1; */
   }
   else if ( strcmp( name, "bopt" ) == 0 ) {
-    mips_opts.nobopt = 0;
+    /* YUNSUP: always nobopt */
+    /* mips_opts.nobopt = 0; */
   }
   else if ( strcmp( name, "nobopt" ) == 0 ) {
-    mips_opts.nobopt = 1;
+    /* YUNSUP: always nobopt */
+    /* mips_opts.nobopt = 1; */
   }
   else if ( strcmp( name, "gp=default" ) == 0 )
     mips_opts.gp32 = file_mips_gp32;

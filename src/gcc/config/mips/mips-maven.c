@@ -24,6 +24,8 @@
    along with GCC; see the file COPYING3. If not see
    <http://www.gnu.org/licenses/>. */
 
+/* YUNSUP: changes for the Maven compiler, this port is based on MIPS. */
+
 #include "config.h"
 #include "system.h"
 #include "coretypes.h"
@@ -14134,7 +14136,8 @@ mips_reorg_process_insns( void )
   cfun->machine->ignore_hazard_length_p = true;
   shorten_branches( get_insns() );
 
-  cfun->machine->all_noreorder_p = true;
+  /* YUNSUP: this needs to be gone in order to get rid of nops */
+  /* cfun->machine->all_noreorder_p = true; */
 
   /* We don't track MIPS16 PC-relative offsets closely enough to make
      a good job of "set .noreorder" code in MIPS16 mode. */
@@ -14232,8 +14235,10 @@ mips_reorg( void )
   mips16_lay_out_constants();
   if ( mips_r10k_cache_barrier != R10K_CACHE_BARRIER_NONE )
     r10k_insert_cache_barriers();
-  if ( optimize > 0 && flag_delayed_branch )
-    dbr_schedule( get_insns() );
+  /* YUNSUP: now we don't define any define_delays in the machine
+   * description file, therefore, the dbr_schedule function doesn't exist. */
+  // if ( optimize > 0 && flag_delayed_branch )
+  //   dbr_schedule( get_insns() );
   mips_reorg_process_insns();
   if ( !TARGET_MIPS16
        && TARGET_EXPLICIT_RELOCS

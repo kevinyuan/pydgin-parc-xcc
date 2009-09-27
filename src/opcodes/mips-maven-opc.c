@@ -26,6 +26,8 @@
    Software Foundation, 51 Franklin Street - Fifth Floor, Boston, MA
    02110-1301, USA. */
 
+/* YUNSUP: changes for the Maven compiler, this port is based on MIPS. */
+
 /*----------------------------------------------------------------------*/
 /* Notes by cbatten                                                     */
 /*----------------------------------------------------------------------*/
@@ -46,8 +48,11 @@
 
 #define LDD     INSN_LOAD_MEMORY_DELAY
 #define LCD     INSN_LOAD_COPROC_DELAY
-#define UBD     INSN_UNCOND_BRANCH_DELAY
-#define CBD     INSN_COND_BRANCH_DELAY
+/* YUNSUP: No branch delay slots */
+/* #define UBD     INSN_UNCOND_BRANCH_DELAY */
+/* #define CBD     INSN_COND_BRANCH_DELAY */
+#define UBD     0
+#define CBD     0
 #define COD     INSN_COPROC_MOVE_DELAY
 #define CLD     INSN_COPROC_MEMORY_DELAY
 #define CBL     INSN_COND_BRANCH_LIKELY
