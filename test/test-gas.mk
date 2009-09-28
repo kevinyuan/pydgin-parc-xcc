@@ -10,6 +10,7 @@ test_gas_srcs = \
   test-gas-amo.s \
   test-gas-vload.s \
   test-gas-regnames.s \
+  test-gas-single.s \
 
 #-------------------------------------------------------------------------
 # Compile tests

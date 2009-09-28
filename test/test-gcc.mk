@@ -13,6 +13,12 @@ test_gcc_srcs = \
   test-gcc-fileio.c \
   test-gcc-regalloc.c \
   test-gcc-regnames.c \
+  test-gcc-args-int.c \
+  test-gcc-args-longlong.c \
+  test-gcc-args-single.c \
+  test-gcc-args-double.c \
+  test-gcc-arth-single.c \
+  test-gcc-arth-double.c \
 
 #-------------------------------------------------------------------------
 # Compile tests
