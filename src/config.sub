@@ -305,7 +305,7 @@ case $basic_machine in
 
 	# cbatten - Add maven target
 	maven)
-		basic_machine=mipsmaven-ucb
+		basic_machine=mipsmavenel-ucb
 		;;
 
 	# We use `pc' rather than `unknown'
