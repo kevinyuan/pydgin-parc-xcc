@@ -823,7 +823,9 @@ march=*: -mhard-float}"
 #define ISA_HAS_FP_CONDMOVE \
   (   (    ISA_MIPS4 || ISA_MIPS32 || ISA_MIPS32R2 \
         || ISA_MIPS64 || ISA_MIPS64R2 ) \
-    && !TARGET_MIPS5500 && !TARGET_MIPS16 )
+    && !TARGET_MIPS5500 && !TARGET_MIPS16 && !TARGET_MAVEN )
+/* YUNSUP: Maven doesn't have floating point conditional move. */
+/*    && !TARGET_MIPS5500 && !TARGET_MIPS16 ) */
 
 /* ISA has the integer conditional move instructions introduced in mips4
    and ST Loongson 2E/2F. */
