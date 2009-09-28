@@ -186,6 +186,19 @@
 /* MIPS MT ASE support. */
 #define MT32    INSN_MT
 
+/* Maven support. */
+
+/* these dependencies are unused and have no effect.
+ * Therefore, optimizations will probably need to be turned OFF
+ * for correct execution of assembled code.  
+ * However, in the interest of future work and to show what the
+ * expected dependencies are, the below dependencies have been added
+ * for Maven instructions.
+ */
+#define INSN_READ_VGPR_V 0        // (undefined)
+#define RD_v    INSN_READ_VGPR_V  // read dependency on vector register
+
+
 /* The order of overloaded instructions matters. Label arguments and
    register arguments look the same. Instructions that can have either
    for arguments must apear in the correct order in this table for the
@@ -255,13 +268,51 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
-{"lw.v",           "#v,t",      0x60000000, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
-{"lh.v",           "#v,t",      0x60000020, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
-{"lhu.v",          "#v,t",      0x600000a0, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
-{"lb.v",           "#v,t",      0x60000060, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
-{"lbu.v",          "#v,t",      0x600000e0, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+{"lw.v",           "#v,t",      0x60000000, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lh.v",           "#v,t",      0x60000020, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhu.v",          "#v,t",      0x600000a0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lb.v",           "#v,t",      0x60000060, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbu.v",          "#v,t",      0x600000e0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 
-{"sw.v",           "#v,t",      0x68000080, 0xffe007ff, WR_d|WR_t,                    0,              INSN_MAVEN        },
+{"lwai.v",         "#v,t,s",    0x60000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhai.v",         "#v,t,s",    0x60000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhuai.v",        "#v,t,s",    0x600000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbai.v",         "#v,t,s",    0x60000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbuai.v",        "#v,t,s",    0x600000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+                                   
+{"lwst.v",         "#v,t,s",    0x64000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhst.v",         "#v,t,s",    0x64000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhust.v",        "#v,t,s",    0x640000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbst.v",         "#v,t,s",    0x64000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbust.v",        "#v,t,s",    0x640000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+
+{"lwseg.v",        "#v,t,#s",    0x60000000, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhseg.v",        "#v,t,#s",    0x60000020, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhuseg.v",       "#v,t,#s",    0x600000a0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbseg.v",        "#v,t,#s",    0x60000060, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbuseg.v",       "#v,t,#s",    0x600000e0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+
+//                 "t,U/?" ...... RD_t, CTRL <<-- scale
+//                 mem[rt{base}] = rv/rd ;;;  $ sw.v r_vsrc, r_base
+//NOTE: this dependencies are not used and may be incorrect if optimizations are turned on!
+//                                   
+{"sw.v",           "#v,t",      0x68000080, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"sh.v",           "#v,t",      0x680000a0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"sb.v",           "#v,t",      0x680000e0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+
+//* mtvp
+
+//  - Summary  : Move to VP register
+//  - Assembly : mtvp r_vp, r_vdst, r_src
+//  - Format   : vtur
+//
+//     31    26 25   21 20   16 15   11 10  8 7       0
+//      +--------+-------+-------+-------+-----+---------+
+//      |  cop2  |  rs   |  rt   |  rv   |     |   cmd   |
+//      | 010010 |  vp   | src   | vdst  | 000 | 0000111 |
+//      +--------+-------+-------+-------+-----+---------+
+
+//{"mtvp",           "s,d,t",     0x48000007, 0xfc0007ff, WR_d|RD_t,                0,              INSN_MAVEN        },
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },

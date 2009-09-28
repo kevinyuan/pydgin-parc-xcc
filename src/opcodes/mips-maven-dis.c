@@ -922,6 +922,19 @@ print_insn_args( const char* d,
         (*info->fprintf_func)( info->stream, "%c", *d );
         break;
 
+      case '#':
+        /* Extension character; switch for second char. */
+        d++;
+        switch ( *d ) {
+          case 's':
+            (*info->fprintf_func)
+              ( info->stream, "0x%lx",
+                (l >> OP_SH_IMMNELM) & OP_MASK_IMMNELM);
+          break;
+        }
+        //TODO do I need a default/error statement? -CCelio
+        break;
+
       case '+':
         /* Extension character; switch for second char. */
         d++;

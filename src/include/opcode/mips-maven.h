@@ -53,6 +53,12 @@
 
    The floating point 'r' format uses OP, FMT, FT, FS, FD and FUNCT.
 
+   //"#" is used to denote added Maven fields (such as #s for segment element count)
+   The vtum format uses OP, RS, RT, RD/RV, U,S, N_ELM <<--- Maven modification - CCelio
+
+
+
+
    A breakpoint instruction uses OP, CODE and SPEC (10 bits of the
    breakpoint instruction are not defined; Kane says the breakpoint code
    field in BREAK is 20 bits; yet MIPS assemblers and debuggers only use
@@ -106,6 +112,8 @@
 #define OP_SH_TARGET            0
 #define OP_MASK_COPZ            0x1ffffff
 #define OP_SH_COPZ              0
+#define OP_MASK_IMMNELM         0x1f    /* celio was here */
+#define OP_SH_IMMNELM           0       /* celio was here */
 #define OP_MASK_IMMEDIATE       0xffff
 #define OP_SH_IMMEDIATE         0
 #define OP_MASK_DELTA           0xffff
@@ -287,6 +295,7 @@ struct mips_opcode
    "c" 10 bit breakpoint code (OP_*_CODE)
    "d" 5 bit destination register specifier (OP_*_RD)
    "h" 5 bit prefx hint (OP_*_PREFX)
+   "#s" 5 bit unsigned immediate for vtum ops (OP_*_IMMNELM) // maven modification -CCelio 
    "i" 16 bit unsigned immediate (OP_*_IMMEDIATE)
    "j" 16 bit signed immediate (OP_*_DELTA)
    "k" 5 bit cache opcode in target register position (OP_*_CACHE)

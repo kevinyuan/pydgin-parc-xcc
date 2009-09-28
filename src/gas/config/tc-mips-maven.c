@@ -3789,9 +3789,14 @@ macro_build( expressionS *ep, const char* name, const char* fmt, ... )
       case '\0':
         break;
 
-      /* cbatten - support for maven vector register specifiers */
+      /* maven modification */
       case '#':
         switch ( *fmt++ ) {
+          /* celio    - support for new field (segment ops "number of elements")*/
+          case 's':
+            INSERT_OPERAND( IMMNELM, insn, va_arg( args, int ) );
+            continue;
+          /* cbatten  - support for maven vector register specifiers */
           case 'v':
             INSERT_OPERAND( RD, insn, va_arg( args, int ) );
             continue;
@@ -8758,6 +8763,18 @@ validate_mips_insn( const struct mips_opcode* opc )
         break;
       case 'l':
         break;
+
+      case '#': /* maven modification -CCelio */
+        switch ( c = *p++ ) {
+          case 's':
+            USE_BITS( OP_MASK_IMMNELM,     OP_SH_IMMNELM );
+            break;
+          default:
+            as_bad( _( "internal: bad mips opcode (unknown extension operand type `n%c'): %s %s" ),
+                    c, opc->name, opc->args );
+            return 0;
+        }
+        break;
       case 'o':
         USE_BITS( OP_MASK_DELTA,        OP_SH_DELTA );
         break;
@@ -8945,7 +8962,7 @@ mips_oddfpreg_ok( const struct mips_opcode* insn, int argnum )
 static void
 mips_ip( char* str, struct mips_cl_insn* ip )
 {
-  char* s;
+  char* s; 
   const char* args;
   char c = 0;
   struct mips_opcode* insn;
@@ -10206,7 +10223,38 @@ do_msbd:
           }
           s = expr_end;
           continue;
+        
+        /* maven modification - CCelio
+         * code copied from '<' shift amount
+         */
+        //TODO move to correct alphabetical location
+        case '#': 
+          switch ( *++args ) {
+            case 's': 
 
+              /* According to the manual, if the shift amount is greater
+                 than 31 or less than 0, then the shift amount should be mod
+                 32. In reality the mips assembler issues an error. We issue
+                 a warning and mask out all but the low 5 bits. */
+
+              my_getExpression( &imm_expr, s );
+              check_absolute_expr( ip, &imm_expr );
+              if ((unsigned long) imm_expr.X_add_number > 31 )
+                as_warn( _( "Improper nelm amount (%lu)" ),
+                         (unsigned long) imm_expr.X_add_number );
+              INSERT_OPERAND( IMMNELM, *ip, imm_expr.X_add_number );
+              imm_expr.X_op = O_absent;
+              s = expr_end;
+              continue;
+
+            default:
+              as_bad( _( "internal: bad mips opcode (unknown extension operand type `n%c'): %s %s" ),
+                      *args, insn->name, insn->args );
+              /* Further processing is fruitless. */
+              return;
+          }
+          break;
+        
         case 'o': /* 16 bit offset */
           /* Check whether there is only a single bracketed expression
              left. If so, it must be the base register and the constant
