@@ -82,20 +82,21 @@ setjmp:
         sw      $s8,  36($a0)
         sw      $ra,  40($a0)
 
+        # YUNSUP: no FPRs anymore
         # Save floating point registers
 
-        swc1    $f20, 44($a0)
-        swc1    $f21, 48($a0)
-        swc1    $f22, 52($a0)
-        swc1    $f23, 56($a0)
-        swc1    $f24, 60($a0)
-        swc1    $f25, 64($a0)
-        swc1    $f26, 68($a0)
-        swc1    $f27, 72($a0)
-        swc1    $f28, 76($a0)
-        swc1    $f29, 80($a0)
-        swc1    $f30, 84($a0)
-        swc1    $f31, 88($a0)
+        # swc1    $f20, 44($a0)
+        # swc1    $f21, 48($a0)
+        # swc1    $f22, 52($a0)
+        # swc1    $f23, 56($a0)
+        # swc1    $f24, 60($a0)
+        # swc1    $f25, 64($a0)
+        # swc1    $f26, 68($a0)
+        # swc1    $f27, 72($a0)
+        # swc1    $f28, 76($a0)
+        # swc1    $f29, 80($a0)
+        # swc1    $f30, 84($a0)
+        # swc1    $f31, 88($a0)
 
         # Always return zero
         
@@ -138,19 +139,20 @@ longjmp:
         lw      $s8,  36($a0)
         lw      $ra,  40($a0)
 
+        # YUNSUP: no FPRs anymore
         # Load floating point registers
 
-        lwc1    $f20, 44($a0)
-        lwc1    $f21, 48($a0)
-        lwc1    $f22, 52($a0)
-        lwc1    $f23, 56($a0)
-        lwc1    $f24, 60($a0)
-        lwc1    $f25, 64($a0)
-        lwc1    $f26, 68($a0)
-        lwc1    $f27, 72($a0)
-        lwc1    $f28, 76($a0)
-        lwc1    $f29, 80($a0)
-        lwc1    $f30, 84($a0)        
+        # lwc1    $f20, 44($a0)
+        # lwc1    $f21, 48($a0)
+        # lwc1    $f22, 52($a0)
+        # lwc1    $f23, 56($a0)
+        # lwc1    $f24, 60($a0)
+        # lwc1    $f25, 64($a0)
+        # lwc1    $f26, 68($a0)
+        # lwc1    $f27, 72($a0)
+        # lwc1    $f28, 76($a0)
+        # lwc1    $f29, 80($a0)
+        # lwc1    $f30, 84($a0)        
 
         # Check ret_val and if zero, return 1, otherwise return ret_val
 
