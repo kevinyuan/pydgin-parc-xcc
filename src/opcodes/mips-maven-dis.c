@@ -903,9 +903,14 @@ print_insn_args( const char* d,
 
   for ( ; *d != '\0'; d++ ) {
     switch ( *d ) {
-
+      /* maven modification */
       case '#':
         switch ( *++d ) {
+          case 's':
+            (*info->fprintf_func)
+              ( info->stream, "0x%lx",
+                (l >> OP_SH_IMMNELM) & OP_MASK_IMMNELM);
+            break;
           case 'v':
             (*info->fprintf_func)
               ( info->stream, "%s",
@@ -920,19 +925,6 @@ print_insn_args( const char* d,
       case '[':
       case ']':
         (*info->fprintf_func)( info->stream, "%c", *d );
-        break;
-
-      case '#':
-        /* Extension character; switch for second char. */
-        d++;
-        switch ( *d ) {
-          case 's':
-            (*info->fprintf_func)
-              ( info->stream, "0x%lx",
-                (l >> OP_SH_IMMNELM) & OP_MASK_IMMNELM);
-          break;
-        }
-        //TODO do I need a default/error statement? -CCelio
         break;
 
       case '+':

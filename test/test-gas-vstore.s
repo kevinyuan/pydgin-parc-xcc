@@ -36,7 +36,7 @@ test:
         sync.l.cv
         
         la        $t1, sw_addr
-        sw.v      $t0, $t1          # store vector t0 register at sw_addr (t1)
+        sw.v      $vt0, $t1          # store vector t0 register at sw_addr (t1)
         lw        $t0, sw_addr      # read back store value
         
         lw        $t1, wvalue       # load the answer
@@ -45,8 +45,8 @@ test:
         bne       $t1, $zero, fail  # failure if not the same
         
 
-        sh.v      $t0, $t1          # not a very tough test....
-        sb.v      $t0, $t1          # not a very tough test....
+        sh.v      $vt0, $t1          # not a very tough test....
+        sb.v      $vt0, $t1          # not a very tough test....
 
         j         pass
         nop

@@ -37,39 +37,39 @@ vp_ret: .word  0xe
 
 test:
         la        $v0, wvalue     
-        lw.v      $t2, $t0        # not really testing functionality
-        lh.v      $t2, $t0        # not really testing functionality
-        lhu.v     $t2, $t0        # not really testing functionality
-        lb.v      $t2, $t0        # not really testing functionality
-        lbu.v     $t2, $t0        # not really testing functionality
+        lw.v      $vt2, $t0        # not really testing functionality
+        lh.v      $vt2, $t0        # not really testing functionality
+        lhu.v     $vt2, $t0        # not really testing functionality
+        lb.v      $vt2, $t0        # not really testing functionality
+        lbu.v     $vt2, $t0        # not really testing functionality
         
         li        $t1, 1
 
 # commented out the below instructions since they are
 # unsupported by the ISA simulator 
-#        lwai.v    $t2, $t0, $t1   # not really testing functionality
-#        lhai.v    $t2, $t0, $t1   # not really testing functionality
-#        lhuai.v   $t2, $t0, $t1   # not really testing functionality
-#        lbai.v    $t2, $t0, $t1   # not really testing functionality
-#        lbuai.v   $t2, $t0, $t1   # not really testing functionality
+#        lwai.v    $vt2, $t0, $t1   # not really testing functionality
+#        lhai.v    $vt2, $t0, $t1   # not really testing functionality
+#        lhuai.v   $vt2, $t0, $t1   # not really testing functionality
+#        lbai.v    $vt2, $t0, $t1   # not really testing functionality
+#        lbuai.v   $vt2, $t0, $t1   # not really testing functionality
         
-#        lwst.v    $t2, $t0, $t1   # not really testing functionality
-#        lhst.v    $t2, $t0, $t1   # not really testing functionality
-#        lhust.v   $t2, $t0, $t1   # not really testing functionality
-#        lbst.v    $t2, $t0, $t1   # not really testing functionality
-#        lbust.v   $t2, $t0, $t1   # not really testing functionality
-        
-#        lwseg.v   $t2, $t0, 0x4     # not really testing functionality
-#        lhseg.v   $t2, $t0, 0x4     # not really testing functionality
-#        lhuseg.v  $t2, $t0, 0x4     # not really testing functionality
-#        lbseg.v   $t2, $t0, 0x4     # not really testing functionality
-#        lbuseg.v  $t2, $t0, 0x4     # not really testing functionality
+#        lwst.v    $vt2, $t0, $t1   # not really testing functionality
+#        lhst.v    $vt2, $t0, $t1   # not really testing functionality
+#        lhust.v   $vt2, $t0, $t1   # not really testing functionality
+#        lbst.v    $vt2, $t0, $t1   # not really testing functionality
+#        lbust.v   $vt2, $t0, $t1   # not really testing functionality
+                    
+#        lwseg.v   $vt2, $t0, 0x4     # not really testing functionality
+#        lhseg.v   $vt2, $t0, 0x4     # not really testing functionality
+#        lhuseg.v  $vt2, $t0, 0x4     # not really testing functionality
+#        lbseg.v   $vt2, $t0, 0x4     # not really testing functionality
+#        lbuseg.v  $vt2, $t0, 0x4     # not really testing functionality
 
         # begin functional test of lw.v
         li        $t0, 1
         setvl     $t0, $t0        # vlen = t0
         la        $t0, wvalue     # t0 = value_ptr
-        lw.v      $t2, $t0        # t2 = *value_ptr
+        lw.v      $vt2, $t0        # t2 = *value_ptr
         vf        vp_w_verify     
         
         sync.l.cv
