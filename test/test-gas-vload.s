@@ -59,12 +59,19 @@ test:
         lbst.v    $vt2, $t0, $t1   # not really testing functionality
         lbust.v   $vt2, $t0, $t1   # not really testing functionality
                     
-#        lwseg.v   $vt2, $t0, 0x4     # not really testing functionality
-#        lhseg.v   $vt2, $t0, 0x4     # not really testing functionality
-#        lhuseg.v  $vt2, $t0, 0x4     # not really testing functionality
-#        lbseg.v   $vt2, $t0, 0x4     # not really testing functionality
-#        lbuseg.v  $vt2, $t0, 0x4     # not really testing functionality
+        lwseg.v   $vt2, $t0, 0x4     # not really testing functionality
+        lhseg.v   $vt2, $t0, 0x4     # not really testing functionality
+        lhuseg.v  $vt2, $t0, 0x4     # not really testing functionality
+        lbseg.v   $vt2, $t0, 0x4     # not really testing functionality
+        lbuseg.v  $vt2, $t0, 0x4     # not really testing functionality
+                     
+        lwsegst.v   $vt2, $t0, 0x4, $t1     # not really testing functionality
+        lhsegst.v   $vt2, $t0, 0x4, $t1     # not really testing functionality
+        lhusegst.v  $vt2, $t0, 0x4, $t1     # not really testing functionality
+        lbsegst.v   $vt2, $t0, 0x4, $t1     # not really testing functionality
+        lbusegst.v  $vt2, $t0, 0x4, $t1     # not really testing functionality
 
+ 
         # begin functional test of lw.v
         li        $t0, 1
         setvl     $t0, $t0        # vlen = t0
