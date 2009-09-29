@@ -53,11 +53,11 @@ test:
 #        lbai.v    $vt2, $t0, $t1   # not really testing functionality
 #        lbuai.v   $vt2, $t0, $t1   # not really testing functionality
         
-#        lwst.v    $vt2, $t0, $t1   # not really testing functionality
-#        lhst.v    $vt2, $t0, $t1   # not really testing functionality
-#        lhust.v   $vt2, $t0, $t1   # not really testing functionality
-#        lbst.v    $vt2, $t0, $t1   # not really testing functionality
-#        lbust.v   $vt2, $t0, $t1   # not really testing functionality
+        lwst.v    $vt2, $t0, $t1   # not really testing functionality
+        lhst.v    $vt2, $t0, $t1   # not really testing functionality
+        lhust.v   $vt2, $t0, $t1   # not really testing functionality
+        lbst.v    $vt2, $t0, $t1   # not really testing functionality
+        lbust.v   $vt2, $t0, $t1   # not really testing functionality
                     
 #        lwseg.v   $vt2, $t0, 0x4     # not really testing functionality
 #        lhseg.v   $vt2, $t0, 0x4     # not really testing functionality

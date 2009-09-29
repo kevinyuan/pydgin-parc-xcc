@@ -292,13 +292,14 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"lbseg.v",        "#v,t,#s",    0x60000060, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lbuseg.v",       "#v,t,#s",    0x600000e0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 
-//                 "t,U/?" ...... RD_t, CTRL <<-- scale
-//                 mem[rt{base}] = rv/rd ;;;  $ sw.v r_vsrc, r_base
-//NOTE: this dependencies are not used and may be incorrect if optimizations are turned on!
-//                                   
+//NOTE: these dependencies are not used and may be incorrect if optimizations are turned on!
 {"sw.v",           "#v,t",      0x68000080, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
 {"sh.v",           "#v,t",      0x680000a0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
 {"sb.v",           "#v,t",      0x680000e0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+
+{"swst.v",         "#v,t,s",    0x6c000080, 0xfc0007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"shst.v",         "#v,t,s",    0x6c0000a0, 0xfc0007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"sbst.v",         "#v,t,s",    0x6c0000e0, 0xfc0007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
 
 //* mtvp
 
