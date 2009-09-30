@@ -317,19 +317,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"shsegst.v",      "#v,t,#s,s", 0x6c0000a0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
 {"sbsegst.v",      "#v,t,#s,s", 0x6c0000e0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
 
-//* mtvp
-
-//  - Summary  : Move to VP register
-//  - Assembly : mtvp r_vp, r_vdst, r_src
-//  - Format   : vtur
-//
-//     31    26 25   21 20   16 15   11 10  8 7       0
-//      +--------+-------+-------+-------+-----+---------+
-//      |  cop2  |  rs   |  rt   |  rv   |     |   cmd   |
-//      | 010010 |  vp   | src   | vdst  | 000 | 0000111 |
-//      +--------+-------+-------+-------+-----+---------+
-
-//{"mtvp",           "s,d,t",     0x48000007, 0xfc0007ff, WR_d|RD_t,                0,              INSN_MAVEN        },
+//does not capture the vector register write dependency
+{"mtvp",           "s,#v,t",    0x48000007, 0xfc0007ff, WR_d|RD_t|RD_s,               0,              INSN_MAVEN        },
+{"mtvps",          "#v,t",      0x48000008, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },
