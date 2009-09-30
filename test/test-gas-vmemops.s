@@ -43,7 +43,6 @@ lw_ref:   .word 1, 2, 3, 4, 5, 6, 7, 8
 
 test:
         la        $a0, vec_a
-        la        $a1, vec_b
         li        $a2, 2
         la        $a3, vec_out
         la        $a1, lw_ref
@@ -81,7 +80,38 @@ wst_test:
         lw        $t1, 8($a1)     # t1 = w_ref[2]
         sw        $0, 8($a3)      # clear vec_out[2]
         bne       $t0, $t1, fail
+         
+wsegst_test:
+        setvl     $a2, $a2            # get one VP
+        li        $t4, 16             # t4 = stride (16 bytes)
+        lwsegst.v $vt0, $a0, 2, $t4   #lwsegst.v from vec_a ([0] [1] [4] [5])
+        swsegst.v $vt0, $a3, 2, $t4   #swsegst.v to vec_out ([0] [2] [4] [5])
+        sync.l.cv
         
+        li        $v0, 5          # test fail number
+        lw        $t0, 0($a3)     # t0 = vec_out[0]
+        lw        $t1, 0($a1)     # t1 = w_ref[0]
+        sw        $0, 0($a3)      # clear vec_out[0]
+        bne       $t0, $t1, fail
+        li        $v0, 6          # test fail number
+        lw        $t0, 4($a3)     # t0 = vec_out[1]
+        lw        $t1, 4($a1)     # t1 = w_ref[1]
+        sw        $0, 4($a3)      # clear vec_out[1]
+        bne       $t0, $t1, fail
+        li        $v0, 7          # test fail number
+        lw        $t0, 16($a3)     # t0 = vec_out[4]
+        lw        $t1, 16($a1)     # t1 = w_ref[4]
+        sw        $0, 16($a3)      # clear vec_out[4]
+        bne       $t0, $t1, fail
+        li        $v0, 8          # test fail number
+        lw        $t0, 20($a3)     # t0 = vec_out[5]
+        lw        $t1, 20($a1)     # t1 = w_ref[5]
+        sw        $0, 20($a3)      # clear vec_out[5]
+        bne       $t0, $t1, fail
+         
+         
+
+         
 
 pass:
         li        $v0, 0          
