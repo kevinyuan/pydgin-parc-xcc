@@ -20,7 +20,7 @@ test_gas_srcs = \
 test_gas_objs         = $(patsubst %.s, %.o, $(test_gas_srcs))
 test_gas_compile_outs = $(patsubst %.s, %-compile.out, $(test_gas_srcs))
 
-$(test_gas_objs) : %.o : %.s $(CROSS_GAS)
+$(test_gas_objs) : %.o : %.s $(CROSS_GAS) $(CROSS_OBJDUMP)
 	-{ $(CROSS_GAS) -o $@ $<; \
     echo "*** gas compile exit = $$?"; \
   } 2>&1 | tee $*-compile.out

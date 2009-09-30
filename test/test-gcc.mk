@@ -34,12 +34,12 @@ test_gcc_O3_compile_outs = $(patsubst %.c, %-O3-compile.out, $(test_gcc_srcs))
 test_gcc_compile_outs = \
   $(test_gcc_O0_compile_outs) $(test_gcc_O3_compile_outs)
 
-$(test_gcc_O0_objs) : %.o : %.c $(CROSS_GCC)
+$(test_gcc_O0_objs) : %.o : %.c $(CROSS_GCC) $(CROSS_OBJDUMP)
 	-{ $(CROSS_GCC) -std=gnu99 -c -o $@ $<; \
     echo "*** gcc compile exit = $$?"; \
   } 2>&1 | tee $*-compile.out
 
-$(test_gcc_O3_objs) : %-O3.o : %.c $(CROSS_GCC)
+$(test_gcc_O3_objs) : %-O3.o : %.c $(CROSS_GCC) $(CROSS_OBJDUMP)
 	-{ $(CROSS_GCC) -O3 -std=gnu99 -c -o $@ $<; \
     echo "*** gcc compile exit = $$?"; \
   } 2>&1 | tee $*-O3-compile.out

@@ -23,12 +23,12 @@ test_gxx_O3_compile_outs = $(patsubst %.cc, %-O3-compile.out, $(test_gxx_srcs))
 test_gxx_compile_outs = \
   $(test_gxx_O0_compile_outs) $(test_gxx_O3_compile_outs)
 
-$(test_gxx_O0_objs) : %.o : %.cc $(CROSS_GXX)
+$(test_gxx_O0_objs) : %.o : %.cc $(CROSS_GXX) $(CROSS_OBJDUMP)
 	-{ $(CROSS_GXX) -c -o $@ $<; \
     echo "*** g++ compile exit = $$?"; \
   } 2>&1 | tee $*-compile.out
 
-$(test_gxx_O3_objs) : %-O3.o : %.cc $(CROSS_GXX)
+$(test_gxx_O3_objs) : %-O3.o : %.cc $(CROSS_GXX) $(CROSS_OBJDUMP)
 	-{ $(CROSS_GXX) -O3 -c -o $@ $<; \
     echo "*** g++ compile exit = $$?"; \
   } 2>&1 | tee $*-O3-compile.out
