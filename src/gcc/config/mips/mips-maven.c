@@ -587,6 +587,8 @@ const struct attribute_spec mips_attribute_table[] =
      code generation but don't carry other semantics. */
   { "mips16",      0, 0, true,  false, false, NULL },
   { "nomips16",    0, 0, true,  false, false, NULL },
+  /* YUNSUP: added to support vpfunc attribute */
+  { "vpfunc",      0, 0, true,  false, false, NULL },
   { NULL,          0, 0, false, false, false, NULL }
 };
 
@@ -1229,6 +1231,18 @@ mips_mips16_decl_p( const_tree decl )
   return lookup_attribute( "mips16", DECL_ATTRIBUTES( decl ) ) != NULL;
 }
 
+/* YUNSUP: added to support vpfunc attribute */
+/*----------------------------------------------------------------------*/
+/* mips_vpfunc_decl_p                                                   */
+/*----------------------------------------------------------------------*/
+/* Similar predicates for "vpfunc" function attributes. */
+
+static bool
+mips_vpfunc_decl_p( const_tree decl )
+{
+  return lookup_attribute( "vpfunc", DECL_ATTRIBUTES( decl ) ) != NULL;
+}
+
 /*----------------------------------------------------------------------*/
 /* mips_nomips16_decl_p                                                 */
 /*----------------------------------------------------------------------*/
@@ -1260,6 +1274,22 @@ mips_use_mips16_mode_p( tree decl )
       return false;
   }
   return mips_base_mips16;
+}
+
+/* YUNSUP: added to support vpfunc attribute */
+/*----------------------------------------------------------------------*/
+/* mips_use_vpfunc_mode_p                                               */
+/*----------------------------------------------------------------------*/
+/* Return true if function DECL is a VPFUNC function. Return false if
+   DECL is null. */
+
+static bool
+mips_use_vpfunc_mode_p( tree decl )
+{
+  if ( decl ) {
+    return mips_vpfunc_decl_p( decl );
+  }
+  return false;
 }
 
 /*----------------------------------------------------------------------*/
@@ -14542,6 +14572,43 @@ mips_set_mips16_mode( int mips16_p )
   was_mips16_pch_p = mips16_p;
 }
 
+/* YUNSUP: added to support vpfunc attribute */
+/*----------------------------------------------------------------------*/
+/* mips_set_vpfunc_mode                                                 */
+/*----------------------------------------------------------------------*/
+/* Set up the target-dependent global state for vpfunc */
+
+static void
+mips_set_vpfunc_mode( int vpfunc_p )
+{
+  int regno;
+
+  if ( vpfunc_p ) {
+    // s0 - s7
+    for (regno=16; regno<24; regno++) {
+      call_used_regs[regno] = call_really_used_regs[regno] = 1;
+    }
+
+    // s8 or fp
+    call_used_regs[30] = call_really_used_regs[30] = 1;
+
+    // ra
+    call_used_regs[31] = call_really_used_regs[31] = 1;
+  }
+  else {
+    // s0 - s7
+    for (regno=16; regno<24; regno++) {
+      call_used_regs[regno] = call_really_used_regs[regno] = 0;
+    }
+
+    // s8 or fp
+    call_used_regs[30] = call_really_used_regs[30] = 0;
+
+    // ra
+    call_used_regs[31] = call_really_used_regs[31] = 0;
+  }
+}
+
 /*----------------------------------------------------------------------*/
 /* mips_set_current_function                                            */
 /*----------------------------------------------------------------------*/
@@ -14552,6 +14619,9 @@ static void
 mips_set_current_function( tree fndecl )
 {
   mips_set_mips16_mode( mips_use_mips16_mode_p( fndecl ) );
+
+  /* YUNSUP: added to support vpfunc attribute */
+  mips_set_vpfunc_mode( mips_use_vpfunc_mode_p( fndecl ) );
 }
 
 /*----------------------------------------------------------------------*/

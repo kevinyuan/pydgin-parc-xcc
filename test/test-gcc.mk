@@ -19,6 +19,7 @@ test_gcc_srcs = \
   test-gcc-args-double.c \
   test-gcc-arth-single.c \
   test-gcc-arth-double.c \
+  test-gcc-vpfunc.c \
 
 #-------------------------------------------------------------------------
 # Compile tests
