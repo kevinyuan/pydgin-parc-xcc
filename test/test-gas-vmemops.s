@@ -52,21 +52,24 @@ w_test:
         setvl     $a2, $a2      # get one VP
         lw.v      $vt0, $a0     #lw.v from vec_a
         sw.v      $vt0, $a3     #sw.v to vec_out
-        
+        sync.l.cv
+
         li        $v0, 2          # test fail number
         lw        $t0, 0($a3)     # t0 = vec_out[0]
-#        lw        $t1, 0($a1)     # t1 = w_ref[0]
+        lw        $t1, 0($a1)     # t1 = w_ref[0]
         sw        $0, 0($a3)      # clear vec_out[0]
         bne       $t0, $t1, fail
         lw        $t0, 4($a3)     # t0 = vec_out[1]
         lw        $t1, 4($a1)     # t1 = w_ref[1]
         sw        $0, 4($a3)      # clear vec_out[1]
         bne       $t0, $t1, fail                 
+
 wst_test:
         setvl     $a2, $a2        # get one VP
         li        $t4, 8          # t4 = stride (8 bytes)
         lwst.v    $vt0, $a0, $t4  #lwst.v from vec_a ([0] [2])
         swst.v    $vt0, $a3, $t4  #swst.v to vec_out ([0] [2])
+        sync.l.cv
         
         li        $v0, 3          # test fail number
         lw        $t0, 0($a3)     # t0 = vec_out[0]
