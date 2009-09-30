@@ -12,6 +12,7 @@ test_gas_srcs = \
   test-gas-regnames.s \
   test-gas-single.s \
   test-gas-vstore.s \
+  test-gas-vmemops.s \
 
 #-------------------------------------------------------------------------
 # Compile tests
