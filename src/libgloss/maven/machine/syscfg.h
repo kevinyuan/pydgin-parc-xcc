@@ -38,7 +38,7 @@
 #define MAVEN_SYSCFG_SYSCALL_STAT                          10
                                                          
 // Extra maven specific system calls                     
-                                                         
+
 #define MAVEN_SYSCFG_SYSCALL_NUMCORES                    4000
 #define MAVEN_SYSCFG_SYSCALL_SENDAM                      4001
                                                          
@@ -70,6 +70,19 @@
 //------------------------------------------------------------------------
 
 // Size of the stack available for each hard thread in bytes
-#define MAVEN_SYSCFG_THREAD_STACK_SIZE 0x00010000
+#define MAVEN_SYSCFG_USER_THREAD_STACK_SIZE   0x00010000
+#define MAVEN_SYSCFG_KERNEL_THREAD_STACK_SIZE 0x00010000
+
+//------------------------------------------------------------------------
+// Memory layout
+//------------------------------------------------------------------------
+
+#define MAVEN_SYSCFG_USER_START   0x00000000
+#define MAVEN_SYSCFG_USER_SIZE    0x70000000
+#define MAVEN_SYSCFG_KERNEL_START 0x70000000
+#define MAVEN_SYSCFG_KERNEL_SIZE  0x10000000
+#define MAVEN_SYSCFG_ARGS_SIZE    0x00010000
+
+#define MAVEN_SYSCFG_MAX_PROCS    64
 
 #endif /* MAVEN_SYSCFG_H */

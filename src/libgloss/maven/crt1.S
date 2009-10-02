@@ -47,46 +47,7 @@
 # arguments to main(). Basically argc is stored in a0 and equals the
 # value pointed to by sp, and argv is stored in a1 equals the sp+4.
 #
-# The crt1 will setup the stack pointers for each of the hard threads.
-# It looks in a control register to see how many hard threads are
-# present, and then allocates space for each stack starting at the
-# initial stack pointer (MEMORY_SIZE - ARGS_SIZE) and growing towards
-# smaller memory addresses. The final memory layout will look something
-# like this:
-#
-#  address = 0
-#  -------------------------------------------
-#  .text and .rodata sections
-#  -------------------------------------------
-#  .data sections
-#  ------------------------------------------- <--- _end
-#  heap                                          | heap grows down
-#  ...                                           v
-#  -------------------------------------------
-#  stack space for thread 1                      ^               
-#  ...                                           | stack grows up
-#  ------------------------------------------- <--- thread 1 sp  
-#  stack space for thread 0                      ^               
-#  ...                                           | stack grows up
-#  ------------------------------------------- <--- thread 0 sp  
-#  argument count and argument pointers        
-#  ...
-#  -------------------------------------------
-#  argument strings
-#  ...
-#  -------------------------------------------
-#  undefined memory from here to MEMORY_SIZE-1
-#  -------------------------------------------
-#  address = MEMORY_SIZE - 1
-#
 
-#include <machine/syscfg.h>
-
-# We define some shorter macro names for use in this file
-
-#define c0_coreid MAVEN_SYSCFG_REGDEF_COP0_CORE_ID
-#define tstack_sz MAVEN_SYSCFG_THREAD_STACK_SIZE
-        
 #-------------------------------------------------------------------------
 # Global symbols defined elsewhere
 #-------------------------------------------------------------------------
@@ -102,18 +63,15 @@
 #-------------------------------------------------------------------------
 
         .text
-        .globl  _start
+        .global _start
         .ent    _start
 _start:
 
         la      $gp, _gp        # Initialize global pointer
-        
-        mfc0    $v0, $c0_coreid # Check to see if we are core 0
-        bnez    $v1, _notcore0  #  COP0 register 15 has core id
 
         la      $v0, _fbss      # Zero out uninitialized data sections
         la      $v1, _end       #  (the .sbss and .bss sections). See 
-1:      sw      $0,  0($v0)    #  linker script for how _fbss and
+1:      sw      $0,  0($v0)     #  linker script for how _fbss and
         addiu   $v0, $v0, 4     #  _end are defined.
         bltu    $v0, $v1, 1b    #
 
@@ -128,18 +86,5 @@ _start:
         
         move    $a0, $v0        # Call exit function with return value
         jal     exit            #  from main as exit code
-        
-_notcore0:
-
-        li      $v0, tstack_sz  # Set up stack pointer for each thread 
-        mul     $v0, $v1        #  v1 still has core id
-        subu    $sp, $v0        #
-
-_waiting:
-
-        move    $v0, $0         # Wait until v0 is changed magically
-1:      beqz    $v0, 1b         #  by simulator, then jump to the value
-        jalr    $v0             #  in v0. When we return keep waiting 
-        j       _waiting        #  for v0 to be set again.
 
         .end    _start
