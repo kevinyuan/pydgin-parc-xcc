@@ -13,6 +13,7 @@ test_gas_srcs = \
   test-gas-single.s \
   test-gas-vstore.s \
   test-gas-vmemops.s \
+  test-gas-cpvpcom.s \
 
 #-------------------------------------------------------------------------
 # Compile tests

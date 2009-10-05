@@ -48,6 +48,8 @@
 #define MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_SETSPECIFIC     4005
 #define MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_GETSPECIFIC     4006
 
+#define MAVEN_SYSCFG_SYSCALL_YIELD                       4007
+
 //------------------------------------------------------------------------
 // Coprocessor 0 Control Registers
 //------------------------------------------------------------------------
@@ -70,6 +72,21 @@
 //------------------------------------------------------------------------
 
 // Size of the stack available for each hard thread in bytes
-#define MAVEN_SYSCFG_THREAD_STACK_SIZE 0x00010000
+#define MAVEN_SYSCFG_USER_THREAD_STACK_SIZE   0x00010000
+#define MAVEN_SYSCFG_KERNEL_THREAD_STACK_SIZE 0x00010000
+
+//------------------------------------------------------------------------
+// Memory layout
+//------------------------------------------------------------------------
+
+#define MAVEN_SYSCFG_MEMORY_SIZE  0x10000000
+#define MAVEN_SYSCFG_USER_START   0x00000000
+#define MAVEN_SYSCFG_USER_SIZE    0x0C000000
+#define MAVEN_SYSCFG_KERNEL_START 0x0C000000
+#define MAVEN_SYSCFG_KERNEL_SIZE  0x04000000
+#define MAVEN_SYSCFG_ARGS_SIZE    0x00010000
+
+#define MAVEN_SYSCFG_MAX_PROCS 64 // maximum number of processors in the system
+#define MAVEN_SYSCFG_MAX_KEYS  64 // maximum number of unique keys per thread
 
 #endif /* MAVEN_SYSCFG_H */

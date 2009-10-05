@@ -39,14 +39,14 @@ GROUP( -lc -lgloss -lgcc )
 STARTUP( crt1.o )
 
 /*----------------------------------------------------------------------*/
-/* Sections */
+/* Sections                                                             */
 /*----------------------------------------------------------------------*/
 /* This is where we specify how the input sections map to output
-sections. The .= commands set the location counter, and the sections are
-inserted in increasing address order according to the location counter.
-The following statement will take all of the .bar input sections and
-reloate them into the .foo output section which starts at address
-0x1000.
+   sections. The .= commands set the location counter, and the
+   sections are inserted in increasing address order according to the
+   location counter. The following statement will take all of the .bar
+   input sections and reloate them into the .foo output section which
+   starts at address 0x1000.
 
     . = 0.x1000;
     .foo : { *(.bar) }

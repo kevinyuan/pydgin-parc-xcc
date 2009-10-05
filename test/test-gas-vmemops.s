@@ -1,7 +1,7 @@
 #=========================================================================
-# Basic gas test for vector load instructions
+# Basic gas test for vector memory ops
 #=========================================================================
-# This test does not exhaustively attempt to try and test if the vload
+# This test does not exhaustively attempt to try and test if the 
 # functionality works but rather tries to make sure that the assembler
 # and the ISA simulator decode is working correctly.
 
@@ -13,23 +13,10 @@
         .data
         .align  4
         
-wvalue: .word  0xaabbccdd
-hvalue: .hword 0xccdd
-bvalue: .byte  0xdd
-
-ans_w:  .word  0xaabbccdd
-ans_h:  .word  0x0000ccdd
-ans_hu: .word  0xFFFFccdd
-ans_b:  .word  0x000000dd
-ans_bu: .word  0xFFFFFFdd
-
-n:        .word 8
 vec_a:    .word 1, 2, 3, 4, 5, 6, 7, 8
-vec_b:    .word 1, 2, 3, 4, 5, 6, 7, 8 
-
-vec_out:  .word 0, 0,  0,  0,  0,  0,  0
-
+vec_out:  .word 0, 0, 0, 0, 0, 0, 0, 0
 lw_ref:   .word 1, 2, 3, 4, 5, 6, 7, 8
+lwsh_ref: .word 1, 2, 3, 4, 5, 6, 7, 8
 
 #-------------------------------------------------------------------------
 # test
@@ -48,7 +35,7 @@ test:
         la        $a1, lw_ref
 
 w_test:
-        setvl     $a2, $a2      # get one VP
+        setvl     $a2, $a2      # get two VPs
         lw.v      $vt0, $a0     #lw.v from vec_a
         sw.v      $vt0, $a3     #sw.v to vec_out
         sync.l.cv
@@ -98,26 +85,29 @@ wsegst_test:
         lw        $t1, 4($a1)     # t1 = w_ref[1]
         sw        $0, 4($a3)      # clear vec_out[1]
         bne       $t0, $t1, fail
-        li        $v0, 7          # test fail number
+        li        $v0, 7           # test fail number
         lw        $t0, 16($a3)     # t0 = vec_out[4]
         lw        $t1, 16($a1)     # t1 = w_ref[4]
         sw        $0, 16($a3)      # clear vec_out[4]
         bne       $t0, $t1, fail
-        li        $v0, 8          # test fail number
+        li        $v0, 8           # test fail number
         lw        $t0, 20($a3)     # t0 = vec_out[5]
         lw        $t1, 20($a1)     # t1 = w_ref[5]
         sw        $0, 20($a3)      # clear vec_out[5]
         bne       $t0, $t1, fail
-         
-         
+  
+wsh_test:
+        lwsh.v    $vt0, $a0       #lw.v from vec_a
+        sync.l.cv
+
+        li        $v0, 9          # test fail number
+        j         pass
 
          
-
 pass:
         li        $v0, 0          
         jr        $ra
 fail:
-       jr         $ra 
-
+        jr        $ra 
 
         .end      test

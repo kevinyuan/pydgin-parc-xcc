@@ -276,12 +276,20 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"lb.v",           "#v,t",      0x60000060, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lbu.v",          "#v,t",      0x600000e0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 
-{"lwai.v",         "#v,t,s",    0x60000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lhai.v",         "#v,t,s",    0x60000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lhuai.v",        "#v,t,s",    0x600000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lbai.v",         "#v,t,s",    0x60000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lbuai.v",        "#v,t,s",    0x600000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-                                   
+//uncommented until the ISA simulator supports it.
+//{"lwai.v",         "#v,t,s",    0x60000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+//{"lhai.v",         "#v,t,s",    0x60000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+//{"lhuai.v",        "#v,t,s",    0x600000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+//{"lbai.v",         "#v,t,s",    0x60000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+//{"lbuai.v",        "#v,t,s",    0x600000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+
+//l*sh.v are actually l*st.v with stride of zero, therefore these ops must be declared first for the dissemambler's sake.
+{"lwsh.v",         "#v,t",      0x64000000, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhsh.v",         "#v,t",      0x64000020, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhush.v",        "#v,t",      0x640000a0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbsh.v",         "#v,t",      0x64000060, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbush.v",        "#v,t",      0x640000e0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+                                                                   
 {"lwst.v",         "#v,t,s",    0x64000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 {"lhst.v",         "#v,t,s",    0x64000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 {"lhust.v",        "#v,t,s",    0x640000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
