@@ -9,6 +9,8 @@ test_gxx_srcs = \
   test-g++-exception.cc \
   test-g++-stl.cc \
   test-g++-fileio.cc \
+	test-g++-static-alloc.cc \
+
 
 #-------------------------------------------------------------------------
 # Compile tests
