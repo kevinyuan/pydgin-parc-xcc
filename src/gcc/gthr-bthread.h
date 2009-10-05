@@ -4,13 +4,13 @@
 #define __GTHREADS 1
 
 #include <machine/syscfg.h>
+#include <machine/syscall.h>
+#include <errno.h>
 //#include <bthread.h>
 // manually including bthread.h
 
 #define __BTHREAD_MUTEX_INIT 0
-#define __BTHREAD_ONCE_INIT  0
-
-//typedef unsigned int uint32;
+#define __BTHREAD_ONCE_INIT  { __BTHREAD_MUTEX_INIT, 0 }
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,28 +18,12 @@ extern "C" {
 
 typedef unsigned int __bthread_t;
 typedef unsigned int __bthread_key_t;
-typedef unsigned int __bthread_once_t;
 typedef unsigned int __bthread_mutex_t;
 
-static inline int __bthread_syscall(int num, int arg0, int arg1, int arg2)
-{
-  register int err asm ("a3");
-  register int ret asm ("v0");
-  __asm__ __volatile__ ("move $v0, %0\n"
-      "move  $a0, %1\n"
-      "move  $a1, %2\n"
-      "move  $a2, %3\n"
-      "syscall\n"
-      : : "r"(num),"r"(arg0),"r"(arg1),"r"(arg2)
-      : "v0","a0","a1","a2","a3");
-  if (err)
-  {
-     // errno = ret;
-     return -1;
-  }
-  else
-     return ret;
-}
+typedef struct {
+  __bthread_mutex_t mutex;
+  int once;
+} __bthread_once_t;
 
 static inline __bthread_t __bthread_self()
 {
@@ -52,10 +36,10 @@ static inline __bthread_t __bthread_self()
 // returns true if there is more than 1 core in the system
 static inline int __bthread_threading()
 {
-  unsigned int temp;
-  temp = __bthread_syscall( MAVEN_SYSCFG_SYSCALL_NUMCORES, 0, 0, 0 );
+  int numcores, error_flag;
+  MAVEN_SYSCALL_ARG0(NUMCORES, numcores, error_flag);
 
-  return (temp > 1);
+  return (numcores > 1);
 }
 
 static inline int __bthread_mutex_trylock(__bthread_mutex_t* lock)
@@ -79,46 +63,94 @@ static inline int __bthread_mutex_unlock(__bthread_mutex_t* lock)
   return 0;
 }
 
-static inline int 
-__bthread_once( __bthread_once_t* __once, void (*__func)(void) )
+static inline int
+__bthread_once (__bthread_once_t *__once, void (*__func) (void))
 {
-  int ret;
-  ret = __bthread_syscall( MAVEN_SYSCFG_SYSCALL_BTHREAD_ONCE, 
-                          (int)__once, 0, 0 );
-  if ( ret == 0 )
-    __func();
-  return 0;
-  
+//  if (! __gthread_active_p ())
+//    return -1;
+
+  if (__once == 0 || __func == 0)
+    return EINVAL;
+
+  if (__once->once == 0)
+    {
+      int __status = __bthread_mutex_lock (&__once->mutex);
+      if (__status != 0)
+	return __status;
+      if (__once->once == 0)
+	{
+	  (*__func) ();
+	  __once->once++;
+	}
+      __bthread_mutex_unlock (&__once->mutex);
+    }
+
+  return 0;  
 }
 
 static inline int 
 __bthread_key_create( __bthread_key_t* __key, void (*__dtor) (void*) )
                                         
 {
-  return __bthread_syscall( MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_CREATE, 
-                            (int)__key, (int)__dtor, 0);
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG2(BTHREAD_KEY_CREATE,result,error_flag,__key,__dtor);
+  if (error_flag)
+  {
+//    errno = result;
+    return -1;
+  }
+  
+  return result;
 }
 
 static inline int
 __bthread_key_delete( __bthread_key_t __key )
 {
-  return __bthread_syscall( MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_DELETE, 
-                            (int)__key, 0, 0);
+  int result, error_flag;
+  int val, *pval;
+  void (*dtor)(void*);
+  void *pdtor = &dtor;
+  pval = &val;
+  
+  MAVEN_SYSCALL_ARG3(BTHREAD_KEY_DELETE,result,error_flag,__key,pdtor,pval);
+  if (error_flag)
+  {
+//    errno = result;
+    return -1;
+  }
+  
+  if (dtor)
+    dtor((void *)val);
+  
+  return result;
 }
 
 static inline int
 __bthread_setspecific( __bthread_key_t __key, const void* __ptr )
 {
-  return __bthread_syscall(
-           MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_SETSPECIFIC, 
-           (int)__key, (int)__ptr, (int)__bthread_self());
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG2(BTHREAD_KEY_SETSPECIFIC,result,error_flag,__key,__ptr);
+  if (error_flag)
+  {
+//    errno = result;
+    return -1;
+  }
+  
+  return result;
 }
 
 static inline void* 
 __bthread_getspecific( __bthread_key_t __key )
 {
-  return (void *) __bthread_syscall( MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_GETSPECIFIC, 
-                                     (int)__key, __bthread_self(), 0);
+  int result, error_flag;
+  MAVEN_SYSCALL_ARG1(BTHREAD_KEY_GETSPECIFIC,result,error_flag,__key);
+  if (error_flag)
+  {
+//    errno = result;
+    return (void*) -1;
+  }
+  
+  return (void *) result;
 }
 
 #ifdef __cplusplus
@@ -312,10 +344,10 @@ __gthread_recursive_mutex_unlock (__gthread_recursive_mutex_t *__mutex)
   if (__gthread_active_p ())
     {
       if (--__mutex->depth == 0)
-	{
+	  {
 	   __mutex->owner = (__bthread_t) 0;
 	   __gthrw_(__bthread_mutex_unlock) (&__mutex->actual);
-	}
+	  }
     }
   return 0;
 }

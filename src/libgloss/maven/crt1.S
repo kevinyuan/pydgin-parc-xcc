@@ -47,7 +47,46 @@
 # arguments to main(). Basically argc is stored in a0 and equals the
 # value pointed to by sp, and argv is stored in a1 equals the sp+4.
 #
+# The crt1 will setup the stack pointers for each of the hard threads.
+# It looks in a control register to see how many hard threads are
+# present, and then allocates space for each stack starting at the
+# initial stack pointer (MEMORY_SIZE - ARGS_SIZE) and growing towards
+# smaller memory addresses. The final memory layout will look something
+# like this:
+#
+#  address = 0
+#  -------------------------------------------
+#  .text and .rodata sections
+#  -------------------------------------------
+#  .data sections
+#  ------------------------------------------- <--- _end
+#  heap                                          | heap grows down
+#  ...                                           v
+#  -------------------------------------------
+#  stack space for thread 1                      ^               
+#  ...                                           | stack grows up
+#  ------------------------------------------- <--- thread 1 sp  
+#  stack space for thread 0                      ^               
+#  ...                                           | stack grows up
+#  ------------------------------------------- <--- thread 0 sp  
+#  argument count and argument pointers        
+#  ...
+#  -------------------------------------------
+#  argument strings
+#  ...
+#  -------------------------------------------
+#  undefined memory from here to MEMORY_SIZE-1
+#  -------------------------------------------
+#  address = MEMORY_SIZE - 1
+#
 
+#include <machine/syscfg.h>
+
+# We define some shorter macro names for use in this file
+
+#define c0_coreid MAVEN_SYSCFG_REGDEF_COP0_CORE_ID
+#define tstack_sz MAVEN_SYSCFG_THREAD_STACK_SIZE
+        
 #-------------------------------------------------------------------------
 # Global symbols defined elsewhere
 #-------------------------------------------------------------------------
