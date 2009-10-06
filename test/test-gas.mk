@@ -60,7 +60,7 @@ test_gas_junk += $(test_gas_exes) $(test_gas_link_outs)
 test_gas_run_outs = $(patsubst %, %-run.out, $(test_gas_exes))
 
 $(test_gas_run_outs) : %-run.out : % $(cross_run_dep)
-	-{ $(CROSS_RUN) $<; \
+	-{ $(CROSS_RUN) ./$<; \
     echo "*** run exit = $$?"; \
   } 2>&1 | tee $@
 

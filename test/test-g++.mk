@@ -68,7 +68,7 @@ test_gxx_junk += $(test_gxx_exes) $(test_gxx_link_outs)
 test_gxx_run_outs = $(patsubst %, %-run.out, $(test_gxx_exes))
 
 $(test_gxx_run_outs) : %-run.out : % $(cross_run_dep)
-	-{ $(CROSS_RUN) $<; \
+	-{ $(CROSS_RUN) ./$<; \
     echo "*** run exit = $$?"; \
   } 2>&1 | tee $@
 

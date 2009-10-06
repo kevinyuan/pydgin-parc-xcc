@@ -77,7 +77,7 @@ test_gcc_junk += $(test_gcc_exes) $(test_gcc_link_outs)
 test_gcc_run_outs += $(patsubst %, %-run.out, $(test_gcc_exes))
 
 $(test_gcc_run_outs) : %-run.out : % $(cross_run_dep)
-	-{ $(CROSS_RUN) $<; \
+	-{ $(CROSS_RUN) ./$<; \
     echo "*** run exit = $$?"; \
   } 2>&1 | tee $@
 
@@ -112,7 +112,7 @@ $(test_gcc_args_exe) : % : %.c $(CROSS_GCC)
   } 2>&1 | tee $*-compile.out
 
 $(test_gcc_args_run_out) : %-run.out : % $(cross_run_dep)
-	-{ $(CROSS_RUN) $< apple pear mango; \
+	-{ $(CROSS_RUN) ./$< apple pear mango; \
     echo "*** run exit = $$?"; \
   } 2>&1 | tee $@
 
