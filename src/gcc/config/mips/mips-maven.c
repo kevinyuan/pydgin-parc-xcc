@@ -4774,9 +4774,12 @@ mips_get_arg_info( struct mips_arg_info* info, const CUMULATIVE_ARGS *cum,
     case ABI_EABI:
       /* The EABI conventions have traditionally been defined in terms
          of TYPE_MODE, regardless of the actual type. */
-      info->fpr_p = (( GET_MODE_CLASS(mode) == MODE_FLOAT
+
+      /* YUNSUP: Since we don't use FPRs anymore */
+      /* info->fpr_p = (( GET_MODE_CLASS(mode) == MODE_FLOAT
                        || GET_MODE_CLASS(mode) == MODE_VECTOR_FLOAT )
-                     && GET_MODE_SIZE(mode) <= UNITS_PER_FPVALUE );
+                     && GET_MODE_SIZE(mode) <= UNITS_PER_FPVALUE ); */
+      info->fpr_p = false;
       break;
 
     case ABI_32:
