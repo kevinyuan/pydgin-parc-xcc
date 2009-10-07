@@ -22,6 +22,19 @@
 ;; YUNSUP: changes for the Maven compiler, this port is based on MIPS
 
 ;;------------------------------------------------------------------------
+;; Maven specific register constraints
+;;------------------------------------------------------------------------
+
+(define_register_constraint "Z" "VEC_REGS"
+  "A vector register.")
+
+;(define_memory_constraint "w"
+;  "A memory address with no offset suitable for a vector memory
+;   instruction's base address"
+;  (and (match_code "mem")
+;       (match_test "mips_maven_vector_mem_operand( XEXP(op,0) )")))
+
+;;------------------------------------------------------------------------
 ;; Register constraints
 ;;------------------------------------------------------------------------
 

@@ -21,6 +21,10 @@ test_gcc_srcs = \
   test-gcc-arth-double.c \
   test-gcc-args-struct-int.c \
   test-gcc-args-struct-single.c \
+  test-gcc-args-vec.c \
+  test-gcc-builtins-ustride.c \
+  test-gcc-builtins-strided.c \
+  test-gcc-builtins-tvec.c \
   test-gcc-vpfunc.c \
 
 #-------------------------------------------------------------------------

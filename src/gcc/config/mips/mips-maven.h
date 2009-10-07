@@ -1549,9 +1549,12 @@ march=*: -mhard-float}"
         - GOT_VERSION_REGNUM (see above load_call<mode> for details)
    - 3 dummy entries that were used at various times in the past.
    - 6 DSP accumulator registers (3 hi-lo pairs) for MIPS DSP ASE
-   - 6 DSP control registers  */
+   - 4 dummy entries so that vec registers are conveniently located 
+   - 32 maven vector regisetrs */
 
-#define FIRST_PSEUDO_REGISTER 188
+/* yunsup/cbatten - This used to be 188, but after adding vector
+   registers it should be 224 */
+#define FIRST_PSEUDO_REGISTER 224
 
 /* By default, fix the kernel registers ($26 and $27), the global
    pointer ($28) and the stack pointer ($29). This can change depending
@@ -1562,6 +1565,10 @@ march=*: -mhard-float}"
    This can be overridden, in, e.g., mips_override_options or
    CONDITIONAL_REGISTER_USAGE should the assumption be inappropriate for
    a particular target. */
+
+/* cbatten - We fix vv0, vat, vgp, vsp, vfp, vra but the remaining 26
+   vector registers are available for general allocation (vv0-vv1,
+   va0-va7, vt4-vt9, vs0-vs8, vk0-vk1) */
 
 #define FIXED_REGISTERS                                                 \
   {                                                                     \
@@ -1580,7 +1587,11 @@ march=*: -mhard-float}"
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
     /* 6 DSP accumulator registers & 6 control registers */             \
-    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1                                  \
+    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,                                 \
+    /* yunsup/cbatten - maven vector registers (see above) */           \
+    1, 1, 1, 1,                                                         \
+    1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1                      \
   }
 
 /* Set up this array for o32 by default.
@@ -1593,6 +1604,9 @@ march=*: -mhard-float}"
    calls, sibcalls don't clobber $31, so the register reaches the called
    function in tact. EPILOGUE_USES says that $31 is useful to the called
    function. */
+
+/* yunsup/cbatten - vector registers have similar clobber semantics as
+   standard mips registers for now. */
 
 #define CALL_USED_REGISTERS                                             \
   {                                                                     \
@@ -1611,9 +1625,12 @@ march=*: -mhard-float}"
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
     /* 6 DSP accumulator registers & 6 control registers */             \
-    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1                                  \
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                                 \
+    /* yunsup - maven vector registers */                               \
+    1, 1, 1, 1,                                                         \
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1                      \
   }
-
 
 /* Define this since $28, though fixed, is call-saved in many ABIs. */
 
@@ -1636,7 +1653,11 @@ march=*: -mhard-float}"
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
     /* 6 DSP accumulator registers & 6 control registers */             \
-    1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0                                  \
+    1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,                                 \
+    /* yunsup - maven vector registers */                               \
+    1, 1, 1, 1,                                                         \
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1                      \
   }
 
 /* Internal macros to classify a register number as to whether it's a
@@ -1698,6 +1719,15 @@ march=*: -mhard-float}"
 #define AT_REGNUM (GP_REG_FIRST + 1)
 #define HI_REGNUM (TARGET_BIG_ENDIAN ? MD_REG_FIRST : MD_REG_FIRST + 1)
 #define LO_REGNUM (TARGET_BIG_ENDIAN ? MD_REG_FIRST + 1 : MD_REG_FIRST)
+
+/* cbatten - maven vector register first/last */
+
+#define VEC_REG_FIRST 192
+#define VEC_REG_LAST  223
+#define VEC_REG_NUM   (VEC_REG_LAST - VEC_REG_FIRST + 1)
+
+#define VEC_REG_P( regno_ ) \
+  ((unsigned int) ((int) (regno_) - VEC_REG_FIRST) < VEC_REG_NUM)
 
 /* FPSW_REGNUM is the single condition code used if !ISA_HAS_8CC. If
    ISA_HAS_8CC, it should not be used, and an arbitrary ST_REG should be
@@ -1862,6 +1892,7 @@ enum reg_class
   GR_AND_MD1_REGS,
   GR_AND_MD_REGS,
   GR_AND_ACC_REGS,
+  VEC_REGS,         /* yunsup - maven vector registesr */
   ALL_REGS,         /* all registers */
   LIM_REG_CLASSES   /* max value + 1 */
 };
@@ -1900,6 +1931,7 @@ enum reg_class
     "GR_AND_MD1_REGS",            \
     "GR_AND_MD_REGS",             \
     "GR_AND_ACC_REGS",            \
+    "VEC_REGS",                   \
     "ALL_REGS"                    \
   }
 
@@ -1914,39 +1946,39 @@ enum reg_class
    suitable as an initializer for the type `HARD_REG_SET' which is
    defined in `hard-reg-set.h'. */
 
-#define REG_CLASS_CONTENTS                                                                              \
-  {                                                                                                     \
-    { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* NO_REGS */           \
-    { 0x000300fc, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* M16_REGS */          \
-    { 0x01000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* T_REG */             \
-    { 0x010300fc, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* M16_T_REGS */        \
-    { 0x02000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* PIC_FN_ADDR_REG */   \
-    { 0x00000008, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* V1_REG */            \
-    { 0xfdffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* LEA_REGS */          \
-    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* GR_REGS */           \
-    /* YUNSUP: change fpr mapping for FP_REGS. */ \
-    /* { 0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* FP_REGS */           \
-    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* FP_REGS */           \
-    { 0x00000000, 0x00000000, 0x00000001, 0x00000000, 0x00000000, 0x00000000 }, /* MD0_REG */           \
-    { 0x00000000, 0x00000000, 0x00000002, 0x00000000, 0x00000000, 0x00000000 }, /* MD1_REG */           \
-    { 0x00000000, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000000 }, /* MD_REGS */           \
-    { 0x00000000, 0x00000000, 0xffff0000, 0x0000ffff, 0x00000000, 0x00000000 }, /* COP0_REGS */         \
-    { 0x00000000, 0x00000000, 0x00000000, 0xffff0000, 0x0000ffff, 0x00000000 }, /* COP2_REGS */         \
-    { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xffff0000, 0x0000ffff }, /* COP3_REGS */         \
-    /* YUNSUP: change fcc mapping for ST_REGS. */ \
-    /* { 0x00000000, 0x00000000, 0x000007f8, 0x00000000, 0x00000000, 0x00000000 }, */ /* ST_REGS */           \
-    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* ST_REGS */           \
-    { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x003f0000 }, /* DSP_ACC_REGS */      \
-    { 0x00000000, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x003f0000 }, /* ACC_REGS */          \
-    { 0x00000000, 0x00000000, 0x00006000, 0x00000000, 0x00000000, 0x00000000 }, /* FRAME_REGS */        \
-    { 0xffffffff, 0x00000000, 0x00000001, 0x00000000, 0x00000000, 0x00000000 }, /* GR_AND_MD0_REGS */   \
-    { 0xffffffff, 0x00000000, 0x00000002, 0x00000000, 0x00000000, 0x00000000 }, /* GR_AND_MD1_REGS */   \
-    { 0xffffffff, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000000 }, /* GR_AND_MD_REGS */    \
-    { 0xffffffff, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x003f0000 }, /* GR_AND_ACC_REGS */   \
-    /* { 0xffffffff, 0xffffffff, 0xffff67ff, 0xffffffff, 0xffffffff, 0x0fffffff } */ /* ALL_REGS */          \
-    { 0xffffffff, 0x00000000, 0xffff6003, 0xffffffff, 0xffffffff, 0x0fffffff }  /* ALL_REGS */          \
+#define REG_CLASS_CONTENTS                                                                                          \
+  {                                                                                                                 \
+    { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* NO_REGS */           \
+    { 0x000300fc, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* M16_REGS */          \
+    { 0x01000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* T_REG */             \
+    { 0x010300fc, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* M16_T_REGS */        \
+    { 0x02000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* PIC_FN_ADDR_REG */   \
+    { 0x00000008, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* V1_REG */            \
+    { 0xfdffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* LEA_REGS */          \
+    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* GR_REGS */           \
+    /* YUNSUP: change fpr mapping for FP_REGS. */                                                                   \
+    /* { 0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* FP_REGS */                 \
+    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* FP_REGS */           \
+    { 0x00000000, 0x00000000, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* MD0_REG */           \
+    { 0x00000000, 0x00000000, 0x00000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* MD1_REG */           \
+    { 0x00000000, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* MD_REGS */           \
+    { 0x00000000, 0x00000000, 0xffff0000, 0x0000ffff, 0x00000000, 0x00000000, 0x00000000 }, /* COP0_REGS */         \
+    { 0x00000000, 0x00000000, 0x00000000, 0xffff0000, 0x0000ffff, 0x00000000, 0x00000000 }, /* COP2_REGS */         \
+    { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xffff0000, 0x0000ffff, 0x00000000 }, /* COP3_REGS */         \
+    /* YUNSUP: change fcc mapping for ST_REGS. */                                                                   \
+    /* { 0x00000000, 0x00000000, 0x000007f8, 0x00000000, 0x00000000, 0x00000000 }, */ /* ST_REGS */                 \
+    { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* ST_REGS */           \
+    { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x003f0000, 0x00000000 }, /* DSP_ACC_REGS */      \
+    { 0x00000000, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x003f0000, 0x00000000 }, /* ACC_REGS */          \
+    { 0x00000000, 0x00000000, 0x00006000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* FRAME_REGS */        \
+    { 0xffffffff, 0x00000000, 0x00000001, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* GR_AND_MD0_REGS */   \
+    { 0xffffffff, 0x00000000, 0x00000002, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* GR_AND_MD1_REGS */   \
+    { 0xffffffff, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* GR_AND_MD_REGS */    \
+    { 0xffffffff, 0x00000000, 0x00000003, 0x00000000, 0x00000000, 0x003f0000, 0x00000000 }, /* GR_AND_ACC_REGS */   \
+    /* YUNSUP: maven vector registers */                                                                            \
+    { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0xffffffff }, /* VEC_REGS */          \
+    { 0xffffffff, 0x00000000, 0xffff6003, 0xffffffff, 0xffffffff, 0x0fffffff, 0xffffffff }  /* ALL_REGS */          \
   }
-
 
 /* A C expression whose value is a register class containing hard
    register REGNO. In general there is more that one such class; choose
@@ -2017,7 +2049,12 @@ enum reg_class
     128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,    \
     144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,    \
     160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,    \
-    182,183,184,185,186,187                                             \
+    182,183,184,185,186,187,                                            \
+    /* YUNSUP: dummy registers */                                       \
+    188,189,190,191,                                                    \
+    /* YUNSUP: maven vector registers */                                \
+    192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,    \
+    208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223     \
   }
 
 /* ORDER_REGS_FOR_LOCAL_ALLOC is a macro which permits reg_alloc_order
@@ -2756,7 +2793,13 @@ typedef struct mips_args
   "$c3r16","$c3r17","$c3r18","$c3r19","$c3r20","$c3r21","$c3r22","$c3r23", \
   "$c3r24","$c3r25","$c3r26","$c3r27","$c3r28","$c3r29","$c3r30","$c3r31", \
   "$ac1hi","$ac1lo","$ac2hi","$ac2lo","$ac3hi","$ac3lo","$dsp_po","$dsp_sc", \
-  "$dsp_ca","$dsp_ou","$dsp_cc","$dsp_ef" \
+  "$dsp_ca","$dsp_ou","$dsp_cc","$dsp_ef",                                 \
+  /* yunsup/cbatten - maven vector registers */                            \
+  "",      "",      "",      "",                                           \
+  "$vzero","$vat",  "$vv0",  "$vv1",  "$va0",  "$va1",  "$va2",  "$va3",   \
+  "$va4",  "$va5",  "$va6",  "$va7",  "$vt4",  "$vt5",  "$vt6",  "$vt7",   \
+  "$vs0",  "$vs1",  "$vs2",  "$vs3",  "$vs4",  "$vs5",  "$vs6",  "$vs7",   \
+  "$vt8",  "$vt9",  "$vk0",  "$vk1",  "$vgp",  "$vsp",  "$vs8",  "$vra"    \
 }
 
 /* List the "software" names for each register. Also list the numerical
@@ -2764,10 +2807,7 @@ typedef struct mips_args
 
 /* cbatten - Maven uses EABI whic has a4-a7,t0-t3,t8-t9 and no t4-t7.
    For now we just hard code this changes into the names below. We also
-   add the names for vector registers and vp registers, but note that
-   these are just aliases for now. The compiled doesn't do anything
-   special with vector registers - it just thinks they are scalar
-   registers. */
+   add the extra names for vector registers vt0-vt3, and vfp. */
 
 #define ADDITIONAL_REGISTER_NAMES                                       \
   {                                                                     \
@@ -2809,42 +2849,11 @@ typedef struct mips_args
     { "s8",     30 + GP_REG_FIRST },                                    \
     { "fp",     30 + GP_REG_FIRST },                                    \
     { "ra",     31 + GP_REG_FIRST },                                    \
-    { "vat",     1 + GP_REG_FIRST },                                    \
-    { "vv0",     2 + GP_REG_FIRST },                                    \
-    { "vv1",     3 + GP_REG_FIRST },                                    \
-    { "va0",     4 + GP_REG_FIRST },                                    \
-    { "va1",     5 + GP_REG_FIRST },                                    \
-    { "va2",     6 + GP_REG_FIRST },                                    \
-    { "va3",     7 + GP_REG_FIRST },                                    \
-    { "va4",     8 + GP_REG_FIRST },                                    \
-    { "va5",     9 + GP_REG_FIRST },                                    \
-    { "va6",    10 + GP_REG_FIRST },                                    \
-    { "va7",    11 + GP_REG_FIRST },                                    \
-    { "vt0",     8 + GP_REG_FIRST },                                    \
-    { "vt1",     9 + GP_REG_FIRST },                                    \
-    { "vt2",    10 + GP_REG_FIRST },                                    \
-    { "vt3",    11 + GP_REG_FIRST },                                    \
-    { "vt4",    12 + GP_REG_FIRST },                                    \
-    { "vt5",    13 + GP_REG_FIRST },                                    \
-    { "vt6",    14 + GP_REG_FIRST },                                    \
-    { "vt7",    15 + GP_REG_FIRST },                                    \
-    { "vs0",    16 + GP_REG_FIRST },                                    \
-    { "vs1",    17 + GP_REG_FIRST },                                    \
-    { "vs2",    18 + GP_REG_FIRST },                                    \
-    { "vs3",    19 + GP_REG_FIRST },                                    \
-    { "vs4",    20 + GP_REG_FIRST },                                    \
-    { "vs5",    21 + GP_REG_FIRST },                                    \
-    { "vs6",    22 + GP_REG_FIRST },                                    \
-    { "vs7",    23 + GP_REG_FIRST },                                    \
-    { "vt8",    24 + GP_REG_FIRST },                                    \
-    { "vt9",    25 + GP_REG_FIRST },                                    \
-    { "vk0",    26 + GP_REG_FIRST },                                    \
-    { "vk1",    27 + GP_REG_FIRST },                                    \
-    { "vgp",    28 + GP_REG_FIRST },                                    \
-    { "vsp",    29 + GP_REG_FIRST },                                    \
-    { "vs8",    30 + GP_REG_FIRST },                                    \
-    { "vfp",    30 + GP_REG_FIRST },                                    \
-    { "vra",    31 + GP_REG_FIRST },                                    \
+    { "vt0",     8 + VEC_REG_FIRST },                                   \
+    { "vt1",     9 + VEC_REG_FIRST },                                   \
+    { "vt2",    10 + VEC_REG_FIRST },                                   \
+    { "vt3",    11 + VEC_REG_FIRST },                                   \
+    { "vfp",    30 + VEC_REG_FIRST },                                   \
     ALL_COP_ADDITIONAL_REGISTER_NAMES                                   \
   }
 

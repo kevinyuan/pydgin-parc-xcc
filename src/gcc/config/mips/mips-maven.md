@@ -256,6 +256,11 @@
 
    (UNSPEC_MIPS_CACHE           600)
    (UNSPEC_R10K_CACHE_BARRIER   601)
+
+   (UNSPEC_MAVEN_VLOAD              700)
+   (UNSPEC_MAVEN_VSTORE             701)
+   (UNSPEC_MAVEN_VLOAD_STRIDED      702)
+   (UNSPEC_MAVEN_VSTORE_STRIDED     703)
   ]
 )
 
@@ -999,6 +1004,165 @@
 (include "sr71k.md")
 (include "xlr.md")
 (include "generic.md")
+
+;;------------------------------------------------------------------------
+;; Maven vector mode iterators and attributes
+;;------------------------------------------------------------------------
+;; cbatten - Ideally we would define this using syscfg.h so that it is
+;; easy to change the maximum vector length. Since this file doesn't go
+;; through the preprocessor, we would need to have a separate .md file
+;; included from here which we preprocess explicitly in our t-maven make
+;; fragment. For now we just hard code the mode types.
+
+;; Basic set of vector modes and attributes
+
+(define_mode_iterator VEC
+  [V32SI V32HI V32QI V32SF])
+
+(define_mode_attr innermode
+  [(V32SI "SI") (V32HI "HI") (V32QI "QI") (V32SF "SF")])
+
+(define_mode_attr vmode
+  [(V32SI "vsi") (V32HI "vhi") (V32QI "vqi") (V32SF "vsf")])
+
+(define_mode_attr vec_mem_suffix
+  [(V32SI "w") (V32HI "h") (V32QI "b") (V32SF "w")])
+
+(define_mode_attr vec_umem_suffix
+  [(V32SI "w") (V32HI "hu") (V32QI "bu") (V32SF "w")])
+
+(define_mode_attr vec_arith_suffix
+  [(V32SI "u") (V32HI "u") (V32QI "u") (V32SF ".s")])
+
+;;------------------------------------------------------------------------
+;; Maven vector move patterns
+;;------------------------------------------------------------------------
+;; cbatten - This pattern is required to support vector modes and
+;; registers. It basically tells gcc how to "reload" vector modes into
+;; and out of vector registers. According to gcc internals we need to be
+;; careful in terms of how we write this pattern - specifically I don't
+;; think you can use multiple patterns via define_qsplit or mutually
+;; exclusive predicates. There needs to be a single pattern for the
+;; reload. This complicates things a bit, because what I really want to
+;; do is a split to brake base offset addressing into two separate
+;; pieces of RTL (the address calculation and the actual load). This
+;; would allow gcc more flexibility in how to schedule and register
+;; allocate the address calculation. Unforutnately, I couldn't get this
+;; to work. I ended up having to hardcode the scheduling and use of the
+;; $at register for the address calculation result (see
+;; mips_maven_output_vector_move). Works for now but maybe not the best
+;; approach. My attempt at using a split is commented out below as an
+;; example for future work.
+
+(define_insn "mov<mode>"
+  [(set (match_operand:VEC 0 "nonimmediate_operand" "=Z,Z,m")
+        (match_operand:VEC 1 "nonimmediate_operand" "Z,m,Z"))]
+  ""
+{
+  return mips_maven_output_vector_move( <MODE>mode, 
+                                        operands[0], operands[1] );
+})
+
+;;(define_insn "*movv32si_load_base"
+;;  [(set (match_operand:V32SI 0 "register_operand" "=Z")
+;;        (mem:V32SI (match_operand:GPR 1 "register_operand" "r")))]
+;;  ""
+;;  "lw.v\t%0,%1")
+;;
+;;(define_split
+;;  [(set (match_operand:V32SI 0 "register_operand")
+;;        (mem:V32SI 
+;;          (plus:SI (match_operand:SI 1 "register_operand")
+;;                    (match_operand:SI 2 "const_int_operand"))))]
+;;  "reload_completed"
+;;  [(set (match_dup 1) (plus:SI (match_dup 1) (match_dup 2)))
+;;   (set (match_dup 0) (mem:V32SI (match_dup 1)))]
+;;  {}
+;;)
+;;
+;;(define_insn "*movv32si_store_base"
+;;  [(set (mem:V32SI (match_operand:GPR 0 "register_operand"))
+;;        (match_operand:V32SI 1 "register_operand"))]
+;;  ""
+;;  "sw.v\t%1,%0")
+;; 
+;;(define_split
+;;  [(set (mem:V32SI 
+;;          (plus:SI (match_operand:SI 0 "register_operand")
+;;                    (match_operand:SI 1 "const_int_operand")))
+;;        (match_operand:V32SI 2 "register_operand"))]
+;;  "reload_completed"
+;;  [(set (match_dup 0) (plus:SI (match_dup 0) (match_dup 1)))
+;;   (set (mem:V32SI (match_dup 0)) (match_dup 2))]
+;;  {}
+;;)
+
+;;------------------------------------------------------------------------
+;; Maven unit-stride vector load/store builtins
+;;------------------------------------------------------------------------
+;; cbatten - The signed/unsigned load variants are actually quite tricky
+;; to get right since normally gcc just always uses unsigned loads and
+;; then has separate sign extension patterns which can be used when
+;; necessary. Because with VT we won't know if sign extension is needed
+;; until inside the vector fetched code (and then it is too late to use
+;; a signed-extending vector load) so for now what we do is always use
+;; unsigned types. Then in the VP code you can explicitly cast to an
+;; signed type if you need to. Not as efficient but it will do for now.
+;; Also note that we include an unspec in these patterns. This is to
+;; make sure that these patterns don't match the normal reload movm
+;; pattern above. I'm not positive whether or not this is necessary, but
+;; from the gcc mailing lists it seems like it might be important.
+
+(define_insn "mips_maven_vload_<VEC:vmode>"
+  [(set (match_operand:VEC 0 "register_operand" "=Z")
+        (unspec:VEC [(mem:VEC 
+                       (match_operand:SI 1 "pmode_register_operand" "b"))]
+                    UNSPEC_MAVEN_VLOAD))]
+  ""
+  "l<vec_umem_suffix>.v\t%0,%1")
+
+(define_insn "mips_maven_vstore_<VEC:vmode>"
+  [(set (mem:VEC (match_operand:SI 1 "pmode_register_operand" "b"))
+        (unspec:VEC [(match_operand:VEC 0 "register_operand" "Z")]
+                    UNSPEC_MAVEN_VSTORE))]
+  ""
+  "s<vec_mem_suffix>.v\t%0,%1")
+
+;;------------------------------------------------------------------------
+;; Maven strided vector load/store builtins
+;;------------------------------------------------------------------------
+;; cbatten - Since we use a standard scalar register as the base
+;; register, gcc will take care of generating any extra address
+;; arithmetic itself.
+
+(define_insn "mips_maven_vload_strided_<VEC:vmode>"
+  [(set (match_operand:VEC 0 "register_operand" "=Z")
+        (unspec:VEC [(mem:BLK (scratch))
+                     (match_operand:SI 1 "pmode_register_operand" "b")
+                     (match_operand:SI 2 "register_operand" "r")]
+                    UNSPEC_MAVEN_VLOAD_STRIDED))]
+  ""
+  "l<vec_umem_suffix>st.v\t%0,%1,%2")
+
+(define_insn "mips_maven_vstore_strided_<VEC:vmode>"
+  [(set (mem:BLK (scratch))
+        (unspec:BLK [(match_operand:VEC 0 "register_operand" "=Z")
+                     (match_operand:SI 1 "pmode_register_operand" "b")
+                     (match_operand:SI 2 "register_operand" "r")]
+                     UNSPEC_MAVEN_VSTORE_STRIDED))]
+  ""
+  "s<vec_mem_suffix>st.v\t%0,%1,%2")
+
+;;------------------------------------------------------------------------
+;; Maven traditional vector ops
+;;------------------------------------------------------------------------
+
+(define_insn "add<mode>3"
+  [(set (match_operand:VEC 0 "register_operand" "=Z")
+        (plus:VEC (match_operand:VEC 1 "register_operand" "Z")
+                  (match_operand:VEC 2 "register_operand" "Z")))]
+  ""
+  "add<vec_arith_suffix>.vv\t%0,%1,%2")
 
 ;;------------------------------------------------------------------------
 ;; Conditional Traps

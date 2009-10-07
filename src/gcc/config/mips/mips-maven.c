@@ -571,7 +571,17 @@ const enum reg_class mips_regno_to_class[FIRST_PSEUDO_REGISTER] =
   COP3_REGS,    COP3_REGS,      COP3_REGS,      COP3_REGS,
   DSP_ACC_REGS, DSP_ACC_REGS,   DSP_ACC_REGS,   DSP_ACC_REGS,
   DSP_ACC_REGS, DSP_ACC_REGS,   ALL_REGS,       ALL_REGS,
-  ALL_REGS,     ALL_REGS,       ALL_REGS,       ALL_REGS
+  ALL_REGS,     ALL_REGS,       ALL_REGS,       ALL_REGS,
+  /* YUNSUP: maven vector registers */
+  NO_REGS,      NO_REGS,        NO_REGS,        NO_REGS,
+  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
+  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
+  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
+  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
+  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
+  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
+  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
+  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS
 };
 
 /* The value of TARGET_ATTRIBUTE_TABLE. */
@@ -1122,9 +1132,13 @@ static const struct mips_rtx_cost_data mips_rtx_cost_data[PROCESSOR_MAX] =
   }
 };
 
+/*----------------------------------------------------------------------*/
+/* mflip_mips16_entry                                                   */
+/*----------------------------------------------------------------------*/
 /* This hash table keeps track of implicit "mips16" and "nomips16"
    attributes for -mflip_mips16. It maps decl names onto a boolean mode
    setting. */
+
 struct mflip_mips16_entry GTY(()) 
 {
   const char* name;
@@ -2171,7 +2185,6 @@ mips_valid_lo_sum_p( enum mips_symbol_type symbol_type,
   return true;
 }
 
-
 /*----------------------------------------------------------------------*/
 /* mips_classify_address                                                */
 /*----------------------------------------------------------------------*/
@@ -3022,6 +3035,7 @@ mips_force_address( rtx x, enum machine_mode mode )
 {
   if ( !mips_legitimate_address_p( mode, x, false ) )
     x = force_reg( Pmode, x );
+
   return x;
 }
 
@@ -7680,12 +7694,18 @@ mips_print_float_branch_condition( FILE *file, enum rtx_code code,
    'D'  Print the second part of a double-word register or mem operand.
    'L'  Print the low-order register in a double-word register operand.
    'M'  Print high-order register in a double-word register operand.
-   'z'  Print $0 if OP is zero, otherwise print OP normally. */
+   'z'  Print $0 if OP is zero, otherwise print OP normally.   
+   'y'  maven - Print just base register, no offset
+   'w'  maven - Print just offset, no base register */
 
 void
 mips_print_operand( FILE *file, rtx op, int letter )
 {
   enum rtx_code code;
+  
+  /* For new Z letter */
+  rtx base;
+  HOST_WIDE_INT offset; 
 
   if ( PRINT_OPERAND_PUNCT_VALID_P( letter ) ) {
     mips_print_operand_punctuation( file, letter );
@@ -7800,7 +7820,22 @@ mips_print_operand( FILE *file, rtx op, int letter )
         break;
 
         case MEM:
-          if ( letter == 'D' )
+
+          /* cbatten - We break the memory address into its base and
+             offset parts and output just the base register. */
+          if ( letter == 'y' ) {
+            mips_split_plus( XEXP(op,0), &base, &offset );
+            fprintf( file, "%s", reg_names[REGNO(base)] );
+          }
+
+          /* cbatten - We break the memory address into its base and
+             offset parts and output just the offset. */
+          else if ( letter == 'w' ) {
+            mips_split_plus( XEXP(op,0), &base, &offset );
+            fprintf( file, "%lld", offset );
+          }
+
+          else if ( letter == 'D' )
             output_address( plus_constant( XEXP( op, 0 ), 4 ) );
           else
             output_address( XEXP( op, 0 ) );
@@ -10219,6 +10254,14 @@ mips_hard_regno_mode_ok_p( unsigned int regno, enum machine_mode mode )
   unsigned int size;
   enum mode_class mclass;
 
+  /* cbatten - Only vector modes are allowed in vector registers, and
+     only vector registers can hold vector modes. */
+
+  if ( VECTOR_MODE_P(mode) )
+    return ( (VEC_REG_FIRST <= regno) && (regno <= VEC_REG_LAST) );
+
+  /* Condition codes */
+
   if ( mode == CCV2mode )
     return ( ISA_HAS_8CC
              && ST_REG_P( regno )
@@ -10338,6 +10381,11 @@ mips_hard_regno_nregs( int regno ATTRIBUTE_UNUSED, enum machine_mode mode )
   // if ( 0 )
   //   return ( GET_MODE_SIZE(mode) + UNITS_PER_FPREG - 1 ) / UNITS_PER_FPREG;
 
+  /* Maven vector modes always take one vector register */
+
+  if ( VECTOR_MODE_P(mode) || VEC_REG_P(regno) )
+    return 1;
+
   /* All other registers are word-sized. */
   return ( GET_MODE_SIZE(mode) + UNITS_PER_WORD - 1 ) / UNITS_PER_WORD;
 }
@@ -10353,6 +10401,11 @@ mips_class_max_nregs( enum reg_class rclass, enum machine_mode mode )
 {
   int size;
   HARD_REG_SET left;
+
+  /* Maven vector modes always take one vector register */
+
+  if ( VECTOR_MODE_P(mode) || (rclass == VEC_REGS) )
+    return 1;
 
   size = 0x8000;
   COPY_HARD_REG_SET( left, reg_class_contents[(int) rclass] );
@@ -10629,18 +10682,20 @@ mips_ira_cover_classes( void )
 {
   static const enum reg_class acc_classes[] =
   {
-    /* YUNSUP: since we don't have a seperate FP_REGS class */
+    /* YUNSUP: since we don't have a seperate FP_REGS class, add maven
+       vector register cover class */
     /* GR_AND_ACC_REGS, FP_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
-    ST_REGS, LIM_REG_CLASSES */
-    GR_AND_ACC_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
+       ST_REGS, LIM_REG_CLASSES */
+    GR_AND_ACC_REGS, COP0_REGS, COP2_REGS, COP3_REGS, VEC_REGS,
     LIM_REG_CLASSES
   };
   static const enum reg_class no_acc_classes[] =
   {
-    /* YUNSUP: since we don't have a seperate FP_REGS class */
+    /* YUNSUP: since we don't have a seperate FP_REGS class, add maven
+       vector register cover class */
     /* GR_REGS, FP_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
-    ST_REGS, LIM_REG_CLASSES */
-    GR_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
+       ST_REGS, LIM_REG_CLASSES */
+    GR_REGS, COP0_REGS, COP2_REGS, COP3_REGS, VEC_REGS,
     LIM_REG_CLASSES
   };
 
@@ -10778,6 +10833,14 @@ static bool
 mips_vector_mode_supported_p( enum machine_mode mode )
 {
   switch (mode) {
+
+    /* Maven vector modes */
+    case V32SImode:
+    case V32HImode:
+    case V32QImode:
+    case V32SFmode:
+      return true;
+
     case V2SFmode:
       return TARGET_PAIRED_SINGLE_FLOAT;
 
@@ -11962,6 +12025,11 @@ struct mips_builtin_description
 /* AVAIL_NON_MIPS16                                                     */
 /*----------------------------------------------------------------------*/
 
+/* cbatten - Seemed easier just to provide an availability predicate
+   even though they are always available since we only compile
+   mips-maven.c for the maven target. */
+AVAIL_NON_MIPS16( maven, TARGET_MAVEN )
+
 AVAIL_NON_MIPS16( paired_single, TARGET_PAIRED_SINGLE_FLOAT )
 AVAIL_NON_MIPS16( sb1_paired_single, TARGET_SB1 && TARGET_PAIRED_SINGLE_FLOAT )
 AVAIL_NON_MIPS16( mips3d, TARGET_MIPS3D )
@@ -12454,7 +12522,29 @@ static const struct mips_builtin_description mips_builtins[] =
   LOONGSON_BUILTIN_SUFFIX( punpcklwd, s, MIPS_V2SI_FTYPE_V2SI_V2SI ),
 
   /* Sundry other built-in functions. */
-  DIRECT_NO_TARGET_BUILTIN( cache, MIPS_VOID_FTYPE_SI_CVPOINTER, cache )
+  DIRECT_NO_TARGET_BUILTIN( cache, MIPS_VOID_FTYPE_SI_CVPOINTER, cache ),
+
+  /* Maven builtins */
+
+  DIRECT_BUILTIN( maven_vload_vsi, MIPS_UVSI_FTYPE_POINTER, maven ),
+  DIRECT_BUILTIN( maven_vload_vhi, MIPS_UVHI_FTYPE_POINTER, maven ),
+  DIRECT_BUILTIN( maven_vload_vqi, MIPS_UVQI_FTYPE_POINTER, maven ),
+  DIRECT_BUILTIN( maven_vload_vsf, MIPS_VSF_FTYPE_POINTER,  maven ),
+
+  DIRECT_BUILTIN( maven_vload_strided_vsi, MIPS_UVSI_FTYPE_POINTER_SI, maven ),
+  DIRECT_BUILTIN( maven_vload_strided_vhi, MIPS_UVHI_FTYPE_POINTER_SI, maven ),
+  DIRECT_BUILTIN( maven_vload_strided_vqi, MIPS_UVQI_FTYPE_POINTER_SI, maven ),
+  DIRECT_BUILTIN( maven_vload_strided_vsf, MIPS_VSF_FTYPE_POINTER_SI,  maven ),
+
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_vsi, MIPS_VOID_FTYPE_UVSI_POINTER, maven ),
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_vhi, MIPS_VOID_FTYPE_UVHI_POINTER, maven ),
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_vqi, MIPS_VOID_FTYPE_UVQI_POINTER, maven ),
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_vsf, MIPS_VOID_FTYPE_VSF_POINTER,  maven ),
+
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vsi, MIPS_VOID_FTYPE_UVSI_POINTER_SI, maven ), 
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vhi, MIPS_VOID_FTYPE_UVHI_POINTER_SI, maven ), 
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vqi, MIPS_VOID_FTYPE_UVQI_POINTER_SI, maven ), 
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vsf, MIPS_VOID_FTYPE_VSF_POINTER_SI,  maven )
 };
 
 /*----------------------------------------------------------------------*/
@@ -12524,6 +12614,29 @@ mips_build_cvpointer_type( void )
   mips_builtin_vector_type (unsigned_intHI_type_node, V4HImode)
 #define MIPS_ATYPE_UV8QI                                                \
   mips_builtin_vector_type (unsigned_intQI_type_node, V8QImode)
+
+/* Maven vector argument types */
+
+#define MIPS_ATYPE_VSI \
+  mips_builtin_vector_type( intSI_type_node, V32SImode )
+
+#define MIPS_ATYPE_VHI \
+  mips_builtin_vector_type( intHI_type_node, V32HImode )
+
+#define MIPS_ATYPE_VQI \
+  mips_builtin_vector_type( intQI_type_node, V32QImode )
+
+#define MIPS_ATYPE_VSF \
+  mips_builtin_vector_type( float_type_node, V32SFmode )
+
+#define MIPS_ATYPE_UVSI \
+  mips_builtin_vector_type( unsigned_intSI_type_node, V32SImode )
+
+#define MIPS_ATYPE_UVHI \
+  mips_builtin_vector_type( unsigned_intHI_type_node, V32HImode )
+
+#define MIPS_ATYPE_UVQI \
+  mips_builtin_vector_type( unsigned_intQI_type_node, V32QImode )
 
 /* MIPS_FTYPE_ATYPESN takes N MIPS_FTYPES-like type codes and lists
    their associated MIPS_ATYPEs. */
@@ -15367,6 +15480,135 @@ mips_order_regs_for_local_alloc( void )
     reg_alloc_order[0] = 24;
     reg_alloc_order[24] = 0;
   }
+}
+
+/*----------------------------------------------------------------------*/
+/* MAVEN_SYSCFG_VLEN_MAX                                                */
+/*----------------------------------------------------------------------*/
+/* Eventually we want to include syscfg.h here so that we can use the
+   common definition of MAVEN_SYSCFG_VLEN_MAX, but for now it is not
+   clear how to do this. syscfg.h in in libgloss which is not used when
+   building the actual cross-compiler. We kind of want to use the
+   "version" in sims - the one for native programs instead of maven
+   programs. Even if we could include syscfg.h though, we would still
+   need to figure out a way to include it in the mips-maven.md since the
+   machine description file also refers to these modes. */
+
+#define MAVEN_SYSCFG_VLEN_MAX 32
+
+/*----------------------------------------------------------------------*/
+/* MIPS_MAVEN_VECTOR_MODE_NAME                                          */
+/*----------------------------------------------------------------------*/
+/* This is a helper macro which creates a maven vector mode name from
+   the given inner_mode. It does this by concatenating a 'V' prefix, the
+   maximum maven vector length, and the inner mode together. For
+   example, MIPS_MAVEN_VECTOR_MODE_NAME(SI) should expand to V32SI if
+   the maven maximum vector length is 32. We need to use the nested
+   macros to make sure MAVEN_SYSCFG_VLEN_MAX is expanded _before_
+   concatenation. */
+
+#define MIPS_MAVEN_VECTOR_MODE_NAME_H2( res_ ) res_
+
+#define MIPS_MAVEN_VECTOR_MODE_NAME_H1( arg0_, arg1_ ) \
+  MIPS_MAVEN_VECTOR_MODE_NAME_H2( V ## arg0_ ## arg1_ ## mode )
+
+#define MIPS_MAVEN_VECTOR_MODE_NAME_H0( arg0_, arg1_ ) \
+  MIPS_MAVEN_VECTOR_MODE_NAME_H1( arg0_, arg1_ )
+
+#define MIPS_MAVEN_VECTOR_MODE_NAME( inner_mode_ ) \
+  MIPS_MAVEN_VECTOR_MODE_NAME_H0( MAVEN_SYSCFG_VLEN_MAX, inner_mode_ )
+
+/*----------------------------------------------------------------------*/
+/* mips_maven_output_vector_move                                        */
+/*----------------------------------------------------------------------*/
+/* cbatten - Return the appropriate instructions to move SRC into DEST.
+   Assume that SRC is operand 1 and DEST is operand 0. We always use
+   unsigned loads and stores - see info in mips-maven.md about vector
+   loads and stores for more information. I'm using a little hacky way
+   to substitute in the memory operation instruction, similar to what
+   they do in mips_output_move. */
+
+const char*
+mips_maven_output_vector_move( enum machine_mode mode, rtx dest, rtx src )
+{
+  enum rtx_code dest_code, src_code;
+  rtx base;
+  HOST_WIDE_INT offset;
+  int i;
+  const char* inst;
+
+  dest_code = GET_CODE(dest);
+  src_code  = GET_CODE(src);
+
+  /* Register to register move */
+
+  if ( (src_code == REG) && (dest_code == REG) )
+    return "mov.vv\t%0,%1";
+
+  /* Load */
+
+  if ( (src_code == MEM) && (dest_code == REG) ) {
+
+    switch ( mode ) {
+      case MIPS_MAVEN_VECTOR_MODE_NAME(SI): inst = "lw.v "; break;
+      case MIPS_MAVEN_VECTOR_MODE_NAME(HI): inst = "lhu.v"; break;
+      case MIPS_MAVEN_VECTOR_MODE_NAME(QI): inst = "lbu.v"; break;
+      case MIPS_MAVEN_VECTOR_MODE_NAME(SF): inst = "lw.v "; break;
+      default: gcc_unreachable();
+    }
+
+    mips_split_plus( XEXP(src,0), &base, &offset );
+    if ( offset == 0 ) {
+      static char retval[] = "_____\t%0,%y1";
+      for ( i = 0; i < 5; i++ )
+        retval[i] = inst[i];
+      return retval;
+    }
+    else {
+      static char retval[]
+        = ".set    noat          \n\t"
+          "addiu   $at, %y1, %w1 \n\t"
+          "_____   %0, $at       \n\t"
+          ".set    at";
+      for ( i = 0; i < 5; i++ )
+        retval[48+i] = inst[i];
+      return retval;
+    }
+
+  }
+
+  /* Store */
+
+  if ( (src_code == REG) && (dest_code == MEM) ) {
+
+    switch ( mode ) {
+      case MIPS_MAVEN_VECTOR_MODE_NAME(SI): inst = "sw.v"; break;
+      case MIPS_MAVEN_VECTOR_MODE_NAME(HI): inst = "sh.v"; break;
+      case MIPS_MAVEN_VECTOR_MODE_NAME(QI): inst = "sb.v"; break;
+      case MIPS_MAVEN_VECTOR_MODE_NAME(SF): inst = "sw.v"; break;
+      default: gcc_unreachable();
+    }
+
+    mips_split_plus( XEXP(dest,0), &base, &offset );
+    if ( offset == 0 ) {
+      static char retval[] = "____\t%1,%y0";
+      for ( i = 0; i < 4; i++ )
+        retval[i] = inst[i];
+      return retval;
+    }
+    else {
+      static char retval[]
+        = ".set    noat          \n\t"
+          "addiu   $at, %y0, %w0 \n\t"
+          "____    %1, $at       \n\t"
+          ".set    at";
+      for ( i = 0; i < 4; i++ )
+        retval[48+i] = inst[i];
+      return retval;
+    }
+  }
+
+  gcc_unreachable();
 }
 
 /*----------------------------------------------------------------------*/

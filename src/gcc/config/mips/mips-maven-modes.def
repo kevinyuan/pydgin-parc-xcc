@@ -1,0 +1,94 @@
+/*======================================================================*/
+/* Maven extra machine modes                                            */
+/*======================================================================*/
+/* Our vector modes use the max vector length since we are essentially
+   leveraging the gcc SIMD extensions (which have a fixed vector
+   length). */
+
+/* Eventually we want to include syscfg.h here so that we can use the
+   common definition of MAVEN_SYSCFG_VLEN_MAX, but for now it is not
+   clear how to do this. syscfg.h in in libgloss which is not used when
+   building the actual cross-compiler. We kind of want to use the
+   "version" in sims - the one for native programs instead of maven
+   programs. Even if we could include syscfg.h though, we would still
+   need to figure out a way to include it in the mips-maven.md since the
+   machine description file also refers to these modes. */
+
+#define MAVEN_SYSCFG_VLEN_MAX 32
+
+/*----------------------------------------------------------------------*/
+/* Old mips modes                                                       */
+/*----------------------------------------------------------------------*/
+/* These modes are in the original mips-modes.def file. Eventually we
+   might be able to remove some of these but for now the
+   mips-maven.[h,c,md] files refer to these mode macros (even though the
+   modes are not used. */
+
+/* MIPS has a quirky almost-IEEE format for all its floating point */
+RESET_FLOAT_FORMAT (SF, mips_single_format);
+RESET_FLOAT_FORMAT (DF, mips_double_format);
+
+/* Irix6 will override this via MIPS_TFMODE_FORMAT */
+FLOAT_MODE (TF, 16, mips_quad_format);
+
+/* Vector modes */
+VECTOR_MODES( INT,    8 ); /* V8QI V4HI V2SI */
+VECTOR_MODES( FLOAT,  8 ); /*      V4HF V2SF */
+VECTOR_MODES( INT,    4 ); /*      V4QI V2HI */
+
+VECTOR_MODES( FRACT,  4 ); /* V4QQ  V2HQ  */
+VECTOR_MODES( UFRACT, 4 ); /* V4UQQ V2UHQ */
+VECTOR_MODES( ACCUM,  4 ); /*       V2HA  */
+VECTOR_MODES( UACCUM, 4 ); /*       V2UHA */
+
+/* Paired single comparison instructions use 2 or 4 CC */
+CC_MODE( CCV2 );
+ADJUST_BYTESIZE( CCV2, 8 );
+ADJUST_ALIGNMENT( CCV2, 8 );
+
+CC_MODE( CCV4 );
+ADJUST_BYTESIZE( CCV4, 16 );
+ADJUST_ALIGNMENT( CCV4, 16 );
+
+/* For MIPS DSP control registers */
+CC_MODE( CCDSP );
+
+/*----------------------------------------------------------------------*/
+/* MAVEN_VECTOR_MODE_NAME                                               */
+/*----------------------------------------------------------------------*/
+/* This is a helper macro which creates a maven vector mode name from
+   the given inner_mode. It does this by concatenating a 'V' prefix, the
+   maximum maven vector length, and the inner mode together. For
+   example, MAVEN_VECTOR_MODE_NAME(SI) should expand to V32SI if the
+   maven maximum vector length is 32. We need to use the nested macros
+   to make sure MAVEN_SYSCFG_VLEN_MAX is expanded _before_
+   concatenation. */
+
+#define MAVEN_VECTOR_MODE_NAME_H2( res_ ) res_
+
+#define MAVEN_VECTOR_MODE_NAME_H1( arg0_, arg1_, arg2_ ) \
+  MAVEN_VECTOR_MODE_NAME_H2( arg0_ ## arg1_ ## arg2_ )
+
+#define MAVEN_VECTOR_MODE_NAME_H0( arg0_, arg1_, arg2_ ) \
+  MAVEN_VECTOR_MODE_NAME_H1( arg0_, arg1_, arg2_ )
+
+#define MAVEN_VECTOR_MODE_NAME( inner_mode_ ) \
+  MAVEN_VECTOR_MODE_NAME_H0( V, MAVEN_SYSCFG_VLEN_MAX, inner_mode_ )
+
+/*----------------------------------------------------------------------*/
+/* Maven Vector Modes                                                   */
+/*----------------------------------------------------------------------*/
+
+VECTOR_MODE( INT,   SI, MAVEN_SYSCFG_VLEN_MAX );
+VECTOR_MODE( INT,   HI, MAVEN_SYSCFG_VLEN_MAX );
+VECTOR_MODE( INT,   QI, MAVEN_SYSCFG_VLEN_MAX );
+VECTOR_MODE( FLOAT, SF, MAVEN_SYSCFG_VLEN_MAX );
+
+/* By default, vector types are forced to be aligned to the full vector
+   size but in maven we just need them to be aligned to the element
+   size. */
+
+ADJUST_ALIGNMENT( MAVEN_VECTOR_MODE_NAME(SI), 4 );
+ADJUST_ALIGNMENT( MAVEN_VECTOR_MODE_NAME(HI), 2 );
+ADJUST_ALIGNMENT( MAVEN_VECTOR_MODE_NAME(QI), 1 );
+ADJUST_ALIGNMENT( MAVEN_VECTOR_MODE_NAME(SF), 4 );
