@@ -113,8 +113,8 @@
 #define OP_SH_COPZ              0
 #define OP_MASK_IMMNELM         0x1f    /* celio was here */
 #define OP_SH_IMMNELM           0       /* celio was here */
-#define OP_MASK_VV              0x1f    /* celio was here */
-#define OP_SH_VV                11      /* celio was here */
+#define OP_MASK_VD              0x1f    /* celio was here */
+#define OP_SH_VD                11      /* celio was here */
 #define OP_MASK_VS              0x1f    /* celio was here */
 #define OP_SH_VS                21      /* celio was here */
 #define OP_MASK_VT              0x1f    /* celio was here */
@@ -301,7 +301,7 @@ struct mips_opcode
    "d" 5 bit destination register specifier (OP_*_RD)
    "h" 5 bit prefx hint (OP_*_PREFX)
    "#n" 5 bit unsigned immediate for vtum ops (OP_*_IMMNELM) // maven modification -CCelio 
-   "#v" 5 bit destination vector register specifier (OP_*_VV) // maven modification -CCelio 
+   "#d" 5 bit destination vector register specifier (OP_*_VD) // maven modification -CCelio 
    "#s" 5 bit source vector register specifier (OP_*_VS)  // maven modification -CCelio
    "#t" 5 bit target vector register specifier (OP_*_VT) // maven modification -CCelio 
    "i" 16 bit unsigned immediate (OP_*_IMMEDIATE)

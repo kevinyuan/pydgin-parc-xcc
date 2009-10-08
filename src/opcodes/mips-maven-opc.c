@@ -270,83 +270,69 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 //NOTE: these dependencies are not used and may be incorrect if optimizations are turned on!
 // in particular there is dependency aliasing on the write destination (which is NOT a GPR)
-{"lw.v",           "#v,t",      0x60000000, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lh.v",           "#v,t",      0x60000020, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lhu.v",          "#v,t",      0x600000a0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lb.v",           "#v,t",      0x60000060, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lbu.v",          "#v,t",      0x600000e0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lw.v",           "#d,t",      0x60000000, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lh.v",           "#d,t",      0x60000020, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhu.v",          "#d,t",      0x600000a0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lb.v",           "#d,t",      0x60000060, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbu.v",          "#d,t",      0x600000e0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 
 //uncommented until the ISA simulator supports it.
-//{"lwai.v",         "#v,t,s",    0x60000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-//{"lhai.v",         "#v,t,s",    0x60000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-//{"lhuai.v",        "#v,t,s",    0x600000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-//{"lbai.v",         "#v,t,s",    0x60000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-//{"lbuai.v",        "#v,t,s",    0x600000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+//{"lwai.v",         "#d,t,s",    0x60000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+//{"lhai.v",         "#d,t,s",    0x60000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+//{"lhuai.v",        "#d,t,s",    0x600000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+//{"lbai.v",         "#d,t,s",    0x60000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+//{"lbuai.v",        "#d,t,s",    0x600000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 
 //l*sh.v are actually l*st.v with stride of zero, therefore these ops must be declared first for the dissemambler's sake.
-{"lwsh.v",         "#v,t",      0x64000000, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lhsh.v",         "#v,t",      0x64000020, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lhush.v",        "#v,t",      0x640000a0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lbsh.v",         "#v,t",      0x64000060, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lbush.v",        "#v,t",      0x640000e0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-                                                                   
-{"lwst.v",         "#v,t,s",    0x64000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lhst.v",         "#v,t,s",    0x64000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lhust.v",        "#v,t,s",    0x640000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lbst.v",         "#v,t,s",    0x64000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lbust.v",        "#v,t,s",    0x640000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lwsh.v",         "#d,t",      0x64000000, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhsh.v",         "#d,t",      0x64000020, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhush.v",        "#d,t",      0x640000a0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbsh.v",         "#d,t",      0x64000060, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbush.v",        "#d,t",      0x640000e0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+                     
+{"lwst.v",         "#d,t,s",    0x64000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhst.v",         "#d,t,s",    0x64000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhust.v",        "#d,t,s",    0x640000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbst.v",         "#d,t,s",    0x64000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbust.v",        "#d,t,s",    0x640000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 
-{"lwseg.v",        "#v,t,#n",   0x60000000, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lhseg.v",        "#v,t,#n",   0x60000020, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lhuseg.v",       "#v,t,#n",   0x600000a0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lbseg.v",        "#v,t,#n",   0x60000060, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lbuseg.v",       "#v,t,#n",   0x600000e0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-                                   
-{"lwsegst.v",      "#v,t,#n,s", 0x64000000, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lhsegst.v",      "#v,t,#n,s", 0x64000020, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lhusegst.v",     "#v,t,#n,s", 0x640000a0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lbsegst.v",      "#v,t,#n,s", 0x64000060, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lbusegst.v",     "#v,t,#n,s", 0x640000e0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lwseg.v",        "#d,t,#n",   0x60000000, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhseg.v",        "#d,t,#n",   0x60000020, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhuseg.v",       "#d,t,#n",   0x600000a0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbseg.v",        "#d,t,#n",   0x60000060, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbuseg.v",       "#d,t,#n",   0x600000e0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+                     
+{"lwsegst.v",      "#d,t,#n,s", 0x64000000, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhsegst.v",      "#d,t,#n,s", 0x64000020, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhusegst.v",     "#d,t,#n,s", 0x640000a0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbsegst.v",      "#d,t,#n,s", 0x64000060, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbusegst.v",     "#d,t,#n,s", 0x640000e0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 
 //NOTE: these dependencies are not used and may be incorrect if optimizations are turned on!
-{"sw.v",           "#v,t",      0x68000080, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
-{"sh.v",           "#v,t",      0x680000a0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
-{"sb.v",           "#v,t",      0x680000e0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"sw.v",           "#d,t",      0x68000080, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"sh.v",           "#d,t",      0x680000a0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"sb.v",           "#d,t",      0x680000e0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
 
-{"swst.v",         "#v,t,s",    0x6c000080, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
-{"shst.v",         "#v,t,s",    0x6c0000a0, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
-{"sbst.v",         "#v,t,s",    0x6c0000e0, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"swst.v",         "#d,t,s",    0x6c000080, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"shst.v",         "#d,t,s",    0x6c0000a0, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"sbst.v",         "#d,t,s",    0x6c0000e0, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
 
-{"swseg.v",        "#v,t,#n",   0x68000080, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
-{"shseg.v",        "#v,t,#n",   0x680000a0, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
-{"sbseg.v",        "#v,t,#n",   0x680000e0, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"swseg.v",        "#d,t,#n",   0x68000080, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"shseg.v",        "#d,t,#n",   0x680000a0, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"sbseg.v",        "#d,t,#n",   0x680000e0, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
 
-{"swsegst.v",      "#v,t,#n,s", 0x6c000080, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
-{"shsegst.v",      "#v,t,#n,s", 0x6c0000a0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
-{"sbsegst.v",      "#v,t,#n,s", 0x6c0000e0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"swsegst.v",      "#d,t,#n,s", 0x6c000080, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"shsegst.v",      "#d,t,#n,s", 0x6c0000a0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"sbsegst.v",      "#d,t,#n,s", 0x6c0000e0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
 
 //does not capture the vector register write dependency
-{"mtvp",           "s,#v,t",    0x48000007, 0xfc0007ff, RD_s|WR_d|RD_t,               0,              INSN_MAVEN        },
-{"mfvp",           "s,#v,t",    0x48000009, 0xfc0007ff, RD_s|RD_v|WR_t,               0,              INSN_MAVEN        },
-{"mtvps",          "#v,t",      0x48000008, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+{"mtvp",           "s,#d,t",    0x48000007, 0xfc0007ff, RD_s|WR_d|RD_t,               0,              INSN_MAVEN        },
+{"mfvp",           "s,#d,t",    0x48000009, 0xfc0007ff, RD_s|RD_v|WR_t,               0,              INSN_MAVEN        },
+{"mtvps",          "#d,t",      0x48000008, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
 
-//* addu.vv (mov.vv)                                                    
-//                                                                      
-// - Summary  : Add with three vector registers (VD = VS + VT)          
-// - Assembly : addu.vv r_vdst, r_vs, r_vt                              
-// - Format   : vtur                                                    
-//                                                                      
-//  31    26 25   21 20   16 15   11 10  8 7       0                    
-// +--------+-------+-------+-------+-----+---------+                   
-// |  cop2  |  vs   |  vt   |  rv   |     |   cmd   |                   
-// | 010010 | vsrc1 | vsrc2 | vdst  | 000 | 10000001|                   
-// +--------+-------+-------+-------+-----+---------+                   
-
-// | 010010 | vsrc1 | vsrc2 | vdst  | 000 | 1000_0001|                   
-                                                                      
 //does not capture the vector registers read and write dependencies
-{"mov.vv",         "#v,#s",     0x48000081, 0xfc1f07ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-{"addu.vv",        "#v,#s,#t",  0x48000081, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"mov.vv",         "#d,#s",     0x48000081, 0xfc1f07ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"addu.vv",        "#d,#s,#t",  0x48000081, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 //{"addu",           "d,v,t",   0x00000021, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              I1                },
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },

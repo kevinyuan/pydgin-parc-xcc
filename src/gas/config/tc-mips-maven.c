@@ -3797,9 +3797,8 @@ macro_build( expressionS *ep, const char* name, const char* fmt, ... )
             INSERT_OPERAND( IMMNELM, insn, va_arg( args, int ) );
             continue;
           /* cbatten  - support for maven vector register specifiers */
-          case 'v':
-//            INSERT_OPERAND( RD, insn, va_arg( args, int ) );
-            INSERT_OPERAND( VV, insn, va_arg( args, int ) );
+          case 'd':
+            INSERT_OPERAND( VD, insn, va_arg( args, int ) );
             continue;
           case 's':
             INSERT_OPERAND( VS, insn, va_arg( args, int ) );
@@ -8581,8 +8580,8 @@ validate_mips_insn( const struct mips_opcode* opc )
             USE_BITS( OP_MASK_IMMNELM, OP_SH_IMMNELM );
             break;
           /* cbatten - support for maven vector register specifiers */
-          case 'v':
-            USE_BITS( OP_MASK_VV, OP_SH_VV );
+          case 'd':
+            USE_BITS( OP_MASK_VD, OP_SH_VD );
             break;
           case 's':
             USE_BITS( OP_MASK_VS, OP_SH_VS );
@@ -9097,12 +9096,11 @@ mips_ip( char* str, struct mips_cl_insn* ip )
               continue;
             
             /* cbatten - support for maven vector register specifiers */
-            case 'v':
+            case 'd':
               ok = reg_lookup( &s, RTYPE_NUM|RTYPE_VREG, &regno );
               if ( !ok )
                 as_bad( _( "Invalid vector register" ) );
-//              INSERT_OPERAND( RD, *ip, regno );
-              INSERT_OPERAND( VV, *ip, regno );
+              INSERT_OPERAND( VD, *ip, regno );
               continue;
             case 's':
               ok = reg_lookup( &s, RTYPE_NUM|RTYPE_VREG, &regno );
