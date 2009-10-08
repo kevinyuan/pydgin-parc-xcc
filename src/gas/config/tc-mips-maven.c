@@ -3793,12 +3793,19 @@ macro_build( expressionS *ep, const char* name, const char* fmt, ... )
       case '#':
         switch ( *fmt++ ) {
           /* celio    - support for new field (segment ops "number of elements")*/
-          case 's':
+          case 'n':
             INSERT_OPERAND( IMMNELM, insn, va_arg( args, int ) );
             continue;
           /* cbatten  - support for maven vector register specifiers */
           case 'v':
-            INSERT_OPERAND( RD, insn, va_arg( args, int ) );
+//            INSERT_OPERAND( RD, insn, va_arg( args, int ) );
+            INSERT_OPERAND( VV, insn, va_arg( args, int ) );
+            continue;
+          case 's':
+            INSERT_OPERAND( VS, insn, va_arg( args, int ) );
+            continue;
+          case 't':
+            INSERT_OPERAND( VT, insn, va_arg( args, int ) );
             continue;
           default:
             internalError();
@@ -8570,12 +8577,18 @@ validate_mips_insn( const struct mips_opcode* opc )
       case '#':
         switch ( c = *p++ ) {
           /* celio - support for new field "# of segments" */
-          case 's':
-            USE_BITS( OP_MASK_IMMNELM,     OP_SH_IMMNELM );
+          case 'n':
+            USE_BITS( OP_MASK_IMMNELM, OP_SH_IMMNELM );
             break;
           /* cbatten - support for maven vector register specifiers */
           case 'v':
-            USE_BITS( OP_MASK_RD, OP_SH_RD );
+            USE_BITS( OP_MASK_VV, OP_SH_VV );
+            break;
+          case 's':
+            USE_BITS( OP_MASK_VS, OP_SH_VS );
+            break;
+          case 't':
+            USE_BITS( OP_MASK_VT, OP_SH_VT );
             break;
           default:
             internalError();
@@ -9066,7 +9079,7 @@ mips_ip( char* str, struct mips_cl_insn* ip )
              * code copied from '<' shift amount
              * support for segment vector loads field "# of elements"
              */
-            case 's': 
+            case 'n': 
 
               /* According to the manual, if the shift amount is greater
                  than 31 or less than 0, then the shift amount should be mod
@@ -9088,7 +9101,20 @@ mips_ip( char* str, struct mips_cl_insn* ip )
               ok = reg_lookup( &s, RTYPE_NUM|RTYPE_VREG, &regno );
               if ( !ok )
                 as_bad( _( "Invalid vector register" ) );
-              INSERT_OPERAND( RD, *ip, regno );
+//              INSERT_OPERAND( RD, *ip, regno );
+              INSERT_OPERAND( VV, *ip, regno );
+              continue;
+            case 's':
+              ok = reg_lookup( &s, RTYPE_NUM|RTYPE_VREG, &regno );
+              if ( !ok )
+                as_bad( _( "Invalid vector register" ) );
+              INSERT_OPERAND( VS, *ip, regno );
+              continue;
+            case 't':
+              ok = reg_lookup( &s, RTYPE_NUM|RTYPE_VREG, &regno );
+              if ( !ok )
+                as_bad( _( "Invalid vector register" ) );
+              INSERT_OPERAND( VT, *ip, regno );
               continue;
             default:
               internalError();

@@ -53,9 +53,8 @@
 
    The floating point 'r' format uses OP, FMT, FT, FS, FD and FUNCT.
 
-   //"#" is used to denote added Maven fields (such as #s for segment element count)
+   //"#" is used to denote added Maven fields (such as #n for segment element count)
    The vtum format uses OP, RS, RT, RD/RV, U,S, N_ELM <<--- Maven modification - CCelio
-
 
 
 
@@ -114,6 +113,12 @@
 #define OP_SH_COPZ              0
 #define OP_MASK_IMMNELM         0x1f    /* celio was here */
 #define OP_SH_IMMNELM           0       /* celio was here */
+#define OP_MASK_VV              0x1f    /* celio was here */
+#define OP_SH_VV                11      /* celio was here */
+#define OP_MASK_VS              0x1f    /* celio was here */
+#define OP_SH_VS                21      /* celio was here */
+#define OP_MASK_VT              0x1f    /* celio was here */
+#define OP_SH_VT                16      /* celio was here */
 #define OP_MASK_IMMEDIATE       0xffff
 #define OP_SH_IMMEDIATE         0
 #define OP_MASK_DELTA           0xffff
@@ -295,7 +300,10 @@ struct mips_opcode
    "c" 10 bit breakpoint code (OP_*_CODE)
    "d" 5 bit destination register specifier (OP_*_RD)
    "h" 5 bit prefx hint (OP_*_PREFX)
-   "#s" 5 bit unsigned immediate for vtum ops (OP_*_IMMNELM) // maven modification -CCelio 
+   "#n" 5 bit unsigned immediate for vtum ops (OP_*_IMMNELM) // maven modification -CCelio 
+   "#v" 5 bit destination vector register specifier (OP_*_VV) // maven modification -CCelio 
+   "#s" 5 bit source vector register specifier (OP_*_VS)  // maven modification -CCelio
+   "#t" 5 bit target vector register specifier (OP_*_VT) // maven modification -CCelio 
    "i" 16 bit unsigned immediate (OP_*_IMMEDIATE)
    "j" 16 bit signed immediate (OP_*_DELTA)
    "k" 5 bit cache opcode in target register position (OP_*_CACHE)

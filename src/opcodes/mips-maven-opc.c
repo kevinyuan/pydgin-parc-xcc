@@ -296,17 +296,17 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"lbst.v",         "#v,t,s",    0x64000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 {"lbust.v",        "#v,t,s",    0x640000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 
-{"lwseg.v",        "#v,t,#s",   0x60000000, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lhseg.v",        "#v,t,#s",   0x60000020, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lhuseg.v",       "#v,t,#s",   0x600000a0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lbseg.v",        "#v,t,#s",   0x60000060, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-{"lbuseg.v",       "#v,t,#s",   0x600000e0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-                                    
-{"lwsegst.v",      "#v,t,#s,s", 0x64000000, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lhsegst.v",      "#v,t,#s,s", 0x64000020, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lhusegst.v",     "#v,t,#s,s", 0x640000a0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lbsegst.v",      "#v,t,#s,s", 0x64000060, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
-{"lbusegst.v",     "#v,t,#s,s", 0x640000e0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lwseg.v",        "#v,t,#n",   0x60000000, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhseg.v",        "#v,t,#n",   0x60000020, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lhuseg.v",       "#v,t,#n",   0x600000a0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbseg.v",        "#v,t,#n",   0x60000060, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+{"lbuseg.v",       "#v,t,#n",   0x600000e0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
+                                   
+{"lwsegst.v",      "#v,t,#n,s", 0x64000000, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhsegst.v",      "#v,t,#n,s", 0x64000020, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhusegst.v",     "#v,t,#n,s", 0x640000a0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbsegst.v",      "#v,t,#n,s", 0x64000060, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbusegst.v",     "#v,t,#n,s", 0x640000e0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 
 //NOTE: these dependencies are not used and may be incorrect if optimizations are turned on!
 {"sw.v",           "#v,t",      0x68000080, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
@@ -317,18 +317,37 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"shst.v",         "#v,t,s",    0x6c0000a0, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
 {"sbst.v",         "#v,t,s",    0x6c0000e0, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
 
-{"swseg.v",        "#v,t,#s",   0x68000080, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
-{"shseg.v",        "#v,t,#s",   0x680000a0, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
-{"sbseg.v",        "#v,t,#s",   0x680000e0, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"swseg.v",        "#v,t,#n",   0x68000080, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"shseg.v",        "#v,t,#n",   0x680000a0, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
+{"sbseg.v",        "#v,t,#n",   0x680000e0, 0xffe007e0, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
 
-{"swsegst.v",      "#v,t,#s,s", 0x6c000080, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
-{"shsegst.v",      "#v,t,#s,s", 0x6c0000a0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
-{"sbsegst.v",      "#v,t,#s,s", 0x6c0000e0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"swsegst.v",      "#v,t,#n,s", 0x6c000080, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"shsegst.v",      "#v,t,#n,s", 0x6c0000a0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"sbsegst.v",      "#v,t,#n,s", 0x6c0000e0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
 
 //does not capture the vector register write dependency
 {"mtvp",           "s,#v,t",    0x48000007, 0xfc0007ff, RD_s|WR_d|RD_t,               0,              INSN_MAVEN        },
 {"mfvp",           "s,#v,t",    0x48000009, 0xfc0007ff, RD_s|RD_v|WR_t,               0,              INSN_MAVEN        },
 {"mtvps",          "#v,t",      0x48000008, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+
+//* addu.vv (mov.vv)                                                    
+//                                                                      
+// - Summary  : Add with three vector registers (VD = VS + VT)          
+// - Assembly : addu.vv r_vdst, r_vs, r_vt                              
+// - Format   : vtur                                                    
+//                                                                      
+//  31    26 25   21 20   16 15   11 10  8 7       0                    
+// +--------+-------+-------+-------+-----+---------+                   
+// |  cop2  |  vs   |  vt   |  rv   |     |   cmd   |                   
+// | 010010 | vsrc1 | vsrc2 | vdst  | 000 | 10000001|                   
+// +--------+-------+-------+-------+-----+---------+                   
+
+// | 010010 | vsrc1 | vsrc2 | vdst  | 000 | 1000_0001|                   
+                                                                      
+//does not capture the vector registers read and write dependencies
+{"mov.vv",         "#v,#s",     0x48000081, 0xfc1f07ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"addu.vv",        "#v,#s,#t",  0x48000081, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+//{"addu",           "d,v,t",   0x00000021, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              I1                },
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },
