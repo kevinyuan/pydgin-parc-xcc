@@ -345,7 +345,7 @@ test:
         bnez    $v1, fail
         
         # Pass/fail (return zero for success, else return $v0)
-
+pass:   
         li      $v0, 0
 fail:   lw      $ra, -4($sp)
         jr      $ra

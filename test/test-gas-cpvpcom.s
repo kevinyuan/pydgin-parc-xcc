@@ -32,24 +32,22 @@ test:
         la        $a1, w_out
         la        $a2, w_ref
         li        $a3, 2
-        setvl     $a3, $a3        # get two VPs
+        setvl     $a3, $a3         # get two VPs
 
 mtvp_test:
-        lw        $t0, wvalue     # lw from wvalue
-        mtvp      $0, $vt0, $t0   # give VP[0],R[vt] = $t0
-        li        $t0, 0          # clear $t0
+        lw        $t0, wvalue      # lw from wvalue
+        mtvp      $0, $vt0, $t0    # give VP[0],R[vt] = $t0
+        li        $t0, 0           # clear $t0
         vf        vp_add_one
-        sync.l.cv
 
-        mfvp      $0, $vt0, $t0   # get value back
+        mfvp      $0, $vt0, $t0    # get value back
         lw        $t1, w_ref
         li        $v0, 0xa
         bne       $t0, $t1, fail                 
 
         lw        $t1, wvalue
-        mtvps     $vt1, $t1       # load wvalue to VP[0], VP[1]
+        mtvps     $vt1, $t1        # load wvalue to VP[0], VP[1]
         vf        vp_mv_add_private
-        sync.l.cv
         
         li        $t1, 1           # get value from VP[1]
         mfvp      $t1, $vt0, $t0   # get value back from VP[1]
@@ -58,10 +56,9 @@ mtvp_test:
         bne       $t0, $t1, fail                 
 
 pass:
-        li        $v0, 0x0          
+        li        $v0, 0x0
+fail:   sync.l.cv
         jr        $ra
-fail:
-        jr        $ra 
 
 vp_add_one:
         addiu     $t0, $t0, 1

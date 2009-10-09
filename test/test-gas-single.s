@@ -17,16 +17,12 @@ test:
         li      $t1, 0x3E4CCCCD # 0.2
         li      $t3, 0x3E99999A # 0.3=0.1+0.2
         add.s   $t2, $t0, $t1
-        bne     $t2, $t3, failed
-        li      $v0, 0
-        j       done
-
-failed:
-
         li      $v0, 1
+        bne     $t2, $t3, fail
 
-done:
+pass:
+        li        $v0, 0x0
+fail:   jr        $ra
 
-        jr       $ra
         .end    test
 

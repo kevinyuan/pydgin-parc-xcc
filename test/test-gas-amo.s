@@ -28,7 +28,7 @@ test:
 
         li      $v0, 0
 
-# test amo.add
+        # test amo.add
 
         la      $t0, value
         li      $t1, 1
@@ -41,7 +41,7 @@ test:
         li      $t3, 1
         bne     $t2, $t2, fail
 
-#test amo.and
+        # test amo.and
         
         li      $t1, 0
         amo.and $t1, $t0, $t1
@@ -53,7 +53,7 @@ test:
         addu    $v0, 1
         bnez    $t2, fail
         
-#test amo.or
+        # test amo.or
         
         li      $t1, 2
         amo.or  $t1, $t0, $t1
@@ -65,11 +65,9 @@ test:
         li      $t3, 2
         bne     $t2, $t3, fail
         
-        li      $v0, 0
-        jr      $ra
-
-fail:                                
-        jr      $ra                  
+pass:
+        li        $v0, 0x0
+fail:   jr        $ra
 
         .end    test
 

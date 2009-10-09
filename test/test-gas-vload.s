@@ -47,55 +47,47 @@ test:
 
 # commented out the below instructions since they are
 # unsupported by the ISA simulator 
-#        lwai.v    $vt2, $t0, $t1   # not really testing functionality
-#        lhai.v    $vt2, $t0, $t1   # not really testing functionality
-#        lhuai.v   $vt2, $t0, $t1   # not really testing functionality
-#        lbai.v    $vt2, $t0, $t1   # not really testing functionality
-#        lbuai.v   $vt2, $t0, $t1   # not really testing functionality
+#        lwai.v    $vt2, $t0, $t1
+#        lhai.v    $vt2, $t0, $t1
+#        lhuai.v   $vt2, $t0, $t1
+#        lbai.v    $vt2, $t0, $t1
+#        lbuai.v   $vt2, $t0, $t1
         
-        lwst.v    $vt2, $t0, $t1   # not really testing functionality
-        lhst.v    $vt2, $t0, $t1   # not really testing functionality
-        lhust.v   $vt2, $t0, $t1   # not really testing functionality
-        lbst.v    $vt2, $t0, $t1   # not really testing functionality
-        lbust.v   $vt2, $t0, $t1   # not really testing functionality
+        lwst.v    $vt2, $t0, $t1
+        lhst.v    $vt2, $t0, $t1
+        lhust.v   $vt2, $t0, $t1
+        lbst.v    $vt2, $t0, $t1
+        lbust.v   $vt2, $t0, $t1
                     
-        lwseg.v   $vt2, $t0, 0x4     # not really testing functionality
-        lhseg.v   $vt2, $t0, 0x4     # not really testing functionality
-        lhuseg.v  $vt2, $t0, 0x4     # not really testing functionality
-        lbseg.v   $vt2, $t0, 0x4     # not really testing functionality
-        lbuseg.v  $vt2, $t0, 0x4     # not really testing functionality
+        lwseg.v   $vt2, $t0, 0x4
+        lhseg.v   $vt2, $t0, 0x4
+        lhuseg.v  $vt2, $t0, 0x4
+        lbseg.v   $vt2, $t0, 0x4
+        lbuseg.v  $vt2, $t0, 0x4
                      
-        lwsegst.v   $vt2, $t0, 0x4, $t1     # not really testing functionality
-        lhsegst.v   $vt2, $t0, 0x4, $t1     # not really testing functionality
-        lhusegst.v  $vt2, $t0, 0x4, $t1     # not really testing functionality
-        lbsegst.v   $vt2, $t0, 0x4, $t1     # not really testing functionality
-        lbusegst.v  $vt2, $t0, 0x4, $t1     # not really testing functionality
-
+        lwsegst.v   $vt2, $t0, 0x4, $t1
+        lhsegst.v   $vt2, $t0, 0x4, $t1
+        lhusegst.v  $vt2, $t0, 0x4, $t1
+        lbsegst.v   $vt2, $t0, 0x4, $t1
+        lbusegst.v  $vt2, $t0, 0x4, $t1
  
         # begin functional test of lw.v
+
         li        $t0, 1
         setvl     $t0, $t0        # vlen = t0
         la        $t0, wvalue     # t0 = value_ptr
-        lw.v      $vt2, $t0        # t2 = *value_ptr
-        vf        vp_w_verify     
-        
+        lw.v      $vt2, $t0       # t2 = *value_ptr
+        vf        vp_w_verify             
         sync.l.cv
         lw        $t4, vp_ret
         li        $v0, 0x3
         bne       $t4, $zero, fail
         nop
-        
-        j         pass
-        nop
 
-fail:
-        jr        $ra
-        nop
-        
 pass:
         li        $v0, 0x0
+fail:   sync.l.cv
         jr        $ra
-        nop
         
 vp_w_verify:
         lw        $t4, ans_w      # load answer to t4

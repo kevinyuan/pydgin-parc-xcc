@@ -92,14 +92,12 @@ loop:
         j       loop                
                                      
 fail:                                
-                                     
         lw      $t4, n              # return index of failure
         subu    $v0, $t4, $t0        
         addu    $v0, $v0, 1          
         jr      $ra                  
                                      
 pass:                                
-                                     
         li      $v0, 0              # return zero for success
         jr      $ra
                  
