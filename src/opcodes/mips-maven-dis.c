@@ -903,21 +903,31 @@ print_insn_args( const char* d,
 
   for ( ; *d != '\0'; d++ ) {
     switch ( *d ) {
-      /* maven modification */
+
+      /* cbatten - maven modifications */
       case '#':
         switch ( *++d ) {
-          case 's':
+          case 'n':
             (*info->fprintf_func)
               ( info->stream, "0x%lx",
                 (l >> OP_SH_IMMNELM) & OP_MASK_IMMNELM);
             break;
-          case 'v':
+          case 'd':
             (*info->fprintf_func)
               ( info->stream, "%s",
                 mips_vreg_names_maven[(l >> OP_SH_RD) & OP_MASK_RD]);
             break;
+          case 's':
+            (*info->fprintf_func)
+              ( info->stream, "%s",
+                mips_vreg_names_maven[(l >> OP_SH_RS) & OP_MASK_RS]);
+            break;
+          case 't':
+            (*info->fprintf_func)
+              ( info->stream, "%s",
+                mips_vreg_names_maven[(l >> OP_SH_RT) & OP_MASK_RT]);
+            break;
         }
-        break;
 
       case ',':
       case '(':
