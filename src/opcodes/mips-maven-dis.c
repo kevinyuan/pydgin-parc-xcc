@@ -928,6 +928,7 @@ print_insn_args( const char* d,
                 mips_vreg_names_maven[(l >> OP_SH_RT) & OP_MASK_RT]);
             break;
         }
+        break;
 
       case ',':
       case '(':
