@@ -895,7 +895,7 @@ march=*: -mhard-float}"
 /* ISA has count leading zeroes/ones instruction (not implemented). */
 #define ISA_HAS_CLZ_CLO \
   (    (ISA_MIPS32 || ISA_MIPS32R2 || ISA_MIPS64 || ISA_MIPS64R2) \
-    && !TARGET_MIPS16 )
+    && !TARGET_MIPS16  && !TARGET_MAVEN)
 
 /* ISA has three operand multiply instructions that put
    the high part in an accumulator: mulhi or mulhiu. */
