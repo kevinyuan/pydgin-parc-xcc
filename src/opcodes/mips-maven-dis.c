@@ -407,7 +407,14 @@ static const char* const mips_vreg_names_maven[32] =
   "vs0",   "vs1",  "vs2",  "vs3",  "vs4",  "vs5",  "vs6",  "vs7",
   "vt8",   "vt9",  "vk0",  "vk1",  "vgp",  "vsp",  "vs8",  "vra"
 };
+                   
+/* Maven symbolic flag register names */
 
+static const char* const mips_freg_names_maven[8] =
+{
+  "flag0", "flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7"
+};
+                   
 /* Maven symbolic coprocessor register names */
 
 static const char* const mips_cp0_names_maven[32] =

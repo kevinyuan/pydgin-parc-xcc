@@ -333,7 +333,13 @@ const struct mips_opcode mips_builtin_opcodes[] =
 //does not capture the vector registers read and write dependencies
 {"mov.vv",         "#d,#s",     0x48000081, 0xfc1f07ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"addu.vv",        "#d,#s,#t",  0x48000081, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"addu.vv",      "#d,#s,#t,#m", 0x48000081, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 //{"addu",           "d,v,t",   0x00000021, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              I1                },
+
+//does not capture the registers read and write dependencies
+{"seq.f.vv",       "#f,#s,#t",  0x480000a0, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"slt.f.vv",       "#f,#s,#t",  0x480000a1, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },

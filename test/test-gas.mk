@@ -15,6 +15,7 @@ test_gas_srcs = \
   test-gas-vmemops.s \
   test-gas-cpvpcom.s \
   test-gas-vvadd.s \
+  test-gas-flags.s \
 
 #-------------------------------------------------------------------------
 # Compile tests

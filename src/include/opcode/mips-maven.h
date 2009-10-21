@@ -119,6 +119,14 @@
 #define OP_SH_VS                21      /* celio was here */
 #define OP_MASK_VT              0x1f    /* celio was here */
 #define OP_SH_VT                16      /* celio was here */
+#define OP_MASK_FLAGD           0x1f    /* celio was here */
+#define OP_SH_FLAGD             11      /* celio was here */
+#define OP_MASK_FLAGS           0x1f    /* celio was here */
+#define OP_SH_FLAGS             21      /* celio was here */
+#define OP_MASK_FLAGT           0x1f    /* celio was here */
+#define OP_SH_FLAGT             16      /* celio was here */
+#define OP_MASK_VVFMASK         0x7    /* celio was here */
+#define OP_SH_VVFMASK           8      /* celio was here */
 #define OP_MASK_IMMEDIATE       0xffff
 #define OP_SH_IMMEDIATE         0
 #define OP_MASK_DELTA           0xffff
@@ -304,6 +312,14 @@ struct mips_opcode
    "#d" 5 bit destination vector register specifier (OP_*_VD) // maven modification -CCelio 
    "#s" 5 bit source vector register specifier (OP_*_VS)  // maven modification -CCelio
    "#t" 5 bit target vector register specifier (OP_*_VT) // maven modification -CCelio 
+   
+   "#f" 5 bit destination vector register specifier (OP_*_FLAGD) // maven modification -CCelio 
+   "#a" 5 bit source vector register specifier (OP_*_FLAGS)  // maven modification -CCelio
+   "#b" 5 bit target vector register specifier (OP_*_VLAGT) // maven modification -CCelio 
+   
+   "#m" 3 bit source flag register specifier for masking (OP_*_VVFMASK) // maven modification -CCelio 
+   
+   
    "i" 16 bit unsigned immediate (OP_*_IMMEDIATE)
    "j" 16 bit signed immediate (OP_*_DELTA)
    "k" 5 bit cache opcode in target register position (OP_*_CACHE)

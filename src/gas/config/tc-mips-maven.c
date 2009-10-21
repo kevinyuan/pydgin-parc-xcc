@@ -1598,6 +1598,7 @@ struct regname
 #define RTYPE_ACC       0x08000
 #define RTYPE_CCC       0x10000
 #define RTYPE_VREG      0x20000
+#define RTYPE_FREG      0x40000
 #define RNUM_MASK       0x000ff
 #define RWARN           0x80000
 
@@ -1892,7 +1893,19 @@ static const struct regname reg_names_maven[] =
   {"$vk0",      RTYPE_VREG | 26}, 
   {"$vk1",      RTYPE_VREG | 27}, 
 
+  /* flag registers */
+
+  {"$flag0",    RTYPE_FREG | 0}, 
+  {"$flag1",    RTYPE_FREG | 1},  
+  {"$flag2",    RTYPE_FREG | 2}, 
+  {"$flag3",    RTYPE_FREG | 3},  
+  {"$flag4",    RTYPE_FREG | 4}, 
+  {"$flag5",    RTYPE_FREG | 5},  
+  {"$flag6",    RTYPE_FREG | 6}, 
+  {"$flag7",    RTYPE_FREG | 7},
+ 
   {0, 0}
+     
 };
 
 /*----------------------------------------------------------------------*/
@@ -3805,6 +3818,20 @@ macro_build( expressionS *ep, const char* name, const char* fmt, ... )
             continue;
           case 't':
             INSERT_OPERAND( VT, insn, va_arg( args, int ) );
+            continue;
+          /* celio    - support for flag register specifiers */
+          case 'f':
+            INSERT_OPERAND( FLAGD, insn, va_arg( args, int ) );
+            continue;
+          case 'a':
+            INSERT_OPERAND( FLAGS, insn, va_arg( args, int ) );
+            continue;
+          case 'b':
+            INSERT_OPERAND( FLAGT, insn, va_arg( args, int ) );
+            continue;
+          /* celio    - support for specifying mask from flag registers */
+          case 'm':
+            INSERT_OPERAND( VVFMASK, insn, va_arg( args, int ) );
             continue;
           default:
             internalError();
@@ -8589,6 +8616,20 @@ validate_mips_insn( const struct mips_opcode* opc )
           case 't':
             USE_BITS( OP_MASK_VT, OP_SH_VT );
             break;
+          /* celio - support for flag register specifiers */
+          case 'f':
+            USE_BITS( OP_MASK_FLAGD, OP_SH_FLAGD );
+            break;
+          case 'a':
+            USE_BITS( OP_MASK_FLAGS, OP_SH_FLAGS );
+            break;
+          case 'b':
+            USE_BITS( OP_MASK_FLAGT, OP_SH_FLAGT );
+            break;
+          /* celio - support for flag register specifier for masking */
+          case 'm':
+            USE_BITS( OP_MASK_VVFMASK, OP_SH_VVFMASK );
+            break;
           default:
             internalError();
         }
@@ -9114,6 +9155,36 @@ mips_ip( char* str, struct mips_cl_insn* ip )
                 as_bad( _( "Invalid vector register" ) );
               INSERT_OPERAND( VT, *ip, regno );
               continue;
+                           
+            /* ccelio - support for maven flag register specifiers */
+            case 'f':
+              ok = reg_lookup( &s, RTYPE_NUM|RTYPE_FREG, &regno );
+              if ( !ok )
+                as_bad( _( "Invalid vector register" ) );
+              INSERT_OPERAND( FLAGD, *ip, regno );
+              continue;
+            case 'a':
+              ok = reg_lookup( &s, RTYPE_NUM|RTYPE_FREG, &regno );
+              if ( !ok )
+                as_bad( _( "Invalid vector register" ) );
+              INSERT_OPERAND( FLAGS, *ip, regno );
+              continue;
+            case 'b':
+              ok = reg_lookup( &s, RTYPE_NUM|RTYPE_FREG, &regno );
+              if ( !ok )
+                as_bad( _( "Invalid vector register" ) );
+              INSERT_OPERAND( FLAGT, *ip, regno );
+              continue;
+            
+            /* ccelio - support for maven flag register specifier for masking */
+            case 'm':
+              ok = reg_lookup( &s, RTYPE_NUM|RTYPE_FREG, &regno );
+              if ( !ok )
+                as_bad( _( "Invalid vector register" ) );
+              INSERT_OPERAND( VVFMASK, *ip, regno );
+              continue;
+
+
             default:
               internalError();
           }
