@@ -934,6 +934,26 @@ print_insn_args( const char* d,
               ( info->stream, "%s",
                 mips_vreg_names_maven[(l >> OP_SH_RT) & OP_MASK_RT]);
             break;
+          case 'm':
+            (*info->fprintf_func)
+              ( info->stream, "%s",
+                mips_freg_names_maven[(l >> OP_SH_VVFMASK) & OP_MASK_VVFMASK]);
+            break;
+          case 'f':
+            (*info->fprintf_func)
+              ( info->stream, "%s",
+                mips_freg_names_maven[(l >> OP_SH_FLAGD) & OP_MASK_FLAGD]);
+            break;
+          case 'a':
+            (*info->fprintf_func)
+              ( info->stream, "%s",
+                mips_freg_names_maven[(l >> OP_SH_FLAGS) & OP_MASK_FLAGS]);
+            break;
+          case 'b':
+            (*info->fprintf_func)
+              ( info->stream, "%s",
+                mips_freg_names_maven[(l >> OP_SH_FLAGT) & OP_MASK_FLAGT]);
+            break;
         }
         break;
 
