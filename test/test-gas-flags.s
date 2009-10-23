@@ -38,6 +38,9 @@ test:
         mov.f     $flag4, $flag3
         or.f      $flag4, $flag3, $flag1
         and.f     $flag4, $flag3, $flag1
+        mtvps.f   $vt0,   $flag4 
+        mfvps.f   $flag1, $vt0
+        
         mov.vv    $vt0, $vt1, $flag1
         addu.vv   $vt0, $vt1, $vzero
         addu.vv   $vt0, $vt1, $vt1
