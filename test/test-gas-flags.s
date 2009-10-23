@@ -31,6 +31,18 @@ msum_ref: .word 17, 4, 6,17
         .ent    test
 
 test:
+        # test compilation of flag instructions
+        seq.f.vv  $flag1, $vt0, $vt0
+        slt.f.vv  $flag1, $vt0, $vt0
+        not.f     $flag3, $flag1
+        mov.f     $flag4, $flag3
+        or.f      $flag4, $flag3, $flag1
+        and.f     $flag4, $flag3, $flag1
+        mov.vv    $vt0, $vt1, $flag1
+        addu.vv   $vt0, $vt1, $vzero
+        addu.vv   $vt0, $vt1, $vt1
+        
+        
         li        $a0, 4            # a0 = vlen (4 to avoid stripmine)
         la        $a1, vec_a
         la        $a2, vec_b

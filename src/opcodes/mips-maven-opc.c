@@ -331,7 +331,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"mtvps",          "#d,t",      0x48000008, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
 
 //does not capture the vector registers read and write dependencies
-{"mov.vv",         "#d,#s",     0x48000081, 0xfc1f07ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"mov.vv",         "#d,#s",     0x48000081, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
+{"mov.vv",         "#d,#s,#m",  0x48000081, 0xfc1f00ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"addu.vv",        "#d,#s,#t",  0x48000081, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"addu.vv",      "#d,#s,#t,#m", 0x48000081, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 //{"addu",           "d,v,t",   0x00000021, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              I1                },
@@ -340,6 +341,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"seq.f.vv",       "#f,#s,#t",  0x480000a0, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"slt.f.vv",       "#f,#s,#t",  0x480000a1, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 
+{"not.f",          "#f,#a",     0x480000fa, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
+{"mov.f",          "#f,#a",     0x480000f3, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
+{"or.f",           "#f,#a,#b",  0x480000f7, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"and.f",          "#f,#a,#b",  0x480000f1, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },
