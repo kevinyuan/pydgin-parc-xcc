@@ -12526,15 +12526,20 @@ static const struct mips_builtin_description mips_builtins[] =
 
   /* Maven builtins */
 
-  DIRECT_BUILTIN( maven_vload_vsi, MIPS_UVSI_FTYPE_POINTER, maven ),
-  DIRECT_BUILTIN( maven_vload_vhi, MIPS_UVHI_FTYPE_POINTER, maven ),
-  DIRECT_BUILTIN( maven_vload_vqi, MIPS_UVQI_FTYPE_POINTER, maven ),
-  DIRECT_BUILTIN( maven_vload_vsf, MIPS_VSF_FTYPE_POINTER,  maven ),
+  DIRECT_BUILTIN( maven_vload_vsi, MIPS_UVSI_FTYPE_CPOINTER, maven ),
+  DIRECT_BUILTIN( maven_vload_vhi, MIPS_UVHI_FTYPE_CPOINTER, maven ),
+  DIRECT_BUILTIN( maven_vload_vqi, MIPS_UVQI_FTYPE_CPOINTER, maven ),
+  DIRECT_BUILTIN( maven_vload_vsf, MIPS_VSF_FTYPE_CPOINTER,  maven ),
 
-  DIRECT_BUILTIN( maven_vload_strided_vsi, MIPS_UVSI_FTYPE_POINTER_SI, maven ),
-  DIRECT_BUILTIN( maven_vload_strided_vhi, MIPS_UVHI_FTYPE_POINTER_SI, maven ),
-  DIRECT_BUILTIN( maven_vload_strided_vqi, MIPS_UVQI_FTYPE_POINTER_SI, maven ),
-  DIRECT_BUILTIN( maven_vload_strided_vsf, MIPS_VSF_FTYPE_POINTER_SI,  maven ),
+  DIRECT_BUILTIN( maven_vload_strided_vsi, MIPS_UVSI_FTYPE_CPOINTER_SI, maven ),
+  DIRECT_BUILTIN( maven_vload_strided_vhi, MIPS_UVHI_FTYPE_CPOINTER_SI, maven ),
+  DIRECT_BUILTIN( maven_vload_strided_vqi, MIPS_UVQI_FTYPE_CPOINTER_SI, maven ),
+  DIRECT_BUILTIN( maven_vload_strided_vsf, MIPS_VSF_FTYPE_CPOINTER_SI,  maven ),
+
+  DIRECT_BUILTIN( maven_vload_shared_vsi, MIPS_UVSI_FTYPE_CPOINTER, maven ),
+  DIRECT_BUILTIN( maven_vload_shared_vhi, MIPS_UVHI_FTYPE_CPOINTER, maven ),
+  DIRECT_BUILTIN( maven_vload_shared_vqi, MIPS_UVQI_FTYPE_CPOINTER, maven ),
+  DIRECT_BUILTIN( maven_vload_shared_vsf, MIPS_VSF_FTYPE_CPOINTER,  maven ),
 
   DIRECT_NO_TARGET_BUILTIN( maven_vstore_vsi, MIPS_VOID_FTYPE_UVSI_POINTER, maven ),
   DIRECT_NO_TARGET_BUILTIN( maven_vstore_vhi, MIPS_VOID_FTYPE_UVHI_POINTER, maven ),
@@ -12590,6 +12595,7 @@ mips_build_cvpointer_type( void )
 #define MIPS_ATYPE_VOID void_type_node
 #define MIPS_ATYPE_INT integer_type_node
 #define MIPS_ATYPE_POINTER ptr_type_node
+#define MIPS_ATYPE_CPOINTER const_ptr_type_node
 #define MIPS_ATYPE_CVPOINTER mips_build_cvpointer_type ()
 
 /* Standard mode-based argument types. */

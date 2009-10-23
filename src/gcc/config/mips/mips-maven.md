@@ -261,6 +261,7 @@
    (UNSPEC_MAVEN_VSTORE             701)
    (UNSPEC_MAVEN_VLOAD_STRIDED      702)
    (UNSPEC_MAVEN_VSTORE_STRIDED     703)
+   (UNSPEC_MAVEN_VLOAD_SHARED       704)
   ]
 )
 
@@ -1152,6 +1153,18 @@
                      UNSPEC_MAVEN_VSTORE_STRIDED))]
   ""
   "s<vec_mem_suffix>st.v\t%0,%1,%2")
+
+;;------------------------------------------------------------------------
+;; Maven vector load shared builtins
+;;------------------------------------------------------------------------
+
+(define_insn "mips_maven_vload_shared_<VEC:vmode>"
+  [(set (match_operand:VEC 0 "register_operand" "=Z")
+        (unspec:VEC [(mem:<innermode>
+                       (match_operand:SI 1 "pmode_register_operand" "b"))]
+                    UNSPEC_MAVEN_VLOAD_SHARED))]
+  ""
+  "l<vec_umem_suffix>sh.v\t%0,%1")
 
 ;;------------------------------------------------------------------------
 ;; Maven traditional vector ops
