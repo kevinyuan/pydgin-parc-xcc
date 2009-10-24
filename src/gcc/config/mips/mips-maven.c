@@ -1128,7 +1128,17 @@ static const struct mips_rtx_cost_data mips_rtx_cost_data[PROCESSOR_MAX] =
     4                    /* memory_latency */
   },
   { /* Maven */
-    DEFAULT_COSTS
+    COSTS_N_INSNS( 8  ), /* fp_add */
+    COSTS_N_INSNS( 8  ), /* fp_mult_sf */
+    COSTS_N_INSNS( 8  ), /* fp_mult_df */
+    COSTS_N_INSNS( 8  ), /* fp_div_sf */
+    COSTS_N_INSNS( 8  ), /* fp_div_df */
+    COSTS_N_INSNS( 4  ), /* int_mult_si */
+    COSTS_N_INSNS( 4  ), /* int_mult_di */
+    COSTS_N_INSNS( 4  ), /* int_div_si */
+    COSTS_N_INSNS( 4  ), /* int_div_di */
+    2,                   /* branch_cost */
+    4                    /* memory_latency */
   }
 };
 

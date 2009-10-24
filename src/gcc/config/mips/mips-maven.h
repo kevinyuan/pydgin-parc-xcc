@@ -1566,9 +1566,9 @@ march=*: -mhard-float}"
    CONDITIONAL_REGISTER_USAGE should the assumption be inappropriate for
    a particular target. */
 
-/* cbatten - We fix vv0, vat, vgp, vsp, vfp, vra but the remaining 26
-   vector registers are available for general allocation (vv0-vv1,
-   va0-va7, vt4-vt9, vs0-vs8, vk0-vk1) */
+/* cbatten - We fix vv0, vat, vk0, vk1, vgp, vsp, vfp, vra but the
+   remaining 24 vector registers are available for general allocation
+   (vv0-vv1, va0-va7, vt4-vt9, vs0-vs8) */
 
 #define FIXED_REGISTERS                                                 \
   {                                                                     \
@@ -1591,7 +1591,7 @@ march=*: -mhard-float}"
     /* yunsup/cbatten - maven vector registers (see above) */           \
     1, 1, 1, 1,                                                         \
     1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1                      \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1                      \
   }
 
 /* Set up this array for o32 by default.
