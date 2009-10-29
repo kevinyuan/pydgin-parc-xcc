@@ -31,21 +31,6 @@ msum_ref: .word 17, 4, 6,17
         .ent    test
 
 test:
-        # test compilation of flag instructions
-        seq.f.vv  $flag1, $vt0, $vt0
-        slt.f.vv  $flag1, $vt0, $vt0
-        not.f     $flag3, $flag1
-        mov.f     $flag4, $flag3
-        or.f      $flag4, $flag3, $flag1
-        and.f     $flag4, $flag3, $flag1
-        mtvps.f   $vt0,   $flag4 
-        mfvps.f   $flag1, $vt0
-        
-        mov.vv    $vt0, $vt1, $flag1
-        addu.vv   $vt0, $vt1, $vzero
-        addu.vv   $vt0, $vt1, $vt1
-        
-        
         li        $a0, 4            # a0 = vlen (4 to avoid stripmine)
         la        $a1, vec_a
         la        $a2, vec_b
@@ -61,7 +46,25 @@ test:
         lw.v      $vt2, $a2         #lw.v from vec_b
         lw.v      $vt4, $a5         #lw.v from sum_ref
         lw.v      $vt5, $a6         #lw.v from msum_ref
+ 
         
+comp_test:        
+        # test compilation of flag instructions
+        seq.f.vv   $flag1, $vt0, $vt0
+        slt.f.vv   $flag1, $vt0, $vt0
+        not.f      $flag3, $flag1
+        mov.f      $flag4, $flag3
+        or.f       $flag4, $flag3, $flag1
+        and.f      $flag4, $flag3, $flag1
+        mtvps.f    $vt0,   $flag4 
+        mfvps.f    $flag1, $vt0
+        popc.f     $t0,    $flag1
+        findfone.f $t0,    $flag1
+        
+        mov.vv    $vt0, $vt1, $flag1
+        addu.vv   $vt0, $vt1, $vzero
+        addu.vv   $vt0, $vt1, $vt1
+          
 add_test:
         addu.vv   $vt0, $vt1, $vt2, $flag0  # vec_out = vec_a + vec_b
         la        $t0, vec_sum

@@ -11,7 +11,12 @@
         .type   test,@function
         .ent    test
 
-test:
+test:   
+        # set vlen and make sure we got it
+        li        $a0, 4            # a0 = vlen = 4
+        setvl     $t0, $a0          # set the VPs
+        bne       $t0, $a0, fail    # verify we got the setvl we wanted
+ 
         c.f.s.f.vv $flag1, $vt0, $vt1
         c.un.s.f.vv $flag1, $vt0, $vt1
         c.eq.s.f.vv $flag1, $vt0, $vt1
@@ -65,5 +70,9 @@ test:
 
         li        $v0, 0          
         jr        $ra 
+
+fail:
+        li        $v0, 1
+        jr        $ra
 
         .end      test
