@@ -15703,6 +15703,7 @@ static const struct mips_cpu_info mips_cpu_info_table[] =
 
   /* Maven */
   { "maven",          0,      ISA_MIPS32R2,   CPU_MAVEN },
+  { "maven_vp",       0,      ISA_MIPS32R2,   CPU_MAVEN },
 
   /* End marker */
   { NULL, 0, 0, 0 }

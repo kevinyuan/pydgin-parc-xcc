@@ -591,7 +591,7 @@
 ;; Attribute describing the processor. This attribute must match exactly
 ;; with the processor_type enumeration in mips.h.
 (define_attr "cpu"
-  "r3000,4kc,4kp,5kc,5kf,20kc,24kc,24kf2_1,24kf1_1,74kc,74kf2_1,74kf1_1,74kf3_2,loongson_2e,loongson_2f,m4k,octeon,r3900,r6000,r4000,r4100,r4111,r4120,r4130,r4300,r4600,r4650,r5000,r5400,r5500,r7000,r8000,r9000,r10000,sb1,sb1a,sr71000,xlr,maven"
+  "r3000,4kc,4kp,5kc,5kf,20kc,24kc,24kf2_1,24kf1_1,74kc,74kf2_1,74kf1_1,74kf3_2,loongson_2e,loongson_2f,m4k,octeon,r3900,r6000,r4000,r4100,r4111,r4120,r4130,r4300,r4600,r4650,r5000,r5400,r5500,r7000,r8000,r9000,r10000,sb1,sb1a,sr71000,xlr,maven,maven_vp"
   (const (symbol_ref "mips_tune")))
 
 ;; The type of hardware hazard associated with this instruction. DELAY
@@ -970,6 +970,7 @@
 ;; define_function_unit descriptions and simply override the parts of
 ;; generic.md that don't apply. The other processor-specific files are
 ;; self-contained.
+
 (define_automaton "alu,imuldiv")
 
 (define_cpu_unit "alu" "alu")
@@ -1004,6 +1005,56 @@
 (include "sb1.md")
 (include "sr71k.md")
 (include "xlr.md")
+
+;;------------------------------------------------------------------------
+;; Maven pipeline description
+;;------------------------------------------------------------------------
+;; These scheduling constraints override some of the generic constraints
+;; contained in generic.md.
+
+;; Specify functional units
+
+(define_automaton "fadd,fmul")
+(define_cpu_unit "fadd" "fadd")
+(define_cpu_unit "fmul" "fmul")
+
+;; Maven CP pipeline - fp adder
+
+(define_insn_reservation "maven_fadd" 4
+  (and (eq_attr "cpu" "maven")
+       (eq_attr "type" "fadd"))
+  "fadd")
+
+;; Maven CP pipeline - fp multiplier
+
+(define_insn_reservation "maven_fmul" 4
+  (and (eq_attr "cpu" "maven")
+       (and (eq_attr "type" "fmul,fmadd")
+            (eq_attr "mode" "SF")))
+  "fmul")
+
+;; Maven VP pipeline - fp adder
+
+(define_insn_reservation "maven_vp_fadd" 8
+  (and (eq_attr "cpu" "maven_vp")
+       (eq_attr "type" "fadd"))
+  "fadd*8")
+
+;; Maven VP pipeline - fp multiplier
+
+(define_insn_reservation "maven_vp_fmul" 8
+  (and (eq_attr "cpu" "maven_vp")
+       (and (eq_attr "type" "fmul,fmadd")
+            (eq_attr "mode" "SF")))
+  "fmul*8")
+
+;; Maven VP bypasses
+
+(define_bypass 4 "maven_vp_fadd" "maven_vp_fmul")
+(define_bypass 4 "maven_vp_fmul" "maven_vp_fadd")
+
+;; Include the generic pipeline description
+
 (include "generic.md")
 
 ;;------------------------------------------------------------------------

@@ -717,7 +717,8 @@ static const struct mips_cpu_info mips_cpu_info_table[] =
   { "octeon", PROCESSOR_OCTEON, 65, PTF_AVOID_BRANCHLIKELY },
 
   // cbatten - Add maven target
-  { "maven", PROCESSOR_MAVEN, 33, PTF_AVOID_BRANCHLIKELY }
+  { "maven",    PROCESSOR_MAVEN,    33, PTF_AVOID_BRANCHLIKELY },
+  { "maven_vp", PROCESSOR_MAVEN_VP, 33, PTF_AVOID_BRANCHLIKELY }
 };
 
 /* Default costs. If these are used for a processor we should look
@@ -1127,12 +1128,25 @@ static const struct mips_rtx_cost_data mips_rtx_cost_data[PROCESSOR_MAX] =
     1,                   /* branch_cost */
     4                    /* memory_latency */
   },
-  { /* Maven */
-    COSTS_N_INSNS( 8  ), /* fp_add */
-    COSTS_N_INSNS( 8  ), /* fp_mult_sf */
-    COSTS_N_INSNS( 8  ), /* fp_mult_df */
-    COSTS_N_INSNS( 8  ), /* fp_div_sf */
-    COSTS_N_INSNS( 8  ), /* fp_div_df */
+  { /* Maven (tune for control processor) */
+    COSTS_N_INSNS( 4  ), /* fp_add */
+    COSTS_N_INSNS( 4  ), /* fp_mult_sf */
+    COSTS_N_INSNS( 4  ), /* fp_mult_df */
+    COSTS_N_INSNS( 4  ), /* fp_div_sf */
+    COSTS_N_INSNS( 4  ), /* fp_div_df */
+    COSTS_N_INSNS( 4  ), /* int_mult_si */
+    COSTS_N_INSNS( 4  ), /* int_mult_di */
+    COSTS_N_INSNS( 4  ), /* int_div_si */
+    COSTS_N_INSNS( 4  ), /* int_div_di */
+    2,                   /* branch_cost */
+    4                    /* memory_latency */
+  },
+  { /* Maven (tune for virtual processors) */
+    COSTS_N_INSNS( 4  ), /* fp_add */
+    COSTS_N_INSNS( 4  ), /* fp_mult_sf */
+    COSTS_N_INSNS( 4  ), /* fp_mult_df */
+    COSTS_N_INSNS( 4  ), /* fp_div_sf */
+    COSTS_N_INSNS( 4  ), /* fp_div_df */
     COSTS_N_INSNS( 4  ), /* int_mult_si */
     COSTS_N_INSNS( 4  ), /* int_mult_di */
     COSTS_N_INSNS( 4  ), /* int_div_si */
@@ -14747,6 +14761,11 @@ mips_set_vpfunc_mode( int vpfunc_p )
 /* Implement TARGET_SET_CURRENT_FUNCTION. Decide whether the current
    function should use the MIPS16 ISA and switch modes accordingly. */
 
+/* cbatten - Remember the last target of mips_set_current_function. This
+   was added to help reduce overhead of function specific command line
+   options. */
+static GTY(()) tree mips_previous_fndecl;
+
 static void
 mips_set_current_function( tree fndecl )
 {
@@ -14754,6 +14773,39 @@ mips_set_current_function( tree fndecl )
 
   /* YUNSUP: added to support vpfunc attribute */
   mips_set_vpfunc_mode( mips_use_vpfunc_mode_p( fndecl ) );
+
+  /* cbatten - Added to support function specific command line
+     arguments. Mosly copied from i386 version which had this comment:
+     Only change the context if the function changes. This hook is
+     called several times in the course of compiling a function, and we
+     don't want to slow things down too much or call target_reinit when
+     it isn't safe. */
+
+  if ( fndecl && fndecl != mips_previous_fndecl ) {
+    tree old_tree
+      = ( mips_previous_fndecl
+         ? DECL_FUNCTION_SPECIFIC_TARGET( mips_previous_fndecl )
+         : NULL_TREE );
+
+    tree new_tree
+      = ( fndecl
+         ? DECL_FUNCTION_SPECIFIC_TARGET( fndecl )
+         : NULL_TREE );
+
+    mips_previous_fndecl = fndecl;
+    if ( old_tree == new_tree )
+      ;
+    else if ( new_tree ) {
+      cl_target_option_restore( TREE_TARGET_OPTION( new_tree ) );
+      target_reinit();
+    }
+    else if ( old_tree ) {
+      struct cl_target_option *def
+        = TREE_TARGET_OPTION( target_option_current_node );
+      cl_target_option_restore( def );
+      target_reinit();
+    }
+  }
 }
 
 /*----------------------------------------------------------------------*/
@@ -15331,6 +15383,11 @@ mips_override_options( void )
      Do all CPP-sensitive stuff in non-MIPS16 mode; we'll switch to
      MIPS16 mode afterwards if need be. */
   mips_set_mips16_mode( false );
+
+  /* cbatten - This is for the function specific target info */
+  target_option_default_node
+    = target_option_current_node
+    = build_target_option_node ();
 }
 
 /*----------------------------------------------------------------------*/
@@ -15628,7 +15685,163 @@ mips_maven_output_vector_move( enum machine_mode mode, rtx dest, rtx src )
 }
 
 /*----------------------------------------------------------------------*/
-/* Initialize the GCC target structure                                  */
+/* mips_maven_option_valid_attribute_opt_str                            */
+/*----------------------------------------------------------------------*/
+/* Helper function used in mips_maven_option_valid_attribute_p for
+   process attribute((target(...))) and get the actual option string.
+   This is based on the x86 version. If the args is a list, recurse to
+   get the options. This seems a little complicated and I am not
+   positive I understand how it works, but it seems to work and it is
+   basically copied from ix86_valid_target_attribute_inner_p in x86.c */
+
+static bool
+mips_maven_option_valid_attribute_opt_str( tree args, char** opt_str )
+{
+  if ( TREE_CODE(args) == TREE_LIST ) {
+    bool ret = true;
+    for ( ; args; args = TREE_CHAIN(args) ) {
+      if (    TREE_VALUE(args)
+           && !mips_maven_option_valid_attribute_opt_str(
+                 TREE_VALUE(args), opt_str ) )
+      {
+        ret = false;
+      }
+    }
+
+    return ret;
+  }
+  else if ( TREE_CODE(args) != STRING_CST )
+    gcc_unreachable();
+
+  *opt_str = xstrdup( TREE_STRING_POINTER(args) );
+  return false;
+}
+
+/*----------------------------------------------------------------------*/
+/* mips_maven_option_valid_attribute_p                                  */
+/*----------------------------------------------------------------------*/
+/* Implement TARGET_OPTION_VALID_ATTRIBUTE_P. Based on x86
+   implementation of this function. */
+
+static bool
+mips_maven_option_valid_attribute_p( tree fndecl,
+                                     tree ARG_UNUSED(name),
+                                     tree args,
+                                     int ARG_UNUSED(flags) )
+{
+  /* Get the actual option string from the target attribute */
+
+  char* opt_str;
+  mips_maven_option_valid_attribute_opt_str( args, &opt_str );
+
+  /* Verify that option string begins with tune= */
+
+  char tune_prefix[] = "tune=";
+  if ( strlen(opt_str) < strlen(tune_prefix) ) {
+    error( "attribute(target(\"%s\")) not supported", opt_str );
+    free( opt_str );
+    return false;
+  }
+
+  unsigned int i;
+  for ( i = 0; i < strlen(tune_prefix); i++ ) {
+    if ( opt_str[i] != tune_prefix[i] ) {
+      error( "attribute(target(\"%s\")) not supported", opt_str );
+      free( opt_str );
+      return false;
+    }
+  }
+
+  /* Get and verify the substring after the tune= prefix */
+
+  char* tune_str = &(opt_str[strlen(tune_prefix)]);
+  if ( mips_parse_cpu(tune_str) == 0 ) {
+      error( "tune string \"%s\" not supported", tune_str );
+      free( opt_str );
+      return false;
+  }
+
+  /* Set the global tune variables. Notice that we make sure that the
+     mips_tune_string points to a static string because the actual tune
+     string is dynamically allocated and will be freed at the end of
+     this function. */
+
+  struct cl_target_option cur_target;
+  cl_target_option_save( &cur_target );
+
+  if ( strcmp(tune_str,"maven_vp") == 0 )
+    mips_tune_string = "maven_vp";
+  else {
+    error( "although valid, tune string \"%s\" not "
+           "supported in a function attribute", tune_str );
+    free( opt_str );
+    return false;
+  }
+
+  /* Built the new target tree as in the x86 version. */
+
+  tree new_target = build_target_option_node();
+  if ( fndecl )
+    DECL_FUNCTION_SPECIFIC_TARGET( fndecl ) = new_target;
+  else
+    gcc_unreachable();
+
+  cl_target_option_restore( &cur_target );
+  free( opt_str );
+  return true;
+}
+
+/*----------------------------------------------------------------------*/
+/* mips_maven_option_save                                               */
+/*----------------------------------------------------------------------*/
+/* Implement TARGET_OPTION_SAVE */
+
+static void
+mips_maven_option_save( struct cl_target_option* topt_ptr )
+{
+  topt_ptr->mips_tune_string = mips_tune_string;
+}
+
+/*----------------------------------------------------------------------*/
+/* mips_maven_option_restore                                            */
+/*----------------------------------------------------------------------*/
+/* Implement TARGET_VALID_OPTION_RESTORE. Basically this is a small
+   part of mips_override_options which relate to setting mips_tune. */
+
+static void
+mips_maven_option_restore( struct cl_target_option* topt_ptr )
+{
+  mips_tune_string = topt_ptr->mips_tune_string;
+
+  /* Optimize for mips_arch unless -mtune selects different proc */
+  if ( mips_tune_string != 0 )
+    mips_set_tune( mips_parse_cpu( mips_tune_string ) );
+  else
+    mips_set_tune( mips_arch_info );
+
+  /* Decide which rtx_costs structure to use */
+  if ( optimize_size )
+    mips_cost = &mips_rtx_cost_optimize_size;
+  else
+    mips_cost = &mips_rtx_cost_data[mips_tune];
+
+}
+
+/*----------------------------------------------------------------------*/
+/* mips_maven_option_print                                              */
+/*----------------------------------------------------------------------*/
+/* Implement TARGET_OPTION_PRINT */
+
+static void
+mips_maven_option_print( FILE* file, int indent,
+                         struct cl_target_option* topt_ptr )
+{
+  fprintf( file, "%*stune = %s\n", indent, "",
+                  topt_ptr->mips_tune_string );
+}
+
+/*----------------------------------------------------------------------*/
+/* Target macros                                                        */
 /*----------------------------------------------------------------------*/
 
 #undef TARGET_ASM_ALIGNED_HI_OP
@@ -15777,6 +15990,22 @@ mips_maven_output_vector_move( enum machine_mode mode, rtx dest, rtx src )
    inlining. */
 #undef TARGET_FUNCTION_ATTRIBUTE_INLINABLE_P
 #define TARGET_FUNCTION_ATTRIBUTE_INLINABLE_P hook_bool_const_tree_true
+
+/* cbatten - Begin support for the target function attribute */
+
+#undef TARGET_OPTION_VALID_ATTRIBUTE_P
+#define TARGET_OPTION_VALID_ATTRIBUTE_P mips_maven_option_valid_attribute_p
+
+#undef TARGET_OPTION_SAVE
+#define TARGET_OPTION_SAVE mips_maven_option_save
+
+#undef TARGET_OPTION_RESTORE
+#define TARGET_OPTION_RESTORE mips_maven_option_restore
+
+#undef TARGET_OPTION_PRINT
+#define TARGET_OPTION_PRINT mips_maven_option_print
+
+/* cbatten - End support for the target function attribute */
 
 #undef TARGET_EXTRA_LIVE_ON_ENTRY
 #define TARGET_EXTRA_LIVE_ON_ENTRY mips_extra_live_on_entry

@@ -27,6 +27,7 @@ test_gcc_srcs = \
   test-gcc-builtins-shared.c \
   test-gcc-builtins-tvec.c \
   test-gcc-vpfunc.c \
+  test-gcc-sched-fp.c \
 
 #-------------------------------------------------------------------------
 # Compile tests

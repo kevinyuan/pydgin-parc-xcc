@@ -76,6 +76,7 @@ enum processor_type
   PROCESSOR_SR71000,
   PROCESSOR_XLR,
   PROCESSOR_MAVEN,
+  PROCESSOR_MAVEN_VP,
   PROCESSOR_MAX
 };
 
@@ -270,7 +271,8 @@ enum mips_code_readable_setting
 #define TARGET_MIPS7000         (mips_arch == PROCESSOR_R7000)
 #define TARGET_MIPS9000         (mips_arch == PROCESSOR_R9000)
 #define TARGET_OCTEON           (mips_arch == PROCESSOR_OCTEON)
-#define TARGET_MAVEN            (mips_arch == PROCESSOR_MAVEN)
+#define TARGET_MAVEN            (   (mips_arch == PROCESSOR_MAVEN)    \
+                                 || (mips_arch == PROCESSOR_MAVEN_VP) )
 #define TARGET_SB1              (mips_arch == PROCESSOR_SB1         \
                                  || mips_arch == PROCESSOR_SB1A)
 #define TARGET_SR71K            (mips_arch == PROCESSOR_SR71000)
@@ -300,6 +302,7 @@ enum mips_code_readable_setting
 #define TUNE_OCTEON             (mips_tune == PROCESSOR_OCTEON)
 #define TUNE_SB1                (mips_tune == PROCESSOR_SB1 \
                                  || mips_tune == PROCESSOR_SB1A)
+#define TUNE_MAVEN_VP           (mips_tune == PROCESSOR_MAVEN_VP)
 
 /* Whether vector modes and intrinsics for ST Microelectronics
    Loongson-2E/2F processors should be enabled. In o32 pairs of

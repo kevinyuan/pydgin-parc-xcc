@@ -268,8 +268,10 @@ msym32
 Target Report Var(TARGET_SYM32)
 Assume all symbols have 32-bit values
 
+;; cbatten - Added "Save" property so that this option will be saved and
+;; restored when processing per-function target options
 mtune=
-Target RejectNegative Joined Var(mips_tune_string)
+Target RejectNegative Joined Var(mips_tune_string) Save
 -mtune=PROCESSOR	Optimize the output for PROCESSOR
 
 muninit-const-in-rodata
