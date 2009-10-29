@@ -17,8 +17,6 @@ test_gas_srcs = \
   test-gas-vvadd.s \
   test-gas-flags.s \
   test-gas-vconds.s \
-  test-gas-varith.s \
-  test-gas-variths.s \
 
 #-------------------------------------------------------------------------
 # Compile tests
