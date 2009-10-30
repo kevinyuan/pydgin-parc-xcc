@@ -1269,11 +1269,10 @@ mips_mips16_decl_p( const_tree decl )
   return lookup_attribute( "mips16", DECL_ATTRIBUTES( decl ) ) != NULL;
 }
 
-/* YUNSUP: added to support vpfunc attribute */
 /*----------------------------------------------------------------------*/
 /* mips_vpfunc_decl_p                                                   */
 /*----------------------------------------------------------------------*/
-/* Similar predicates for "vpfunc" function attributes. */
+/* YUNSUP: Similar predicates for "vpfunc" function attributes. */
 
 static bool
 mips_vpfunc_decl_p( const_tree decl )
@@ -1314,19 +1313,18 @@ mips_use_mips16_mode_p( tree decl )
   return mips_base_mips16;
 }
 
-/* YUNSUP: added to support vpfunc attribute */
 /*----------------------------------------------------------------------*/
 /* mips_use_vpfunc_mode_p                                               */
 /*----------------------------------------------------------------------*/
-/* Return true if function DECL is a VPFUNC function. Return false if
-   DECL is null. */
+/* YUNSUP: Return true if function DECL is a VPFUNC function. Return
+   false if DECL is null. */
 
 static bool
 mips_use_vpfunc_mode_p( tree decl )
 {
-  if ( decl ) {
+  if ( decl ) 
     return mips_vpfunc_decl_p( decl );
-  }
+
   return false;
 }
 
@@ -10086,9 +10084,22 @@ mips_restore_reg( rtx reg, rtx mem )
 /*----------------------------------------------------------------------*/
 /* Emit any instructions needed before a return. */
 
+static bool mips_maven_in_vpfunc = false;
+
 void
 mips_expand_before_return( void )
 {
+
+  /* cbatten - If we are in a vpfunc then we need to insert a stop
+     instruction right before the final jr which returns from the
+     instruction. This function is called in a define_expand for the
+     return pattern, which according to the internals manual means any
+     emitted instructions will come _before_ the return RTL ... which
+     eventually gets expanded into the jr instruction. */
+
+  if ( mips_maven_in_vpfunc )
+    emit_insn( gen_maven_stop() );
+
   /* When using a call-clobbered gp, we start out with unified call
      insns that include instructions to restore the gp. We then split
      these unified calls after reload. These split calls explicitly
@@ -10098,8 +10109,10 @@ mips_expand_before_return( void )
      For consistency, we should also insert an explicit clobber of $28
      before return insns, so that the post-reload optimizers know that
      the register is not live on exit. */
+
   if ( TARGET_CALL_CLOBBERED_GP )
     emit_clobber( pic_offset_table_rtx );
+
 }
 
 /*----------------------------------------------------------------------*/
@@ -14718,11 +14731,10 @@ mips_set_mips16_mode( int mips16_p )
   was_mips16_pch_p = mips16_p;
 }
 
-/* YUNSUP: added to support vpfunc attribute */
 /*----------------------------------------------------------------------*/
 /* mips_set_vpfunc_mode                                                 */
 /*----------------------------------------------------------------------*/
-/* Set up the target-dependent global state for vpfunc */
+/* YUNSUP: Set up the target-dependent global state for vpfunc */
 
 static void
 mips_set_vpfunc_mode( int vpfunc_p )
@@ -14730,10 +14742,13 @@ mips_set_vpfunc_mode( int vpfunc_p )
   int regno;
 
   if ( vpfunc_p ) {
+
+    // Set global variable which indicates if we are in a vpfunc
+    mips_maven_in_vpfunc = true;
+
     // s0 - s7
-    for (regno=16; regno<24; regno++) {
+    for ( regno = 16; regno < 24; regno++ )
       call_used_regs[regno] = call_really_used_regs[regno] = 1;
-    }
 
     // s8 or fp
     call_used_regs[30] = call_really_used_regs[30] = 1;
@@ -14742,10 +14757,13 @@ mips_set_vpfunc_mode( int vpfunc_p )
     call_used_regs[31] = call_really_used_regs[31] = 1;
   }
   else {
+
+    // Reset global variable which indicates if we are in a vpfunc
+    mips_maven_in_vpfunc = false;
+
     // s0 - s7
-    for (regno=16; regno<24; regno++) {
+    for ( regno = 16; regno < 24; regno++ )
       call_used_regs[regno] = call_really_used_regs[regno] = 0;
-    }
 
     // s8 or fp
     call_used_regs[30] = call_really_used_regs[30] = 0;

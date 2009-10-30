@@ -262,6 +262,7 @@
    (UNSPEC_MAVEN_VLOAD_STRIDED      702)
    (UNSPEC_MAVEN_VSTORE_STRIDED     703)
    (UNSPEC_MAVEN_VLOAD_SHARED       704)
+   (UNSPEC_MAVEN_STOP               705)
   ]
 )
 
@@ -1227,6 +1228,18 @@
                   (match_operand:VEC 2 "register_operand" "Z")))]
   ""
   "add<vec_arith_suffix>.vv\t%0,%1,%2")
+
+;;------------------------------------------------------------------------
+;; Maven stop instruction
+;;------------------------------------------------------------------------
+;; This is explicitly generated for functions with the vpfunc attribute.
+;; We do this from within the mips_expand_before_return() function. I
+;; needed some operand for this so I just used a constant.
+
+(define_insn "maven_stop"
+  [(unspec_volatile:VOID [(const_int 0)] UNSPEC_MAVEN_STOP)]
+  ""
+  "stop")
 
 ;;------------------------------------------------------------------------
 ;; Conditional Traps

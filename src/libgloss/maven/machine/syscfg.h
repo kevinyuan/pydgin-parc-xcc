@@ -78,9 +78,10 @@
 // Threads
 //------------------------------------------------------------------------
 
-// Size of the stack available for each hard thread in bytes
+// Size of the various stacks
 #define MAVEN_SYSCFG_USER_THREAD_STACK_SIZE   0x00010000
 #define MAVEN_SYSCFG_KERNEL_THREAD_STACK_SIZE 0x00010000
+#define MAVEN_SYSCFG_VP_THREAD_STACK_SIZE     0x00001000
 
 //------------------------------------------------------------------------
 // Memory layout
