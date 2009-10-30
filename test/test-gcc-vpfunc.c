@@ -26,7 +26,7 @@
 //  18: jr      ra
 //
 
-int standard_func( int a )
+int func_standard( int a )
 {
   register int t asm("s0") = a;
   asm("" :: "r"(t));
@@ -136,5 +136,5 @@ int vfunc_multiple_exit( int a )
 
 int test()
 {
-  return ( foo(1) != 2 );
+  return ( func_standard(1) != 2 );
 }
