@@ -187,6 +187,19 @@ test:
         li      $v0, 32
         bne     $t2, $t3, fail
 
+        # sqrt.s infinity test
+        li      $t0, 0x7f800000 # + infinity
+        li      $t3, 0x7f800000 # qNaN
+        sqrt.s  $t2, $t0
+        li      $v0, 33
+        bne     $t2, $t3, fail
+
+        li      $t0, 0xff800000 # - infinity
+        li      $t3, 0xffc00000 # qNaN
+        sqrt.s  $t2, $t0
+        li      $v0, 34
+        bne     $t2, $t3, fail
+
 pass:
         li        $v0, 0x0
 fail:   jr        $ra
