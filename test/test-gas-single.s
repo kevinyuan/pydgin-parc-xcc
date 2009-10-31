@@ -175,6 +175,18 @@ test:
         li      $v0, 30
         bne     $t2, $t3, fail
 
+        li      $t0, 0x80000000 # -0
+        li      $t3, 0x80000000 # qNaN
+        sqrt.s  $t2, $t0
+        li      $v0, 31
+        bne     $t2, $t3, fail
+
+        li      $t0, 0x80000001 # -1.401298464324817e-45
+        li      $t3, 0xffc00000 # qNaN
+        sqrt.s  $t2, $t0
+        li      $v0, 32
+        bne     $t2, $t3, fail
+
 pass:
         li        $v0, 0x0
 fail:   jr        $ra
