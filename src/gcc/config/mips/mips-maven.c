@@ -14789,9 +14789,6 @@ mips_set_current_function( tree fndecl )
 {
   mips_set_mips16_mode( mips_use_mips16_mode_p( fndecl ) );
 
-  /* YUNSUP: added to support vpfunc attribute */
-  mips_set_vpfunc_mode( mips_use_vpfunc_mode_p( fndecl ) );
-
   /* cbatten - Added to support function specific command line
      arguments. Mosly copied from i386 version which had this comment:
      Only change the context if the function changes. This hook is
@@ -14824,6 +14821,13 @@ mips_set_current_function( tree fndecl )
       target_reinit();
     }
   }
+
+  /* YUNSUP: added to support vpfunc attribute. cbatten - It is
+     important that we call this _after_ the function specific command
+     line stuff above, since tune=maven_vp was effectively resetting
+     the call_used_regs variable. But putting this second we can
+     override the per-architecture settings like we want. */
+  mips_set_vpfunc_mode( mips_use_vpfunc_mode_p( fndecl ) );
 }
 
 /*----------------------------------------------------------------------*/

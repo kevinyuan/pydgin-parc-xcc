@@ -36,7 +36,7 @@ int func_standard( int a )
 //------------------------------------------------------------------------
 // vpfunc_simple
 //------------------------------------------------------------------------
-// Compiles to something like what is below. Notice that gcc no loner
+// Compiles to something like what is below. Notice that gcc no longer
 // needs to save the s0 register to the stack since we have annotated
 // this function as a vpfunc. Also notice that gcc has inserted a stop
 // instruction right before the final jr.
@@ -49,6 +49,22 @@ int func_standard( int a )
 
 __attribute__ ((vpfunc))
 int vpfunc_simple( int a )
+{
+  register int t asm("s0") = a;
+  asm("" :: "r"(t));
+  return a + t;
+}
+
+//------------------------------------------------------------------------
+// vpfunc_tune
+//------------------------------------------------------------------------
+// Make sure that combining vpfunc and a function specific command line
+// parameter to tune for maven VPs still does the right thing for s*
+// registers. Originally it didn't which is why added this test. Ideally
+// this should compile to the exact same code as above.
+
+__attribute__ ((vpfunc,target("tune=maven_vp")))
+int vpfunc_tune( int a )
 {
   register int t asm("s0") = a;
   asm("" :: "r"(t));
