@@ -2,6 +2,8 @@
 // Test Traditional Vector Ops Builtins
 //========================================================================
 
+#include <stdio.h>
+
 #include <machine/syscfg.h>
 #if ( MAVEN_SYSCFG_VLEN_MIN != 4 )
 #error "Test currently only works if MAVEN_SYSCFG_VLEN_MIN == 4"
@@ -110,76 +112,103 @@ inline void vt_vstore_float( vfloat_t v_in, float* out_ptr )
 }
 
 //------------------------------------------------------------------------
-// add_vv_int
+// Helper Macros
 //------------------------------------------------------------------------
 
-__attribute__ ((noinline))
-void add_vv_int( int* a_ptr, int* b_ptr, int* c_ptr )
-{
-  vint_t v_a, v_b, v_c;
-  vt_vload_int( &v_a, a_ptr );
-  vt_vload_int( &v_b, b_ptr );
-  
-  v_c = v_a + v_b;
-  
-  vt_vstore_int( v_c, c_ptr );
-  vt_sync_l_cv();
-}
+#define ELM_TYPE_int    int
+#define ELM_TYPE_uint   unsigned int
+#define ELM_TYPE_short  short
+#define ELM_TYPE_ushort unsigned short
+#define ELM_TYPE_char   signed char
+#define ELM_TYPE_uchar  unsigned char
+#define ELM_TYPE_float  float
+
+#define ELM_TYPE( short_name_ ) \
+  ELM_TYPE_ ## short_name_
+
+#define VEC_TYPE_int    vint_t
+#define VEC_TYPE_uint   vuint_t
+#define VEC_TYPE_short  vshort_t
+#define VEC_TYPE_ushort vushort_t
+#define VEC_TYPE_char   vchar_t
+#define VEC_TYPE_uchar  vuchar_t
+#define VEC_TYPE_float  vfloat_t
+
+#define VEC_TYPE( short_name_ ) \
+  VEC_TYPE_ ## short_name_
+
+#define STRIP_PAREN_H0( args_... ) args_
+
+#define STRIP_PAREN( input_ ) \
+  STRIP_PAREN_H0 input_
+
+#define MK_TEST_FUNC( name_, elm_, op_ )                                \
+ __attribute__ ((noinline))                                             \
+ void name_ ## _ ## elm_ ( ELM_TYPE(elm_)* dest,                        \
+                           ELM_TYPE(elm_)* src0,                        \
+                           ELM_TYPE(elm_)* src1 )                       \
+ {                                                                      \
+   VEC_TYPE(elm_) vdest, vsrc0, vsrc1;                                  \
+   vt_sync_l_cv();                                                      \
+   vt_vload_ ## elm_ ( &vsrc0, src0 );                                  \
+   vt_vload_ ## elm_ ( &vsrc1, src1 );                                  \
+                                                                        \
+   vdest = vsrc0 op_ vsrc1;                                             \
+                                                                        \
+   vt_vstore_ ## elm_ ( vdest, dest );                                  \
+   vt_sync_l_cv();                                                      \
+ }                                                                      \
+
+#define RUN_TEST( name_, elm_, src0_, src1_, dest_ref_ )                \
+{                                                                       \
+  ELM_TYPE(elm_) src0[]     = STRIP_PAREN(src0_);                       \
+  ELM_TYPE(elm_) src1[]     = STRIP_PAREN(src1_);                       \
+  ELM_TYPE(elm_) dest_ref[] = STRIP_PAREN(dest_ref_);                   \
+                                                                        \
+  ELM_TYPE(elm_) dest[vlen];                                            \
+  name_ ## _ ## elm_( dest, src0, src1 );                               \
+                                                                        \
+  error_code++;                                                         \
+  for ( int i = 0; i < vlen; i++ ) {                                    \
+    if ( dest[i] != dest_ref[i] )                                       \
+      return error_code;                                                \
+  }                                                                     \
+}                                                                       \
+
+#define RUN_TEST_FP( name_, elm_, src0_, src1_, dest_ref_ )             \
+{                                                                       \
+  ELM_TYPE(elm_) src0[]     = STRIP_PAREN(src0_);                       \
+  ELM_TYPE(elm_) src1[]     = STRIP_PAREN(src1_);                       \
+  ELM_TYPE(elm_) dest_ref[] = STRIP_PAREN(dest_ref_);                   \
+                                                                        \
+  ELM_TYPE(elm_) dest[vlen];                                            \
+  name_ ## _ ## elm_( dest, src0, src1 );                               \
+                                                                        \
+  error_code++;                                                         \
+  for ( int i = 0; i < vlen; i++ ) {                                    \
+    if ( !fp_equal( dest[i], dest_ref[i] ) )                            \
+      return error_code;                                                \
+  }                                                                     \
+}                                                                       \
 
 //------------------------------------------------------------------------
-// add_vv_short
+// Test functions
 //------------------------------------------------------------------------
 
-__attribute__ ((noinline))
-void add_vv_short( short* a_ptr, short* b_ptr, short* c_ptr )
-{
-  vshort_t v_a, v_b, v_c;
-  vt_vload_short( &v_a, a_ptr );
-  vt_vload_short( &v_b, b_ptr );
-  
-  v_c = v_a + v_b;
-  
-  vt_vstore_short( v_c, c_ptr );
-  vt_sync_l_cv();
-}
+MK_TEST_FUNC( test_add_vv, int,    + );
+MK_TEST_FUNC( test_add_vv, short,  + );
+MK_TEST_FUNC( test_add_vv, ushort, + );
+MK_TEST_FUNC( test_add_vv, float,  + );
 
-//------------------------------------------------------------------------
-// add_vv_ushort
-//------------------------------------------------------------------------
+MK_TEST_FUNC( test_sub_vv, int,    - );
+MK_TEST_FUNC( test_sub_vv, short,  - );
+MK_TEST_FUNC( test_sub_vv, ushort, - );
+MK_TEST_FUNC( test_sub_vv, float,  - );
 
-__attribute__ ((noinline))
-void add_vv_ushort( unsigned short* a_ptr, unsigned short* b_ptr, 
-                    unsigned short* c_ptr )
-{
-  vushort_t v_a, v_b, v_c;
-  vt_vload_ushort( &v_a, a_ptr );
-  vt_vload_ushort( &v_b, b_ptr );
-  
-  v_c = v_a + v_b;
-  
-  vt_vstore_ushort( v_c, c_ptr );
-  vt_sync_l_cv();
-}
-
-//------------------------------------------------------------------------
-// add_vv_float
-//------------------------------------------------------------------------
-// add.s.vv not implemented yet
-
-/*
-__attribute__ ((noinline))
-void add_vv_float( float* a_ptr, float* b_ptr, float* c_ptr )
-{
-  vfloat_t v_a, v_b, v_c;
-  vt_vload_float( &v_a, a_ptr );
-  vt_vload_float( &v_b, b_ptr );
-  
-  v_c = v_a + v_b;
-  
-  vt_vstore_float( v_c, c_ptr );
-  vt_sync_l_cv();
-}
-*/
+MK_TEST_FUNC( test_mul_vv, int,    * );
+MK_TEST_FUNC( test_mul_vv, short,  * );
+MK_TEST_FUNC( test_mul_vv, ushort, * );
+MK_TEST_FUNC( test_mul_vv, float,  * );
 
 //------------------------------------------------------------------------
 // test
@@ -196,69 +225,79 @@ int test()
   int vlen = MAVEN_SYSCFG_VLEN_MIN;
   vt_setvl(vlen);
 
+  if ( vlen != 4 )
+    return 255;
+
   // Test add_vv_int
 
-  int vec_int_a[]   = { 0, 2,  8, 34 };
-  int vec_int_b[]   = { 1, 3, 13, 55 };
-  int vec_int_ref[] = { 1, 5, 21, 89 };
+  RUN_TEST( test_add_vv, int,
+    ({  0, 2,  8, 34 }),
+    ({ -1, 3, 13, 55 }),
+    ({ -1, 5, 21, 89 }) );
 
-  int vec_int_c[vlen];
-  add_vv_int( vec_int_a, vec_int_b, vec_int_c );
+  RUN_TEST( test_add_vv, short,
+    ({ 0, -2,  8, 34 }),
+    ({ 1,  3, 13, 55 }),
+    ({ 1,  1, 21, 89 }) );
 
-  error_code++;
-  for ( int i = 0; i < vlen; i++ ) {
-    if ( vec_int_c[i] != vec_int_ref[i] )
-      return error_code;
-  }
+  RUN_TEST( test_add_vv, ushort,
+    ({ 0, 2,  8, 34 }),
+    ({ 1, 3, 13, 55 }),
+    ({ 1, 5, 21, 89 }) );
 
-  // Test add_vv_short
+  RUN_TEST_FP( test_add_vv, float,
+    ({ 0.0, 1.5,  7.5, 13.2 }),
+    ({ 1.0, 3.0,  3.3,  6.3 }),
+    ({ 1.0, 4.5, 10.8, 19.5 }) );
 
-  short vec_short_a[]   = { 0, 2,  8, 34 };
-  short vec_short_b[]   = { 1, 3, 13, 55 };
-  short vec_short_ref[] = { 1, 5, 21, 89 };
+  // Test sub_vv_int
 
-  short vec_short_c[vlen];
-  add_vv_short( vec_short_a, vec_short_b, vec_short_c );
+  RUN_TEST( test_sub_vv, int,
+    ({  0, -2, 13, 89 }),
+    ({  1, -2,  8, 55 }),
+    ({ -1,  0,  5, 34 }) );
 
-  error_code++;
-  for ( int i = 0; i < vlen; i++ ) {
-    if ( vec_short_c[i] != vec_short_ref[i] )
-      return error_code;
-  }
+  RUN_TEST( test_sub_vv, short,
+    ({  0, -2, 13, 89 }),
+    ({  1, -2,  8, 55 }),
+    ({ -1,  0,  5, 34 }) );
 
-  // Test add_vv_ushort
+  RUN_TEST( test_sub_vv, ushort,
+    ({ 1, 5, 21, 89 }),
+    ({ 0, 3, 13, 55 }),
+    ({ 1, 2,  8, 34 }) );
 
-  unsigned short vec_ushort_a[]   = { 0, 2,  8, 34 };
-  unsigned short vec_ushort_b[]   = { 1, 3, 13, 55 };
-  unsigned short vec_ushort_ref[] = { 1, 5, 21, 89 };
+  RUN_TEST_FP( test_sub_vv, float,
+    ({ 1.0, 4.5, 10.8, 19.5 }),
+    ({ 1.0, 3.0,  3.3,  6.3 }),
+    ({ 0.0, 1.5,  7.5, 13.2 }) );
 
-  unsigned short vec_ushort_c[vlen];
-  add_vv_ushort( vec_ushort_a, vec_ushort_b, vec_ushort_c );
-
-  error_code++;
-  for ( int i = 0; i < vlen; i++ ) {
-    if ( vec_ushort_c[i] != vec_ushort_ref[i] )
-      return error_code;
-  }
-
-  // Test add_vv_float
-
+  // Test mul_vv_int
+  // NOTE: Integer vector-vector multiplies not implemented in sim yet
   /*
-  float vec_float_a[]   = { 0.0, 1.5,  7.5, 13.2 };
-  float vec_float_b[]   = { 1.0, 3.0,  3.3,  6.3 };
-  float vec_float_ref[] = { 1.0, 4.5, 10.8, 19.5 };
+  RUN_TEST( test_mul_vv, int,
+    ({ 0, -2,   3, 13 }),
+    ({ 1, -2,  -4,  4 }),
+    ({ 0, -4, -12, 52 }) );
 
-  float vec_float_c[vlen];
-  add_vv_float( vec_float_a, vec_float_b, vec_float_c );
+  RUN_TEST( test_mul_vv, short,
+    ({ 0, -2,   3, 13 }),
+    ({ 1, -2,  -4,  4 }),
+    ({ 0, -4, -12, 52 }) );
 
-  error_code++;
-  for ( int i = 0; i < vlen; i++ ) {
-    if ( fp_equal( vec_float_c[i], vec_float_ref[i] ) )
-      return error_code;
-  }
+  RUN_TEST( test_mul_vv, ushort,
+    ({ 0, 2,  3, 13 }),
+    ({ 1, 2,  4,  4 }),
+    ({ 0, 4, 12, 52 }) );
   */
+
+  RUN_TEST_FP( test_mul_vv, float,
+    ({ 1.0,  4.5, 2.0, 10.0 }),
+    ({ 1.0,  3.0, 3.3,  3.3 }),
+    ({ 1.0, 13.5, 6.6, 33.0 }) );
 
   // If all tests passed return zero
 
   return 0;
 }
+

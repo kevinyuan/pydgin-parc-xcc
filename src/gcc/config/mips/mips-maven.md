@@ -395,13 +395,19 @@
 ;; nop          no operation
 ;; ghost        an instruction that produces no real code
 
+;; cbatten - extra traditional vector instruction types for manve
+;; viadd       vector integer add/sub
+;; vimul       vector integer multiply
+;; vfadd       vector floating point add/sub
+;; vfmul       vector floating point multiply
+
 (define_attr "type"
   "unknown,branch,jump,call,load,fpload,fpidxload,store,fpstore,
    fpidxstore,prefetch,prefetchx,condmove,mtc,mfc,mthilo,mfhilo,const,
    arith,logical,shift,slt,signext,clz,pop,trap,imul,imul3,imul3nc,
    imadd,idiv,idiv3,move,fmove,fadd,fmul,fmadd,fdiv,frdiv,frdiv1,
    frdiv2,fabs,fneg,fcmp,fcvt,fsqrt,frsqrt,frsqrt1,frsqrt2,multi,
-   nop,ghost"
+   nop,ghost,viadd,vimul,vfadd,vfmul"
   (cond [(eq_attr "jal" "!unset") (const_string "call")
          (eq_attr "got" "load") (const_string "load")
 
@@ -1016,10 +1022,11 @@
 ;; Specify functional units
 
 (define_automaton "fadd,fmul")
+
 (define_cpu_unit "fadd" "fadd")
 (define_cpu_unit "fmul" "fmul")
 
-;; Maven CP pipeline - fp adder
+;; Maven CP pipeline - fp add/sub
 
 (define_insn_reservation "maven_fadd" 4
   (and (eq_attr "cpu" "maven")
@@ -1030,23 +1037,38 @@
 
 (define_insn_reservation "maven_fmul" 4
   (and (eq_attr "cpu" "maven")
-       (and (eq_attr "type" "fmul,fmadd")
+       (and (eq_attr "type" "fmul")
             (eq_attr "mode" "SF")))
   "fmul")
+
+;; Maven traditional vector pipeline - fp add/sub
+
+(define_insn_reservation "maven_vfadd" 8
+  (and (eq_attr "cpu" "maven") (eq_attr "type" "vfadd"))
+  "fadd*8")
+
+;; Maven traditional vector pipeline - fp multiplier
+
+(define_insn_reservation "maven_vfmul" 8
+  (and (eq_attr "cpu" "maven") (eq_attr "type" "vfmul"))
+  "fmul*8")
+
+;; Maven traditional vector bypasses
+
+(define_bypass 4 "maven_vfadd" "maven_vfmul")
+(define_bypass 4 "maven_vfmul" "maven_vfadd")
 
 ;; Maven VP pipeline - fp adder
 
 (define_insn_reservation "maven_vp_fadd" 8
-  (and (eq_attr "cpu" "maven_vp")
-       (eq_attr "type" "fadd"))
+  (and (eq_attr "cpu" "maven_vp") (eq_attr "type" "fadd"))
   "fadd*8")
 
 ;; Maven VP pipeline - fp multiplier
 
 (define_insn_reservation "maven_vp_fmul" 8
   (and (eq_attr "cpu" "maven_vp")
-       (and (eq_attr "type" "fmul,fmadd")
-            (eq_attr "mode" "SF")))
+       (and (eq_attr "type" "fmul,fmadd") (eq_attr "mode" "SF")))
   "fmul*8")
 
 ;; Maven VP bypasses
@@ -1072,6 +1094,9 @@
 (define_mode_iterator VEC
   [V32SI V32HI V32QI V32SF])
 
+(define_mode_iterator IVEC
+  [V32SI V32HI V32QI])
+
 (define_mode_attr innermode
   [(V32SI "SI") (V32HI "HI") (V32QI "QI") (V32SF "SF")])
 
@@ -1084,8 +1109,11 @@
 (define_mode_attr vec_umem_suffix
   [(V32SI "w") (V32HI "hu") (V32QI "bu") (V32SF "w")])
 
-(define_mode_attr vec_arith_suffix
+(define_mode_attr vec_uarith_suffix
   [(V32SI "u") (V32HI "u") (V32QI "u") (V32SF ".s")])
+
+(define_mode_attr vec_arith_suffix
+  [(V32SI "") (V32HI "") (V32QI "") (V32SF ".s")])
 
 ;;------------------------------------------------------------------------
 ;; Maven vector move patterns
@@ -1219,15 +1247,49 @@
   "l<vec_umem_suffix>sh.v\t%0,%1")
 
 ;;------------------------------------------------------------------------
-;; Maven traditional vector ops
+;; Maven traditional vector add
 ;;------------------------------------------------------------------------
+
+(define_mode_attr vec_add_alu
+  [(V32SI "viadd") (V32HI "viadd") (V32QI "viadd") (V32SF "vfadd")])
 
 (define_insn "add<mode>3"
   [(set (match_operand:VEC 0 "register_operand" "=Z")
         (plus:VEC (match_operand:VEC 1 "register_operand" "Z")
                   (match_operand:VEC 2 "register_operand" "Z")))]
   ""
-  "add<vec_arith_suffix>.vv\t%0,%1,%2")
+  "add<vec_uarith_suffix>.vv\t%0,%1,%2"
+  [(set_attr "type" "<vec_add_alu>")])
+
+;;------------------------------------------------------------------------
+;; Maven traditional vector subtract
+;;------------------------------------------------------------------------
+
+(define_mode_attr vec_sub_alu
+  [(V32SI "viadd") (V32HI "viadd") (V32QI "viadd") (V32SF "vfadd")])
+
+(define_insn "sub<mode>3"
+  [(set (match_operand:VEC 0 "register_operand" "=Z")
+        (minus:VEC (match_operand:VEC 1 "register_operand" "Z")
+                   (match_operand:VEC 2 "register_operand" "Z")))]
+  ""
+  "sub<vec_uarith_suffix>.vv\t%0,%1,%2"
+  [(set_attr "type" "<vec_sub_alu>")])
+
+;;------------------------------------------------------------------------
+;; Maven traditional vector multiply
+;;------------------------------------------------------------------------
+
+(define_mode_attr vec_mul_alu
+  [(V32SI "vimul") (V32HI "vimul") (V32QI "vimul") (V32SF "vfmul")])
+
+(define_insn "mul<mode>3"
+  [(set (match_operand:VEC 0 "register_operand" "=Z")
+        (mult:VEC (match_operand:VEC 1 "register_operand" "Z")
+                  (match_operand:VEC 2 "register_operand" "Z")))]
+  ""
+  "mul<vec_arith_suffix>.vv\t%0,%1,%2"
+  [(set_attr "type" "<vec_mul_alu>")])
 
 ;;------------------------------------------------------------------------
 ;; Maven stop instruction
@@ -1255,8 +1317,7 @@
     return "break 0";
   else
     return "break";
-}
-  [(set_attr "type" "trap")])
+}  [(set_attr "type" "trap")])
 
 (define_expand "conditional_trap"
   [(trap_if (match_operator 0 "comparison_operator"
