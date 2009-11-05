@@ -274,7 +274,7 @@ int test()
 
   // Test mul_vv_int
   // NOTE: Integer vector-vector multiplies not implemented in sim yet
-  /*
+
   RUN_TEST( test_mul_vv, int,
     ({ 0, -2,   3, 13 }),
     ({ 1, -2,  -4,  4 }),
@@ -289,7 +289,6 @@ int test()
     ({ 0, 2,  3, 13 }),
     ({ 1, 2,  4,  4 }),
     ({ 0, 4, 12, 52 }) );
-  */
 
   RUN_TEST_FP( test_mul_vv, float,
     ({ 1.0,  4.5, 2.0, 10.0 }),
