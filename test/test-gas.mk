@@ -19,6 +19,7 @@ test_gas_srcs = \
   test-gas-vconds.s \
   test-gas-varith.s \
   test-gas-variths.s \
+  test-gas-divrem.s \
 
 #-------------------------------------------------------------------------
 # Compile tests

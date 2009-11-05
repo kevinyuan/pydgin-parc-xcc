@@ -239,9 +239,11 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"b",              "p",         0x04010000, 0xffff0000, UBD,                          INSN2_ALIAS,    I1                }, /* bgez 0 */
 {"bal",            "p",         0x04110000, 0xffff0000, UBD|WR_31,                    INSN2_ALIAS,    I1                }, /* bgezal 0*/
 
+/*----------------------------------------------------------------------------------------------------------------------*/
 /* Maven CP/VP SMIPS Instructions - Synchronization Instructions */
 /*  SY = INSN_SYNC which should prevent gas from reording the stop, sync, amo ops */
 /*  sync.g is an alias for sync */
+
 
 {"stop",           "",          0x9c000000, 0xffffffff, SY,                           0,              INSN_MAVEN        },
 {"sync.l",         "",          0x9c000001, 0xffffffff, SY,                           0,              INSN_MAVEN        },
@@ -522,6 +524,12 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 {"popc.f",         "d,#a",      0x480000bb, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
 {"findfone.f",     "d,#a",      0x480000bc, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
+
+// note: does not do dependency checking
+{"div",            "d,s,t",     0x9c000005, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"rem",            "d,s,t",     0x9c000006, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+
+/*----------------------------------------------------------------------------------------------------------------------*/
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
 {"abs.s",          "D,V",       0x46000005, 0xffff003f, WR_D|RD_S|FP_S,               0,              I1                },
@@ -930,10 +938,11 @@ const struct mips_opcode mips_builtin_opcodes[] =
    though the first operand appeared twice (the first operand is both
    a source and a destination). To get the div machine instruction,
    you must use an explicit destination of $0. */
-{"div",            "z,s,t",     0x0000001a, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
-{"div",            "z,t",       0x0000001a, 0xffe0ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
-{"div",            "d,v,t",     0,   (int)  M_DIV_3,    INSN_MACRO,                   0,              I1                },
-{"div",            "d,v,I",     0,   (int)  M_DIV_3I,   INSN_MACRO,                   0,              I1                },
+//celio here: div commented out since Maven ISA uses its own div instruction
+//{"div",            "z,s,t",     0x0000001a, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
+//{"div",            "z,t",       0x0000001a, 0xffe0ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
+//{"div",            "d,v,t",     0,   (int)  M_DIV_3,    INSN_MACRO,                   0,              I1                },
+//{"div",            "d,v,I",     0,   (int)  M_DIV_3I,   INSN_MACRO,                   0,              I1                },
 {"div.d",          "D,V,T",     0x46200003, 0xffe0003f, WR_D|RD_S|RD_T|FP_D,          0,              I1                },
 {"div.s",          "D,V,T",     0x46000003, 0xffe0003f, WR_D|RD_S|RD_T|FP_S,          0,              I1                },
 {"div.ps",         "D,V,T",     0x46c00003, 0xffe0003f, WR_D|RD_S|RD_T|FP_D,          0,              SB1               },
@@ -1492,9 +1501,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"recip2.d",       "D,S,T",     0x4620001c, 0xffe0003f, WR_D|RD_S|RD_T|FP_D,          0,              M3D               },
 {"recip2.ps",      "D,S,T",     0x46c0001c, 0xffe0003f, WR_D|RD_S|RD_T|FP_S,          0,              M3D               },
 {"recip2.s",       "D,S,T",     0x4600001c, 0xffe0003f, WR_D|RD_S|RD_T|FP_S,          0,              M3D               },
-{"rem",            "z,s,t",     0x0000001a, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
-{"rem",            "d,v,t",     0,   (int)  M_REM_3,    INSN_MACRO,                   0,              I1                },
-{"rem",            "d,v,I",     0,   (int)  M_REM_3I,   INSN_MACRO,                   0,              I1                },
+//celio here: rem commented out
+//{"rem",            "z,s,t",     0x0000001a, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
+//{"rem",            "d,v,t",     0,   (int)  M_REM_3,    INSN_MACRO,                   0,              I1                },
+//{"rem",            "d,v,I",     0,   (int)  M_REM_3I,   INSN_MACRO,                   0,              I1                },
 {"remu",           "z,s,t",     0x0000001b, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
 {"remu",           "d,v,t",     0,   (int)  M_REMU_3,   INSN_MACRO,                   0,              I1                },
 
