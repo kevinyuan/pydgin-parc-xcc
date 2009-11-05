@@ -272,6 +272,12 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 //NOTE: these dependencies are not used and may be incorrect if optimizations are turned on!
 // in particular there is dependency aliasing on the write destination (which is NOT a GPR)
+{"lwx.v",          "#d,t,#s",   0xb0000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhx.v",          "#d,t,#s",   0xb0000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lhux.v",         "#d,t,#s",   0xb00000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbx.v",          "#d,t,#s",   0xb0000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+{"lbux.v",         "#d,t,#s",   0xb00000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
+
 {"lw.v",           "#d,t",      0x60000000, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lh.v",           "#d,t",      0x60000020, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lhu.v",          "#d,t",      0x600000a0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
@@ -311,6 +317,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"lbusegst.v",     "#d,t,#n,s", 0x640000e0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 
 //NOTE: these dependencies are not used and may be incorrect if optimizations are turned on!
+{"swx.v",          "#d,t,#s",   0xb4000080, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"shx.v",          "#d,t,#s",   0xb40000a0, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+{"sbx.v",          "#d,t,#s",   0xb40000e0, 0xfc0007ff, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
+
 {"sw.v",           "#d,t",      0x68000080, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
 {"sh.v",           "#d,t",      0x680000a0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },
 {"sb.v",           "#d,t",      0x680000e0, 0xffe007ff, SM|RD_v|RD_t,                 0,              INSN_MAVEN        },

@@ -71,6 +71,12 @@ test:
         lbsegst.v   $vt2, $t0, 0x4, $t1
         lbusegst.v  $vt2, $t0, 0x4, $t1
  
+        lwx.v    $vt3, $t0, $vt2
+        lhx.v    $vt3, $t0, $vt2
+        lhux.v   $vt3, $t0, $vt2
+        lbx.v    $vt3, $t0, $vt2
+        lbux.v   $vt3, $t0, $vt2
+                    
         # begin functional test of lw.v
 
         li        $t0, 1
