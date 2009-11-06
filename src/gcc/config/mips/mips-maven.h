@@ -1571,7 +1571,8 @@ march=*: -mhard-float}"
 
 /* cbatten - We fix vv0, vat, vk0, vk1, vgp, vsp, vfp, vra but the
    remaining 24 vector registers are available for general allocation
-   (vv0-vv1, va0-va7, vt4-vt9, vs0-vs8) */
+   (vv0-vv1, va0-va7, vt4-vt9, vs0-vs8) We also fix hi/lo (#64/65) to
+   make sure that gcc is not trying to allocate and use them. */
 
 #define FIXED_REGISTERS                                                 \
   {                                                                     \
@@ -1579,7 +1580,7 @@ march=*: -mhard-float}"
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,                     \
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
-    0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,                     \
+    1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,                     \
     /* COP0 registers */                                                \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \

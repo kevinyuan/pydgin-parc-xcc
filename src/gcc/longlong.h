@@ -695,7 +695,7 @@ UDItype __umulsidi3 (USItype, USItype);
 #endif /* __mc88110__ */
 #endif /* __m88000__ */
 
-#if defined (__mips__) && W_TYPE_SIZE == 32
+#if defined (__mips__) && W_TYPE_SIZE == 32 && ! _MIPS_ARCH_MAVEN
 #define umul_ppmm(w1, w0, u, v)						\
   do {									\
     UDItype __x = (UDItype) (USItype) (u) * (USItype) (v);		\

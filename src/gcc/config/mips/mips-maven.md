@@ -1081,6 +1081,55 @@
 (include "generic.md")
 
 ;;------------------------------------------------------------------------
+;; Maven integer multiply/divide/remainder
+;;------------------------------------------------------------------------
+
+(define_insn "mul<mode>3"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+        (mult:GPR (match_operand:GPR 1 "register_operand" "r")
+                  (match_operand:GPR 2 "register_operand" "r")))]
+  ""
+  "mul\t%0,%1,%2"
+  [(set_attr "type" "imul3")
+   (set_attr "mode" "<MODE>")])
+
+(define_insn "div<mode>3"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+        (div:GPR (match_operand:GPR 1 "register_operand" "r")
+                 (match_operand:GPR 2 "register_operand" "r")))]
+  ""
+  "div\t%0,%1,%2"
+ [(set_attr "type" "idiv")
+  (set_attr "mode" "<MODE>")])
+
+(define_insn "udiv<mode>3"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+        (udiv:GPR (match_operand:GPR 1 "register_operand" "r")
+                 (match_operand:GPR 2 "register_operand" "r")))]
+  ""
+  "divu\t%0,%1,%2"
+ [(set_attr "type" "idiv")
+  (set_attr "mode" "<MODE>")])
+
+(define_insn "mod<mode>3"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+        (mod:GPR (match_operand:GPR 1 "register_operand" "r")
+                 (match_operand:GPR 2 "register_operand" "r")))]
+  ""
+  "rem\t%0,%1,%2"
+ [(set_attr "type" "idiv")
+  (set_attr "mode" "<MODE>")])
+
+(define_insn "umod<mode>3"
+  [(set (match_operand:GPR 0 "register_operand" "=r")
+        (umod:GPR (match_operand:GPR 1 "register_operand" "r")
+                 (match_operand:GPR 2 "register_operand" "r")))]
+  ""
+  "remu\t%0,%1,%2"
+ [(set_attr "type" "idiv")
+  (set_attr "mode" "<MODE>")])
+
+;;------------------------------------------------------------------------
 ;; Maven vector mode iterators and attributes
 ;;------------------------------------------------------------------------
 ;; cbatten - Ideally we would define this using syscfg.h so that it is
@@ -1609,6 +1658,11 @@
 ;;------------------------------------------------------------------------
 ;; Multiplication
 ;;------------------------------------------------------------------------
+;; cbatten - revising how we generate the mul instruction for maven. I
+;; added two simple patterns which generate the integer and
+;; floating-point multiplies. I looked through all of the other multiply
+;; related patterns and they didn't seem relevant except maybe the mixed
+;; mode ones (allowing one to multiply si with di).
 
 (define_expand "mul<mode>3"
   [(set (match_operand:SCALARF 0 "register_operand")
@@ -1630,6 +1684,7 @@
 ;; operands may corrupt immediately following multiplies. This is a
 ;; simple fix to insert NOPs.
 
+;; Maven - does not apply
 (define_insn "*mul<mode>3_r4300"
   [(set (match_operand:SCALARF 0 "register_operand" "=f")
         (mult:SCALARF (match_operand:SCALARF 1 "register_operand" "f")
@@ -1640,6 +1695,7 @@
    (set_attr "mode" "<MODE>")
    (set_attr "length" "8")])
 
+;; Maven - does not apply
 (define_insn "mulv2sf3"
   [(set (match_operand:V2SF 0 "register_operand" "=f")
         (mult:V2SF (match_operand:V2SF 1 "register_operand" "f")
@@ -1704,25 +1760,27 @@
 ;; These processors have PRId values of 0x00004220 and 0x00004300,
 ;; respectively.
 
-(define_expand "mul<mode>3"
-  [(set (match_operand:GPR 0 "register_operand")
-        (mult:GPR (match_operand:GPR 1 "register_operand")
-                  (match_operand:GPR 2 "register_operand")))]
-  ""
-{
-  if (TARGET_LOONGSON_2EF)
-    emit_insn (gen_mul<mode>3_mul3_ls2ef (operands[0], operands[1],
-                                          operands[2]));
-  else if (ISA_HAS_<D>MUL3)
-    emit_insn (gen_mul<mode>3_mul3 (operands[0], operands[1], operands[2]));
-  else if (TARGET_FIX_R4000)
-    emit_insn (gen_mul<mode>3_r4000 (operands[0], operands[1], operands[2]));
-  else
-    emit_insn
-      (gen_mul<mode>3_internal (operands[0], operands[1], operands[2]));
-  DONE;
-})
+;; Maven - replaced with dedicated define_insn at top of md file
+;;(define_expand "mul<mode>3"
+;;  [(set (match_operand:GPR 0 "register_operand")
+;;        (mult:GPR (match_operand:GPR 1 "register_operand")
+;;                  (match_operand:GPR 2 "register_operand")))]
+;;  ""
+;;{
+;;  if (TARGET_LOONGSON_2EF)
+;;    emit_insn (gen_mul<mode>3_mul3_ls2ef (operands[0], operands[1],
+;;                                          operands[2]));
+;;  else if (ISA_HAS_<D>MUL3)
+;;    emit_insn (gen_mul<mode>3_mul3 (operands[0], operands[1], operands[2]));
+;;  else if (TARGET_FIX_R4000)
+;;    emit_insn (gen_mul<mode>3_r4000 (operands[0], operands[1], operands[2]));
+;;  else
+;;    emit_insn
+;;      (gen_mul<mode>3_internal (operands[0], operands[1], operands[2]));
+;;  DONE;
+;;})
 
+;; Maven - does not apply
 (define_insn "mul<mode>3_mul3_ls2ef"
   [(set (match_operand:GPR 0 "register_operand" "=d")
         (mult:GPR (match_operand:GPR 1 "register_operand" "d")
@@ -1732,21 +1790,22 @@
   [(set_attr "type" "imul3nc")
    (set_attr "mode" "<MODE>")])
 
-(define_insn "mul<mode>3_mul3"
-  [(set (match_operand:GPR 0 "register_operand" "=d,l")
-        (mult:GPR (match_operand:GPR 1 "register_operand" "d,d")
-                  (match_operand:GPR 2 "register_operand" "d,d")))
-   (clobber (match_scratch:GPR 3 "=l,X"))]
-  "ISA_HAS_<D>MUL3"
-{
-  if (which_alternative == 1)
-    return "<d>mult\t%1,%2";
-  if (<MODE>mode == SImode && TARGET_MIPS3900)
-    return "mult\t%0,%1,%2";
-  return "<d>mul\t%0,%1,%2";
-}
-  [(set_attr "type" "imul3,imul")
-   (set_attr "mode" "<MODE>")])
+;; Maven - replaced with dedicated define_insn above
+;;(define_insn "mul<mode>3_mul3"
+;;  [(set (match_operand:GPR 0 "register_operand" "=d,l")
+;;        (mult:GPR (match_operand:GPR 1 "register_operand" "d,d")
+;;                  (match_operand:GPR 2 "register_operand" "d,d")))
+;;   (clobber (match_scratch:GPR 3 "=l,X"))]
+;;  "ISA_HAS_<D>MUL3"
+;;{
+;;  if (which_alternative == 1)
+;;    return "<d>mult\t%1,%2";
+;;  if (<MODE>mode == SImode && TARGET_MIPS3900)
+;;    return "mult\t%0,%1,%2";
+;;  return "<d>mul\t%0,%1,%2";
+;;}
+;;  [(set_attr "type" "imul3,imul")
+;;   (set_attr "mode" "<MODE>")])
 
 ;; If a register gets allocated to LO, and we spill to memory, the
 ;; reload will include a move from LO to a GPR. Merge it into the
@@ -1757,6 +1816,7 @@
 ;;  Operand 2: GPR (2nd multiplication operand)
 ;;  Operand 3: GPR (destination)
 
+;; Maven - does not apply
 (define_peephole2
   [(parallel
        [(set (match_operand:SI 0 "lo_operand")
@@ -1772,15 +1832,17 @@
                       (match_dup 2)))
         (clobber (match_dup 0))])])
 
-(define_insn "mul<mode>3_internal"
-  [(set (match_operand:GPR 0 "register_operand" "=l")
-        (mult:GPR (match_operand:GPR 1 "register_operand" "d")
-                  (match_operand:GPR 2 "register_operand" "d")))]
-  "!TARGET_FIX_R4000"
-  "<d>mult\t%1,%2"
-  [(set_attr "type" "imul")
-   (set_attr "mode" "<MODE>")])
+;; cbatten - replaced with dedicated define_insn at top of md file
+;;(define_insn "mul<mode>3_internal"
+;;  [(set (match_operand:GPR 0 "register_operand" "=l")
+;;        (mult:GPR (match_operand:GPR 1 "register_operand" "d")
+;;                  (match_operand:GPR 2 "register_operand" "d")))]
+;;  "!TARGET_FIX_R4000"
+;;  "<d>mult\t%1,%2"
+;;  [(set_attr "type" "imul")
+;;   (set_attr "mode" "<MODE>")])
 
+;; Maven - does not apply
 (define_insn "mul<mode>3_r4000"
   [(set (match_operand:GPR 0 "register_operand" "=d")
         (mult:GPR (match_operand:GPR 1 "register_operand" "d")
@@ -1801,6 +1863,7 @@
 ;;  Operand 2: GPR (2nd multiplication operand)
 ;;  Operand 3: GPR (destination)
 
+;; Maven - does not apply
 (define_peephole2
   [(set (match_operand:SI 0 "lo_operand")
         (mult:SI (match_operand:SI 1 "d_operand")
@@ -1837,6 +1900,7 @@
 ;; alternative is two reloads more costly than the first. We add "*?*?"
 ;; to the first alternative as a counterweight.
 
+;; Maven - does not apply
 (define_insn "*mul_acc_si"
   [(set (match_operand:SI 0 "register_operand" "=l*?*?,d?")
         (plus:SI (mult:SI (match_operand:SI 1 "register_operand" "d,d")
@@ -1856,6 +1920,7 @@
 ;; clobber than the final alternative, so we add "*?" as a
 ;; counterweight.
 
+;; Maven - does not apply
 (define_insn "*mul_acc_si_r3900"
   [(set (match_operand:SI 0 "register_operand" "=l*?*?,d*?,d?")
         (plus:SI (mult:SI (match_operand:SI 1 "register_operand" "d,d,d")
@@ -1874,7 +1939,6 @@
 
 ;; Split *mul_acc_si if both the source and destination accumulator
 ;; values are GPRs.
-
 (define_split
   [(set (match_operand:SI 0 "d_operand")
         (plus:SI (mult:SI (match_operand:SI 1 "d_operand")
@@ -1889,6 +1953,7 @@
    (set (match_dup 0) (plus:SI (match_dup 5) (match_dup 3)))]
   "")
 
+;; Maven - does not apply
 (define_insn "*macc"
   [(set (match_operand:SI 0 "register_operand" "=l,d")
         (plus:SI (mult:SI (match_operand:SI 1 "register_operand" "d,d")
@@ -1910,6 +1975,7 @@
   [(set_attr "type" "imadd")
    (set_attr "mode" "SI")])
 
+;; Maven - does not apply
 (define_insn "*msac"
   [(set (match_operand:SI 0 "register_operand" "=l,d")
         (minus:SI (match_operand:SI 1 "register_operand" "0,l")
@@ -1930,6 +1996,7 @@
 
 ;; An msac-like instruction implemented using negation and a macc.
 
+;; Maven - does not apply
 (define_insn_and_split "*msac_using_macc"
   [(set (match_operand:SI 0 "register_operand" "=l,d")
         (minus:SI (match_operand:SI 1 "register_operand" "0,l")
@@ -1954,6 +2021,7 @@
 
 ;; Patterns generated by the define_peephole2 below.
 
+;; Maven - does not apply
 (define_insn "*macc2"
   [(set (match_operand:SI 0 "register_operand" "=l")
         (plus:SI (mult:SI (match_operand:SI 1 "register_operand" "d")
@@ -1968,6 +2036,7 @@
   [(set_attr "type"     "imadd")
    (set_attr "mode"     "SI")])
 
+;; Maven - does not apply
 (define_insn "*msac2"
   [(set (match_operand:SI 0 "register_operand" "=l")
         (minus:SI (match_dup 0)
@@ -1989,6 +2058,7 @@
 ;;  Operand 1: macc/msac
 ;;  Operand 2: GPR (destination)
 
+;; Maven - does not apply
 (define_peephole2
   [(parallel
        [(set (match_operand:SI 0 "lo_operand")
@@ -2017,6 +2087,7 @@
 ;;  Operand 5: new multiplication
 ;;  Operand 6: new addition/subtraction
 
+;; Maven - does not apply
 (define_peephole2
   [(match_scratch:SI 0 "d")
    (set (match_operand:SI 1 "lo_operand")
@@ -2048,6 +2119,7 @@
 ;; Operand 5: new multiplication
 ;; Operand 6: new addition/subtraction
 
+;; Maven - does not apply
 (define_peephole2
   [(match_scratch:SI 0 "d")
    (set (match_operand:SI 1 "lo_operand")
@@ -2072,6 +2144,7 @@
                                 operands[2], operands[0]);
 })
 
+;; Maven - does not apply
 ;; See the comment above *mul_add_si for details.
 (define_insn "*mul_sub_si"
   [(set (match_operand:SI 0 "register_operand" "=l*?*?,d?")
@@ -2104,6 +2177,7 @@
    (set (match_dup 0) (minus:SI (match_dup 1) (match_dup 5)))]
   "")
 
+;; Maven - does not apply
 (define_insn "*muls"
   [(set (match_operand:SI 0 "register_operand" "=l,d")
         (neg:SI (mult:SI (match_operand:SI 1 "register_operand" "d,d")
@@ -2116,31 +2190,34 @@
   [(set_attr "type"     "imul,imul3")
    (set_attr "mode"     "SI")])
 
-(define_expand "<u>mulsidi3"
-  [(set (match_operand:DI 0 "register_operand")
-        (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand"))
-                 (any_extend:DI (match_operand:SI 2 "register_operand"))))]
-  "!TARGET_64BIT || !TARGET_FIX_R4000"
-{
-  if (TARGET_64BIT)
-    emit_insn (gen_<u>mulsidi3_64bit (operands[0], operands[1], operands[2]));
-  else if (TARGET_FIX_R4000)
-    emit_insn (gen_<u>mulsidi3_32bit_r4000 (operands[0], operands[1],
-                                            operands[2]));
-  else
-    emit_insn (gen_<u>mulsidi3_32bit (operands[0], operands[1], operands[2]));
-  DONE;
-})
+;; cbatten - may need to do something about this for maven mul/div/rem
+;;(define_expand "<u>mulsidi3"
+;;  [(set (match_operand:DI 0 "register_operand")
+;;        (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand"))
+;;                 (any_extend:DI (match_operand:SI 2 "register_operand"))))]
+;;  "!TARGET_64BIT || !TARGET_FIX_R4000"
+;;{
+;;  if (TARGET_64BIT)
+;;    emit_insn (gen_<u>mulsidi3_64bit (operands[0], operands[1], operands[2]));
+;;  else if (TARGET_FIX_R4000)
+;;    emit_insn (gen_<u>mulsidi3_32bit_r4000 (operands[0], operands[1],
+;;                                            operands[2]));
+;;  else
+;;    emit_insn (gen_<u>mulsidi3_32bit (operands[0], operands[1], operands[2]));
+;;  DONE;
+;;})
 
-(define_insn "<u>mulsidi3_32bit"
-  [(set (match_operand:DI 0 "register_operand" "=x")
-        (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand" "d"))
-                 (any_extend:DI (match_operand:SI 2 "register_operand" "d"))))]
-  "!TARGET_64BIT && !TARGET_FIX_R4000 && !ISA_HAS_DSPR2"
-  "mult<u>\t%1,%2"
-  [(set_attr "type" "imul")
-   (set_attr "mode" "SI")])
+;; cbatten - may need to do something about this for maven mul/div/rem
+;;(define_insn "<u>mulsidi3_32bit"
+;;  [(set (match_operand:DI 0 "register_operand" "=x")
+;;        (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand" "d"))
+;;                 (any_extend:DI (match_operand:SI 2 "register_operand" "d"))))]
+;;  "!TARGET_64BIT && !TARGET_FIX_R4000 && !ISA_HAS_DSPR2"
+;;  "mult<u>\t%1,%2"
+;;  [(set_attr "type" "imul")
+;;   (set_attr "mode" "SI")])
 
+;; Maven - does not apply
 (define_insn "<u>mulsidi3_32bit_r4000"
   [(set (match_operand:DI 0 "register_operand" "=d")
         (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand" "d"))
@@ -2152,6 +2229,7 @@
    (set_attr "mode" "SI")
    (set_attr "length" "12")])
 
+;; Maven - does not apply
 (define_insn_and_split "<u>mulsidi3_64bit"
   [(set (match_operand:DI 0 "register_operand" "=d")
         (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand" "d"))
@@ -2192,6 +2270,7 @@
    (set_attr "mode" "SI")
    (set_attr "length" "24")])
 
+;; Maven - does not apply
 (define_insn "<u>mulsidi3_64bit_hilo"
   [(set (match_operand:TI 0 "register_operand" "=x")
         (unspec:TI
@@ -2204,6 +2283,7 @@
   [(set_attr "type" "imul")
    (set_attr "mode" "SI")])
 
+;; Maven - does not apply
 ;; Widening multiply with negation.
 (define_insn "*muls<u>_di"
   [(set (match_operand:DI 0 "register_operand" "=x")
@@ -2216,6 +2296,7 @@
   [(set_attr "type" "imul")
    (set_attr "mode" "SI")])
 
+;; Maven - does not apply
 (define_insn "<u>msubsidi4"
   [(set (match_operand:DI 0 "register_operand" "=ka")
         (minus:DI
@@ -2237,58 +2318,60 @@
 
 ;; _highpart patterns
 
-(define_expand "<su>mulsi3_highpart"
-  [(set (match_operand:SI 0 "register_operand")
-        (truncate:SI
-         (lshiftrt:DI
-          (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand"))
-                   (any_extend:DI (match_operand:SI 2 "register_operand")))
-          (const_int 32))))]
-  ""
-{
-  if (ISA_HAS_MULHI)
-    emit_insn (gen_<su>mulsi3_highpart_mulhi_internal (operands[0],
-                                                       operands[1],
-                                                       operands[2]));
-  else
-    emit_insn (gen_<su>mulsi3_highpart_internal (operands[0], operands[1],
-                                                 operands[2]));
-  DONE;
-})
+;; cbatten - we don't support the highpart pattern on maven
+;;(define_expand "<su>mulsi3_highpart"
+;;  [(set (match_operand:SI 0 "register_operand")
+;;        (truncate:SI
+;;         (lshiftrt:DI
+;;          (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand"))
+;;                   (any_extend:DI (match_operand:SI 2 "register_operand")))
+;;          (const_int 32))))]
+;;  ""
+;;{
+;;  if (ISA_HAS_MULHI)
+;;    emit_insn (gen_<su>mulsi3_highpart_mulhi_internal (operands[0],
+;;                                                       operands[1],
+;;                                                       operands[2]));
+;;  else
+;;    emit_insn (gen_<su>mulsi3_highpart_internal (operands[0], operands[1],
+;;                                                 operands[2]));
+;;  DONE;
+;;})
 
-(define_insn_and_split "<su>mulsi3_highpart_internal"
-  [(set (match_operand:SI 0 "register_operand" "=d")
-        (truncate:SI
-         (lshiftrt:DI
-          (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand" "d"))
-                   (any_extend:DI (match_operand:SI 2 "register_operand" "d")))
-          (const_int 32))))
-   (clobber (match_scratch:SI 3 "=l"))]
-  "!ISA_HAS_MULHI"
-  { return TARGET_FIX_R4000 ? "mult<u>\t%1,%2\n\tmfhi\t%0" : "#"; }
-  "&& reload_completed && !TARGET_FIX_R4000"
-  [(const_int 0)]
-{
-  rtx hilo;
+;;(define_insn_and_split "<su>mulsi3_highpart_internal"
+;;  [(set (match_operand:SI 0 "register_operand" "=d")
+;;        (truncate:SI
+;;         (lshiftrt:DI
+;;          (mult:DI (any_extend:DI (match_operand:SI 1 "register_operand" "d"))
+;;                   (any_extend:DI (match_operand:SI 2 "register_operand" "d")))
+;;          (const_int 32))))
+;;   (clobber (match_scratch:SI 3 "=l"))]
+;;  "!ISA_HAS_MULHI"
+;;  { return TARGET_FIX_R4000 ? "mult<u>\t%1,%2\n\tmfhi\t%0" : "#"; }
+;;  "&& reload_completed && !TARGET_FIX_R4000"
+;;  [(const_int 0)]
+;;{
+;;  rtx hilo;
+;;
+;;  if (TARGET_64BIT)
+;;    {
+;;      hilo = gen_rtx_REG (TImode, MD_REG_FIRST);
+;;      emit_insn (gen_<u>mulsidi3_64bit_hilo (hilo, operands[1], operands[2]));
+;;      emit_insn (gen_mfhisi_ti (operands[0], hilo));
+;;    }
+;;  else
+;;    {
+;;      hilo = gen_rtx_REG (DImode, MD_REG_FIRST);
+;;      emit_insn (gen_<u>mulsidi3_32bit (hilo, operands[1], operands[2]));
+;;      emit_insn (gen_mfhisi_di (operands[0], hilo));
+;;    }
+;;  DONE;
+;;}
+;;  [(set_attr "type" "imul")
+;;   (set_attr "mode" "SI")
+;;   (set_attr "length" "8")])
 
-  if (TARGET_64BIT)
-    {
-      hilo = gen_rtx_REG (TImode, MD_REG_FIRST);
-      emit_insn (gen_<u>mulsidi3_64bit_hilo (hilo, operands[1], operands[2]));
-      emit_insn (gen_mfhisi_ti (operands[0], hilo));
-    }
-  else
-    {
-      hilo = gen_rtx_REG (DImode, MD_REG_FIRST);
-      emit_insn (gen_<u>mulsidi3_32bit (hilo, operands[1], operands[2]));
-      emit_insn (gen_mfhisi_di (operands[0], hilo));
-    }
-  DONE;
-}
-  [(set_attr "type" "imul")
-   (set_attr "mode" "SI")
-   (set_attr "length" "8")])
-
+;; Maven - does not apply
 (define_insn "<su>mulsi3_highpart_mulhi_internal"
   [(set (match_operand:SI 0 "register_operand" "=d")
         (truncate:SI
@@ -2303,6 +2386,7 @@
   [(set_attr "type" "imul3")
    (set_attr "mode" "SI")])
 
+;; Maven - does not apply
 (define_insn "*<su>mulsi3_highpart_neg_mulhi_internal"
   [(set (match_operand:SI 0 "register_operand" "=d")
         (truncate:SI
@@ -2318,6 +2402,7 @@
   [(set_attr "type" "imul3")
    (set_attr "mode" "SI")])
 
+;; Maven - does not apply
 ;; Disable unsigned multiplication for -mfix-vr4120. This is for VR4120
 ;; errata MD(0), which says that dmultu does not always produce the
 ;; correct result.
@@ -2345,6 +2430,7 @@
    (set_attr "mode" "DI")
    (set_attr "length" "8")])
 
+;; Maven - does not apply
 (define_expand "<u>mulditi3"
   [(set (match_operand:TI 0 "register_operand")
         (mult:TI (any_extend:TI (match_operand:DI 1 "register_operand"))
@@ -2359,6 +2445,7 @@
   DONE;
 })
 
+;; Maven - does not apply
 (define_insn "<u>mulditi3_internal"
   [(set (match_operand:TI 0 "register_operand" "=x")
         (mult:TI (any_extend:TI (match_operand:DI 1 "register_operand" "d"))
@@ -2370,6 +2457,7 @@
   [(set_attr "type" "imul")
    (set_attr "mode" "DI")])
 
+;; Maven - does not apply
 (define_insn "<u>mulditi3_r4000"
   [(set (match_operand:TI 0 "register_operand" "=d")
         (mult:TI (any_extend:TI (match_operand:DI 1 "register_operand" "d"))
@@ -2386,6 +2474,7 @@
 ;; The R4650 supports a 32-bit multiply/ 64-bit accumulate
 ;; instruction.  The HI/LO registers are used as a 64-bit accumulator.
 
+;; Maven - does not apply
 (define_insn "madsi"
   [(set (match_operand:SI 0 "register_operand" "+l")
         (plus:SI (mult:SI (match_operand:SI 1 "register_operand" "d")
@@ -2396,6 +2485,7 @@
   [(set_attr "type"     "imadd")
    (set_attr "mode"     "SI")])
 
+;; Maven - does not apply
 (define_insn "<u>maddsidi4"
   [(set (match_operand:DI 0 "register_operand" "=ka")
         (plus:DI
@@ -2420,6 +2510,7 @@
 
 ;; Floating point multiply accumulate instructions.
 
+;; Maven - does not apply
 (define_insn "*madd4<mode>"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (plus:ANYF (mult:ANYF (match_operand:ANYF 1 "register_operand" "f")
@@ -2430,6 +2521,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*madd3<mode>"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (plus:ANYF (mult:ANYF (match_operand:ANYF 1 "register_operand" "f")
@@ -2440,6 +2532,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*msub4<mode>"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (minus:ANYF (mult:ANYF (match_operand:ANYF 1 "register_operand" "f")
@@ -2450,6 +2543,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*msub3<mode>"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (minus:ANYF (mult:ANYF (match_operand:ANYF 1 "register_operand" "f")
@@ -2460,6 +2554,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*nmadd4<mode>"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (neg:ANYF (plus:ANYF
@@ -2474,6 +2569,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*nmadd3<mode>"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (neg:ANYF (plus:ANYF
@@ -2488,6 +2584,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*nmadd4<mode>_fastmath"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (minus:ANYF
@@ -2502,6 +2599,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*nmadd3<mode>_fastmath"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (minus:ANYF
@@ -2516,6 +2614,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*nmsub4<mode>"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (neg:ANYF (minus:ANYF
@@ -2530,6 +2629,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*nmsub3<mode>"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (neg:ANYF (minus:ANYF
@@ -2544,6 +2644,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*nmsub4<mode>_fastmath"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (minus:ANYF
@@ -2558,6 +2659,7 @@
   [(set_attr "type" "fmadd")
    (set_attr "mode" "<UNITMODE>")])
 
+;; Maven - does not apply
 (define_insn "*nmsub3<mode>_fastmath"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (minus:ANYF
@@ -2617,6 +2719,7 @@
                       (const_int 8)
                       (const_int 4)))])
 
+;; Maven - does not apply
 (define_insn "*recip<mode>3"
   [(set (match_operand:ANYF 0 "register_operand" "=f")
         (div:ANYF (match_operand:ANYF 1 "const_1_operand" "")
@@ -2635,82 +2738,85 @@
                       (const_int 8)
                       (const_int 4)))])
 
+;; cbatten - replaced with dedicated define_insn at top of md file
 ;; VR4120 errata MD(A1): signed division instructions do not work correctly
 ;; with negative operands.  We use special libgcc functions instead.
-(define_insn_and_split "divmod<mode>4"
-  [(set (match_operand:GPR 0 "register_operand" "=l")
-        (div:GPR (match_operand:GPR 1 "register_operand" "d")
-                 (match_operand:GPR 2 "register_operand" "d")))
-   (set (match_operand:GPR 3 "register_operand" "=d")
-        (mod:GPR (match_dup 1)
-                 (match_dup 2)))]
-  "!TARGET_FIX_VR4120"
-  "#"
-  "&& reload_completed"
-  [(const_int 0)]
-{
-  rtx hilo;
+;;(define_insn_and_split "divmod<mode>4"
+;;  [(set (match_operand:GPR 0 "register_operand" "=l")
+;;        (div:GPR (match_operand:GPR 1 "register_operand" "d")
+;;                 (match_operand:GPR 2 "register_operand" "d")))
+;;   (set (match_operand:GPR 3 "register_operand" "=d")
+;;        (mod:GPR (match_dup 1)
+;;                 (match_dup 2)))]
+;;  "!TARGET_FIX_VR4120"
+;;  "#"
+;;  "&& reload_completed"
+;;  [(const_int 0)]
+;;{
+;;  rtx hilo;
+;;
+;;  if (TARGET_64BIT)
+;;    {
+;;      hilo = gen_rtx_REG (TImode, MD_REG_FIRST);
+;;      emit_insn (gen_divmod<mode>4_hilo_ti (hilo, operands[1], operands[2]));
+;;      emit_insn (gen_mfhi<mode>_ti (operands[3], hilo));
+;;    }
+;;  else
+;;    {
+;;      hilo = gen_rtx_REG (DImode, MD_REG_FIRST);
+;;      emit_insn (gen_divmod<mode>4_hilo_di (hilo, operands[1], operands[2]));
+;;      emit_insn (gen_mfhi<mode>_di (operands[3], hilo));
+;;    }
+;;  DONE;
+;;}
+;; [(set_attr "type" "idiv")
+;;  (set_attr "mode" "<MODE>")
+;;  (set_attr "length" "8")])
 
-  if (TARGET_64BIT)
-    {
-      hilo = gen_rtx_REG (TImode, MD_REG_FIRST);
-      emit_insn (gen_divmod<mode>4_hilo_ti (hilo, operands[1], operands[2]));
-      emit_insn (gen_mfhi<mode>_ti (operands[3], hilo));
-    }
-  else
-    {
-      hilo = gen_rtx_REG (DImode, MD_REG_FIRST);
-      emit_insn (gen_divmod<mode>4_hilo_di (hilo, operands[1], operands[2]));
-      emit_insn (gen_mfhi<mode>_di (operands[3], hilo));
-    }
-  DONE;
-}
- [(set_attr "type" "idiv")
-  (set_attr "mode" "<MODE>")
-  (set_attr "length" "8")])
+;; cbatten - replaced with dedicated define_insn at top of md file
+;;(define_insn_and_split "udivmod<mode>4"
+;;  [(set (match_operand:GPR 0 "register_operand" "=l")
+;;        (udiv:GPR (match_operand:GPR 1 "register_operand" "d")
+;;                  (match_operand:GPR 2 "register_operand" "d")))
+;;   (set (match_operand:GPR 3 "register_operand" "=d")
+;;        (umod:GPR (match_dup 1)
+;;                  (match_dup 2)))]
+;;  ""
+;;  "#"
+;;  "reload_completed"
+;;  [(const_int 0)]
+;;{
+;;  rtx hilo;
+;;
+;;  if (TARGET_64BIT)
+;;    {
+;;      hilo = gen_rtx_REG (TImode, MD_REG_FIRST);
+;;      emit_insn (gen_udivmod<mode>4_hilo_ti (hilo, operands[1], operands[2]));
+;;      emit_insn (gen_mfhi<mode>_ti (operands[3], hilo));
+;;    }
+;;  else
+;;    {
+;;      hilo = gen_rtx_REG (DImode, MD_REG_FIRST);
+;;      emit_insn (gen_udivmod<mode>4_hilo_di (hilo, operands[1], operands[2]));
+;;      emit_insn (gen_mfhi<mode>_di (operands[3], hilo));
+;;    }
+;;  DONE;
+;;}
+;; [(set_attr "type" "idiv")
+;;  (set_attr "mode" "<MODE>")
+;;  (set_attr "length" "8")])
 
-(define_insn_and_split "udivmod<mode>4"
-  [(set (match_operand:GPR 0 "register_operand" "=l")
-        (udiv:GPR (match_operand:GPR 1 "register_operand" "d")
-                  (match_operand:GPR 2 "register_operand" "d")))
-   (set (match_operand:GPR 3 "register_operand" "=d")
-        (umod:GPR (match_dup 1)
-                  (match_dup 2)))]
-  ""
-  "#"
-  "reload_completed"
-  [(const_int 0)]
-{
-  rtx hilo;
-
-  if (TARGET_64BIT)
-    {
-      hilo = gen_rtx_REG (TImode, MD_REG_FIRST);
-      emit_insn (gen_udivmod<mode>4_hilo_ti (hilo, operands[1], operands[2]));
-      emit_insn (gen_mfhi<mode>_ti (operands[3], hilo));
-    }
-  else
-    {
-      hilo = gen_rtx_REG (DImode, MD_REG_FIRST);
-      emit_insn (gen_udivmod<mode>4_hilo_di (hilo, operands[1], operands[2]));
-      emit_insn (gen_mfhi<mode>_di (operands[3], hilo));
-    }
-  DONE;
-}
- [(set_attr "type" "idiv")
-  (set_attr "mode" "<MODE>")
-  (set_attr "length" "8")])
-
-(define_insn "<u>divmod<GPR:mode>4_hilo_<HILO:mode>"
-  [(set (match_operand:HILO 0 "register_operand" "=x")
-        (unspec:HILO
-          [(any_div:GPR (match_operand:GPR 1 "register_operand" "d")
-                        (match_operand:GPR 2 "register_operand" "d"))]
-          UNSPEC_SET_HILO))]
-  ""
-  { return mips_output_division ("<GPR:d>div<u>\t%.,%1,%2", operands); }
-  [(set_attr "type" "idiv")
-   (set_attr "mode" "<GPR:MODE>")])
+;; cbatten - replaced with dedicated define_insn at top of md file
+;;(define_insn "<u>divmod<GPR:mode>4_hilo_<HILO:mode>"
+;;  [(set (match_operand:HILO 0 "register_operand" "=x")
+;;        (unspec:HILO
+;;          [(any_div:GPR (match_operand:GPR 1 "register_operand" "d")
+;;                        (match_operand:GPR 2 "register_operand" "d"))]
+;;          UNSPEC_SET_HILO))]
+;;  ""
+;;  { return mips_output_division ("<GPR:d>div<u>\t%.,%1,%2", operands); }
+;;  [(set_attr "type" "idiv")
+;;   (set_attr "mode" "<GPR:MODE>")])
 
 ;;------------------------------------------------------------------------
 ;; Square Root

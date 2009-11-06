@@ -10742,7 +10742,12 @@ mips_ira_cover_classes( void )
      per-register costs. Using it when not optimizing can cause us to
      think accumulators have the same cost as GPRs in cases where GPRs
      are actually much cheaper. */
-  return TARGET_MIPS16 || !optimize ? no_acc_classes : acc_classes;
+
+  /* cbatten - Don't include accumulators since we don't have lo/hi on
+     maven. */
+  return
+    ( TARGET_MAVEN || TARGET_MIPS16 || !optimize )
+      ? no_acc_classes : acc_classes;
 }
 
 /*----------------------------------------------------------------------*/

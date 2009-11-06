@@ -28,6 +28,7 @@ test_gcc_srcs = \
   test-gcc-builtins-tvec.c \
   test-gcc-vpfunc.c \
   test-gcc-sched-fp.c \
+  test-gcc-muldivrem.c \
 
 #-------------------------------------------------------------------------
 # Compile tests

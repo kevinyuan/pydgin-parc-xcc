@@ -476,20 +476,21 @@
 
 ;; Integer division and modulus.
 
-(define_insn "<u>div<mode>3"
-  [(set (match_operand:GPR 0 "register_operand" "=&d")
-	(any_div:GPR (match_operand:GPR 1 "register_operand" "d")
-		     (match_operand:GPR 2 "register_operand" "d")))]
-  "TARGET_LOONGSON_2EF"
-  { return mips_output_division ("<d>div<u>.g\t%0,%1,%2", operands); }
-  [(set_attr "type" "idiv3")
-   (set_attr "mode" "<MODE>")])
-
-(define_insn "<u>mod<mode>3"
-  [(set (match_operand:GPR 0 "register_operand" "=&d")
-	(any_mod:GPR (match_operand:GPR 1 "register_operand" "d")
-		     (match_operand:GPR 2 "register_operand" "d")))]
-  "TARGET_LOONGSON_2EF"
-  { return mips_output_division ("<d>mod<u>.g\t%0,%1,%2", operands); }
-  [(set_attr "type" "idiv3")
-   (set_attr "mode" "<MODE>")])
+;; cbatten - need to comment this out since we define these for maven
+;;(define_insn "<u>div<mode>3"
+;;  [(set (match_operand:GPR 0 "register_operand" "=&d")
+;;        (any_div:GPR (match_operand:GPR 1 "register_operand" "d")
+;;        	     (match_operand:GPR 2 "register_operand" "d")))]
+;;  "TARGET_LOONGSON_2EF"
+;;  { return mips_output_division ("<d>div<u>.g\t%0,%1,%2", operands); }
+;;  [(set_attr "type" "idiv3")
+;;   (set_attr "mode" "<MODE>")])
+;;
+;;(define_insn "<u>mod<mode>3"
+;;  [(set (match_operand:GPR 0 "register_operand" "=&d")
+;;        (any_mod:GPR (match_operand:GPR 1 "register_operand" "d")
+;;        	     (match_operand:GPR 2 "register_operand" "d")))]
+;;  "TARGET_LOONGSON_2EF"
+;;  { return mips_output_division ("<d>mod<u>.g\t%0,%1,%2", operands); }
+;;  [(set_attr "type" "idiv3")
+;;   (set_attr "mode" "<MODE>")])

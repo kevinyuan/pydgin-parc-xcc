@@ -537,7 +537,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 // note: does not do dependency checking
 {"div",            "d,s,t",     0x9c000005, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"divu",           "d,s,t",     0x9c000007, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"rem",            "d,s,t",     0x9c000006, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"remu",           "d,s,t",     0x9c000008, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 
 /*----------------------------------------------------------------------------------------------------------------------*/
 
@@ -957,10 +959,11 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"div.s",          "D,V,T",     0x46000003, 0xffe0003f, WR_D|RD_S|RD_T|FP_S,          0,              I1                },
 {"div.ps",         "D,V,T",     0x46c00003, 0xffe0003f, WR_D|RD_S|RD_T|FP_D,          0,              SB1               },
 /* For divu, see the comments about div. */
-{"divu",           "z,s,t",     0x0000001b, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
-{"divu",           "z,t",       0x0000001b, 0xffe0ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
-{"divu",           "d,v,t",     0,   (int)  M_DIVU_3,   INSN_MACRO,                   0,              I1                },
-{"divu",           "d,v,I",     0,   (int)  M_DIVU_3I,  INSN_MACRO,                   0,              I1                },
+// cbatten - as above, in maven we are using a 3 GPR version of div
+//{"divu",           "z,s,t",     0x0000001b, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
+//{"divu",           "z,t",       0x0000001b, 0xffe0ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
+//{"divu",           "d,v,t",     0,   (int)  M_DIVU_3,   INSN_MACRO,                   0,              I1                },
+//{"divu",           "d,v,I",     0,   (int)  M_DIVU_3I,  INSN_MACRO,                   0,              I1                },
 {"dla",            "t,A(b)",    0,   (int)  M_DLA_AB,   INSN_MACRO,                   0,              I3                },
 {"dlca",           "t,A(b)",    0,   (int)  M_DLCA_AB,  INSN_MACRO,                   0,              I3                },
 
@@ -1515,10 +1518,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
 //{"rem",            "z,s,t",     0x0000001a, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
 //{"rem",            "d,v,t",     0,   (int)  M_REM_3,    INSN_MACRO,                   0,              I1                },
 //{"rem",            "d,v,I",     0,   (int)  M_REM_3I,   INSN_MACRO,                   0,              I1                },
-{"remu",           "z,s,t",     0x0000001b, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
-{"remu",           "d,v,t",     0,   (int)  M_REMU_3,   INSN_MACRO,                   0,              I1                },
+//{"remu",           "z,s,t",     0x0000001b, 0xfc00ffff, RD_s|RD_t|WR_HILO,            0,              I1                },
+//{"remu",           "d,v,t",     0,   (int)  M_REMU_3,   INSN_MACRO,                   0,              I1                },
+//{"remu",           "d,v,I",     0,   (int)  M_REMU_3I,  INSN_MACRO,                   0,              I1                },
 
-{"remu",           "d,v,I",     0,   (int)  M_REMU_3I,  INSN_MACRO,                   0,              I1                },
 {"rdhwr",          "t,K",       0x7c00003b, 0xffe007ff, WR_t,                         0,              I33               },
 {"rdpgpr",         "d,w",       0x41400000, 0xffe007ff, WR_d,                         0,              I33               },
 {"rfe",            "",          0x42000010, 0xffffffff, 0,                            0,              I1|T3             },
