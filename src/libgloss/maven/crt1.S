@@ -108,11 +108,11 @@ _start:
 
         la      $gp, _gp        # Initialize global pointer
 
-        la      $v0, _fbss      # Zero out uninitialized data sections
-        la      $v1, _end       #  (the .sbss and .bss sections). See 
-1:      sw      $0,  0($v0)     #  linker script for how _fbss and
-        addiu   $v0, $v0, 4     #  _end are defined.
-        bltu    $v0, $v1, 1b    #
+#        la      $v0, _fbss      # Zero out uninitialized data sections
+#        la      $v1, _end       #  (the .sbss and .bss sections). See 
+#1:      sw      $0,  0($v0)     #  linker script for how _fbss and
+#        addiu   $v0, $v0, 4     #  _end are defined.
+#        bltu    $v0, $v1, 1b    #
 
         jal     _init           # Run global initialization functions
 
