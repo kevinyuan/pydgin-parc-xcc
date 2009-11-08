@@ -541,6 +541,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"rem",            "d,s,t",     0x9c000006, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"remu",           "d,s,t",     0x9c000008, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 
+{"vpidx",          "d",         0x9c000009, 0xffff07ff, WR_d,                         0,              INSN_MAVEN        },
+
 /*----------------------------------------------------------------------------------------------------------------------*/
 
 {"abs",            "d,v",       0,   (int)  M_ABS,      INSN_MACRO,                   0,              I1                },
