@@ -1128,7 +1128,7 @@ static const struct mips_rtx_cost_data mips_rtx_cost_data[PROCESSOR_MAX] =
     1,                   /* branch_cost */
     4                    /* memory_latency */
   },
-  { /* Maven (tune for control processor) */
+  { /* maven (tune for control processor) */
     COSTS_N_INSNS( 4  ), /* fp_add */
     COSTS_N_INSNS( 4  ), /* fp_mult_sf */
     COSTS_N_INSNS( 4  ), /* fp_mult_df */
@@ -1138,10 +1138,10 @@ static const struct mips_rtx_cost_data mips_rtx_cost_data[PROCESSOR_MAX] =
     COSTS_N_INSNS( 4  ), /* int_mult_di */
     COSTS_N_INSNS( 4  ), /* int_div_si */
     COSTS_N_INSNS( 4  ), /* int_div_di */
-    2,                   /* branch_cost */
+    1,                   /* branch_cost */
     4                    /* memory_latency */
   },
-  { /* Maven (tune for virtual processors) */
+  { /* maven_vp (tune for virtual processors) */
     COSTS_N_INSNS( 4  ), /* fp_add */
     COSTS_N_INSNS( 4  ), /* fp_mult_sf */
     COSTS_N_INSNS( 4  ), /* fp_mult_df */
@@ -1151,7 +1151,7 @@ static const struct mips_rtx_cost_data mips_rtx_cost_data[PROCESSOR_MAX] =
     COSTS_N_INSNS( 4  ), /* int_mult_di */
     COSTS_N_INSNS( 4  ), /* int_div_si */
     COSTS_N_INSNS( 4  ), /* int_div_di */
-    2,                   /* branch_cost */
+    8,                   /* branch_cost */
     4                    /* memory_latency */
   }
 };
@@ -4723,10 +4723,11 @@ mips_expand_conditional_move( rtx *operands )
 
   code = GET_CODE( operands[1] );
   mips_emit_compare( &code, &op0, &op1, true );
-  cond = gen_rtx_fmt_ee( code, GET_MODE( op0 ), op0, op1 ),
-         emit_insn( gen_rtx_SET( VOIDmode, operands[0],
-                                 gen_rtx_IF_THEN_ELSE( GET_MODE( operands[0] ), cond,
-                                                       operands[2], operands[3] ) ) );
+  cond
+    = gen_rtx_fmt_ee( code, GET_MODE( op0 ), op0, op1 ),
+      emit_insn( gen_rtx_SET( VOIDmode, operands[0],
+        gen_rtx_IF_THEN_ELSE( GET_MODE( operands[0] ), cond,
+                              operands[2], operands[3] ) ) );
 }
 
 /*----------------------------------------------------------------------*/
@@ -7799,7 +7800,12 @@ mips_print_operand( FILE *file, rtx op, int letter )
     case 'T':
     case 't': {
       int truth = ( code == NE ) == ( letter == 'T' );
-      fputc( "zfnt"[truth * 2 + ( GET_MODE( op ) == CCmode )], file );
+      /* cbatten - Change this since we only have GPR conditional moves */
+      /* fputc( "zfnt"[truth * 2 + ( GET_MODE( op ) == CCmode )], file ); */
+      if ( truth )
+        fputc( 'n', file );
+      else
+        fputc( 'z', file );
     }
     break;
 
@@ -15852,6 +15858,8 @@ mips_maven_option_restore( struct cl_target_option* topt_ptr )
   else
     mips_cost = &mips_rtx_cost_data[mips_tune];
 
+  /* Initialize branch cost */
+  mips_branch_cost = mips_cost->branch_cost;
 }
 
 /*----------------------------------------------------------------------*/

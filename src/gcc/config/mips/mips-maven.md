@@ -6695,6 +6695,25 @@
   [(set_attr "type" "condmove")
    (set_attr "mode" "<GPR:MODE>")])
 
+;;define_insn "*mov<SCALARF:mode>_on_<MOVECC:mode>"
+;; [(set (match_operand:SCALARF 0 "register_operand" "=f,f")
+;;       (if_then_else:SCALARF
+;;        (match_operator:MOVECC 4 "equality_operator"
+;;               [(match_operand:MOVECC 1 "register_operand" "<MOVECC:reg>,<MOVECC:reg>")
+;;                (const_int 0)])
+;;        (match_operand:SCALARF 2 "register_operand" "f,0")
+;;        (match_operand:SCALARF 3 "register_operand" "0,f")))]
+;; "ISA_HAS_FP_CONDMOVE"
+;; "@
+;;   mov%T4.<fmt>\t%0,%2,%1
+;;   mov%t4.<fmt>\t%0,%3,%1"
+;; [(set_attr "type" "condmove")
+;;  (set_attr "mode" "<SCALARF:MODE>")])
+
+;; cbatten - maven does have a floating point conditional move but it is
+;; just the same as  the integer one. So I removed the .<fmt> in the
+;; template.
+
 (define_insn "*mov<SCALARF:mode>_on_<MOVECC:mode>"
   [(set (match_operand:SCALARF 0 "register_operand" "=f,f")
         (if_then_else:SCALARF
@@ -6703,10 +6722,10 @@
                  (const_int 0)])
          (match_operand:SCALARF 2 "register_operand" "f,0")
          (match_operand:SCALARF 3 "register_operand" "0,f")))]
-  "ISA_HAS_FP_CONDMOVE"
+  ""
   "@
-    mov%T4.<fmt>\t%0,%2,%1
-    mov%t4.<fmt>\t%0,%3,%1"
+    mov%T4\t%0,%2,%1
+    mov%t4\t%0,%3,%1"
   [(set_attr "type" "condmove")
    (set_attr "mode" "<SCALARF:MODE>")])
 

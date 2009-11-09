@@ -29,6 +29,7 @@ test_gcc_srcs = \
   test-gcc-vpfunc.c \
   test-gcc-sched-fp.c \
   test-gcc-muldivrem.c \
+  test-gcc-cmove.c \
 
 #-------------------------------------------------------------------------
 # Compile tests

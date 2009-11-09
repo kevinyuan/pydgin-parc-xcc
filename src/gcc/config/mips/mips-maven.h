@@ -826,13 +826,16 @@ march=*: -mhard-float}"
 #define ISA_HAS_FP_CONDMOVE \
   (   (    ISA_MIPS4 || ISA_MIPS32 || ISA_MIPS32R2 \
         || ISA_MIPS64 || ISA_MIPS64R2 ) \
-    && !TARGET_MIPS5500 && !TARGET_MIPS16 && !TARGET_MAVEN )
+    && !TARGET_MIPS5500 && !TARGET_MIPS16 && TARGET_MAVEN )
 /* YUNSUP: Maven doesn't have floating point conditional move. */
+/* cbatten: well it kind of does but it uses standard GPRs. */
 /*    && !TARGET_MIPS5500 && !TARGET_MIPS16 ) */
 
 /* ISA has the integer conditional move instructions introduced in mips4
    and ST Loongson 2E/2F. */
-#define ISA_HAS_CONDMOVE (ISA_HAS_FP_CONDMOVE || TARGET_LOONGSON_2EF)
+/* cbatten - turn on GPR conditional move for maven */
+#define ISA_HAS_CONDMOVE \
+  (ISA_HAS_FP_CONDMOVE || TARGET_LOONGSON_2EF || TARGET_MAVEN)
 
 /* ISA has LDC1 and SDC1. */
 #define ISA_HAS_LDC1_SDC1 (!ISA_MIPS1 && !TARGET_MIPS16)
