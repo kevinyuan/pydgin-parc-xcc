@@ -59,6 +59,7 @@
 #define MAVEN_SYSCFG_REGDEF_COP0_COUNT_HI  25
 
 #define MAVEN_SYSCFG_REGDEF_COP0_CORE_ID   17
+#define MAVEN_SYSCFG_REGDEF_COP0_STATS_EN  21
 
 //------------------------------------------------------------------------
 // Maven minimum and maximum vector length
