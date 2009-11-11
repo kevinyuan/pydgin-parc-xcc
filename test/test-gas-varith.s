@@ -14,7 +14,7 @@
         .align  4
   
 vec_a:    .word  1, 2, 3, 4
-vec_b:    .word  0, 2, 3, 1
+vec_b:    .word  4, 2, 3, 1
 vec_sum:  .word 17,17,17,17 
 vec_msum: .word 17,17,17,17
 sum_ref:  .word  1, 4, 6, 5
@@ -72,7 +72,35 @@ comp_test:
         subu.vs   $vt0, $vt1, $a0, $flag1
         subu.sv   $vt0, $a0, $vt1
         subu.sv   $vt0, $a0, $vt1, $flag1
-                              
+            
+        div.vv   $vt0, $vt1, $vt2
+        div.vv   $vt0, $vt1, $vt2, $flag1
+        div.vs   $vt0, $vt1, $a0
+        div.vs   $vt0, $vt1, $a0, $flag1
+        div.sv   $vt0, $a0, $vt1
+        div.sv   $vt0, $a0, $vt1, $flag1
+            
+        rem.vv   $vt0, $vt1, $vt2
+        rem.vv   $vt0, $vt1, $vt2, $flag1
+        rem.vs   $vt0, $vt1, $a0
+        rem.vs   $vt0, $vt1, $a0, $flag1
+        rem.sv   $vt0, $a0, $vt1
+        rem.sv   $vt0, $a0, $vt1, $flag1
+             
+        divu.vv   $vt0, $vt1, $vt2
+        divu.vv   $vt0, $vt1, $vt2, $flag1
+        divu.vs   $vt0, $vt1, $a0
+        divu.vs   $vt0, $vt1, $a0, $flag1
+        divu.sv   $vt0, $a0, $vt1
+        divu.sv   $vt0, $a0, $vt1, $flag1
+             
+        remu.vv   $vt0, $vt1, $vt2
+        remu.vv   $vt0, $vt1, $vt2, $flag1
+        remu.vs   $vt0, $vt1, $a0
+        remu.vs   $vt0, $vt1, $a0, $flag1
+        remu.sv   $vt0, $a0, $vt1
+        remu.sv   $vt0, $a0, $vt1, $flag1
+
         sll.vv   $vt0, $vt1, $vt2
         sll.vv   $vt0, $vt1, $vt2, $flag1
         sll.vs   $vt0, $vt1, $a0

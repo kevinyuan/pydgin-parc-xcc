@@ -378,6 +378,21 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"rem.sv",       "#d,s,#t",     0x4800008d, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"rem.sv",       "#d,s,#t,#m",  0x4800008d, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 
+//apologies for the lack of continuity on these command codes (for divu, remu)
+{"divu.vv",       "#d,#s,#t",    0x48000080, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"divu.vv",       "#d,#s,#t,#m", 0x48000080, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"divu.vs",       "#d,#t,s",     0x4800009f, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"divu.vs",       "#d,#t,s,#m",  0x4800009f, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"divu.sv",       "#d,s,#t",     0x480000bd, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"divu.sv",       "#d,s,#t,#m",  0x480000bd, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+
+{"remu.vv",       "#d,#s,#t",    0x480000be, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"remu.vv",       "#d,#s,#t,#m", 0x480000be, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"remu.vs",       "#d,#t,s",     0x480000bf, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"remu.vs",       "#d,#t,s,#m",  0x480000bf, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"remu.sv",       "#d,s,#t",     0x480000f0, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"remu.sv",       "#d,s,#t,#m",  0x480000f0, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+
 {"sll.vv",       "#d,#s,#t",    0x4800008e, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sll.vv",       "#d,#s,#t,#m", 0x4800008e, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sll.vs",       "#d,#t,s",     0x4800008f, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
