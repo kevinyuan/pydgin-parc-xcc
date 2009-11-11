@@ -1185,11 +1185,11 @@
 ;; example for future work.
 
 (define_insn "mov<mode>"
-  [(set (match_operand:VEC 0 "nonimmediate_operand" "=Z,Z,m")
-        (match_operand:VEC 1 "nonimmediate_operand" "Z,m,Z"))]
+  [(set (match_operand:VEC 0 "nonimmediate_operand" "=Z,Z,m,q,q,Z")
+        (match_operand:VEC 1 "nonimmediate_operand" "Z,m,Z,q,Z,q"))]
   ""
 {
-  return mips_maven_output_vector_move( <MODE>mode, 
+  return mips_maven_output_vector_move( <MODE>mode,
                                         operands[0], operands[1] );
 })
 

@@ -28,11 +28,8 @@
 (define_register_constraint "Z" "VEC_REGS"
   "A vector register.")
 
-;(define_memory_constraint "w"
-;  "A memory address with no offset suitable for a vector memory
-;   instruction's base address"
-;  (and (match_code "mem")
-;       (match_test "mips_maven_vector_mem_operand( XEXP(op,0) )")))
+(define_register_constraint "q" "VEC_FLAG_REGS"
+  "A vector flag register.")
 
 ;;------------------------------------------------------------------------
 ;; Register constraints

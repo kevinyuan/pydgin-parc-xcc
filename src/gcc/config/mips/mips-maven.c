@@ -69,6 +69,43 @@
 #include "bitmap.h"
 #include "diagnostic.h"
 
+/*----------------------------------------------------------------------*/
+/* MAVEN_SYSCFG_VLEN_MAX                                                */
+/*----------------------------------------------------------------------*/
+/* Eventually we want to include syscfg.h here so that we can use the
+   common definition of MAVEN_SYSCFG_VLEN_MAX, but for now it is not
+   clear how to do this. syscfg.h in in libgloss which is not used when
+   building the actual cross-compiler. We kind of want to use the
+   "version" in sims - the one for native programs instead of maven
+   programs. Even if we could include syscfg.h though, we would still
+   need to figure out a way to include it in the mips-maven.md since the
+   machine description file also refers to these modes. */
+
+#define MAVEN_SYSCFG_VLEN_MAX 32
+
+/*----------------------------------------------------------------------*/
+/* MIPS_MAVEN_VECTOR_MODE_NAME                                          */
+/*----------------------------------------------------------------------*/
+/* This is a helper macro which creates a maven vector mode name from
+   the given inner_mode. It does this by concatenating a 'V' prefix, the
+   maximum maven vector length, and the inner mode together. For
+   example, MIPS_MAVEN_VECTOR_MODE_NAME(SI) should expand to V32SI if
+   the maven maximum vector length is 32. We need to use the nested
+   macros to make sure MAVEN_SYSCFG_VLEN_MAX is expanded _before_
+   concatenation. */
+
+#define MIPS_MAVEN_VECTOR_MODE_NAME_H2( res_ ) res_
+
+#define MIPS_MAVEN_VECTOR_MODE_NAME_H1( arg0_, arg1_ ) \
+  MIPS_MAVEN_VECTOR_MODE_NAME_H2( V ## arg0_ ## arg1_ ## mode )
+
+#define MIPS_MAVEN_VECTOR_MODE_NAME_H0( arg0_, arg1_ ) \
+  MIPS_MAVEN_VECTOR_MODE_NAME_H1( arg0_, arg1_ )
+
+#define MIPS_MAVEN_VECTOR_MODE_NAME( inner_mode_ ) \
+  MIPS_MAVEN_VECTOR_MODE_NAME_H0( MAVEN_SYSCFG_VLEN_MAX, inner_mode_ )
+
+
 /* True if X is an UNSPEC wrapper around a SYMBOL_REF or LABEL_REF. */
 #define UNSPEC_ADDRESS_P(X)                                             \
   (GET_CODE (X) == UNSPEC                                               \
@@ -581,7 +618,10 @@ const enum reg_class mips_regno_to_class[FIRST_PSEUDO_REGISTER] =
   VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
   VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
   VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
-  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS
+  VEC_REGS,     VEC_REGS,       VEC_REGS,       VEC_REGS,
+  /* cbatten - maven vector flag registers */
+  VEC_FLAG_REGS,VEC_FLAG_REGS,  VEC_FLAG_REGS,  VEC_FLAG_REGS,
+  VEC_FLAG_REGS,VEC_FLAG_REGS,  VEC_FLAG_REGS,  VEC_FLAG_REGS
 };
 
 /* The value of TARGET_ATTRIBUTE_TABLE. */
@@ -10297,11 +10337,16 @@ mips_hard_regno_mode_ok_p( unsigned int regno, enum machine_mode mode )
   unsigned int size;
   enum mode_class mclass;
 
-  /* cbatten - Only vector modes are allowed in vector registers, and
-     only vector registers can hold vector modes. */
+  /* cbatten - Only vector modes and vector flag modes are allowed in
+     vector registers, and only vector registers can hold vector modes
+     and vector flag modes except vector flag registers can also hold
+     vector flag modes. */
 
-  if ( VECTOR_MODE_P(mode) )
-    return ( (VEC_REG_FIRST <= regno) && (regno <= VEC_REG_LAST) );
+  if ( VECTOR_MODE_P(mode) ) {
+    if ( VEC_FLAG_REG_P(regno) )
+      return ( mode == MIPS_MAVEN_VECTOR_MODE_NAME(QI) );
+    return VEC_REG_P(regno);
+  }
 
   /* Condition codes */
 
@@ -10426,7 +10471,10 @@ mips_hard_regno_nregs( int regno ATTRIBUTE_UNUSED, enum machine_mode mode )
 
   /* Maven vector modes always take one vector register */
 
-  if ( VECTOR_MODE_P(mode) || VEC_REG_P(regno) )
+  if ( VECTOR_MODE_P(mode) )
+    return 1;
+
+  if ( VEC_REG_P(regno) || VEC_FLAG_REG_P(regno) )
     return 1;
 
   /* All other registers are word-sized. */
@@ -10447,7 +10495,10 @@ mips_class_max_nregs( enum reg_class rclass, enum machine_mode mode )
 
   /* Maven vector modes always take one vector register */
 
-  if ( VECTOR_MODE_P(mode) || (rclass == VEC_REGS) )
+  if ( VECTOR_MODE_P(mode) )
+    return 1;
+
+  if ( (rclass == VEC_REGS) || (rclass == VEC_FLAG_REGS) )
     return 1;
 
   size = 0x8000;
@@ -10723,22 +10774,24 @@ mips_register_move_cost( enum machine_mode mode,
 static const enum reg_class *
 mips_ira_cover_classes( void )
 {
+  /* YUNSUP: since we don't have a seperate FP_REGS class, add maven
+     vector register cover class */
+
   static const enum reg_class acc_classes[] =
   {
-    /* YUNSUP: since we don't have a seperate FP_REGS class, add maven
-       vector register cover class */
     /* GR_AND_ACC_REGS, FP_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
        ST_REGS, LIM_REG_CLASSES */
-    GR_AND_ACC_REGS, COP0_REGS, COP2_REGS, COP3_REGS, VEC_REGS,
+    GR_AND_ACC_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
+    VEC_REGS, VEC_FLAG_REGS,
     LIM_REG_CLASSES
   };
+
   static const enum reg_class no_acc_classes[] =
   {
-    /* YUNSUP: since we don't have a seperate FP_REGS class, add maven
-       vector register cover class */
     /* GR_REGS, FP_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
        ST_REGS, LIM_REG_CLASSES */
-    GR_REGS, COP0_REGS, COP2_REGS, COP3_REGS, VEC_REGS,
+    GR_REGS, COP0_REGS, COP2_REGS, COP3_REGS,
+    VEC_REGS, VEC_FLAG_REGS,
     LIM_REG_CLASSES
   };
 
@@ -10767,10 +10820,16 @@ mips_ira_cover_classes( void )
 /* YUNSUP: mode and in_p is unused. */
 enum reg_class
 mips_secondary_reload_class( enum reg_class rclass,
-                             enum machine_mode mode ATTRIBUTE_UNUSED, rtx x, 
-                             bool in_p ATTRIBUTE_UNUSED )
+                             enum machine_mode mode ATTRIBUTE_UNUSED,
+                             rtx x, bool in_p ATTRIBUTE_UNUSED )
 {
   int regno;
+
+  /* cbatten - Vector flag registers must use a vector register as an
+     intermediate when copying to/from memory. */
+
+  if ( rclass == VEC_FLAG_REGS )
+    return VEC_REGS;
 
   /* If X is a constant that cannot be loaded into $25, it must be
      loaded into some other GPR. No other register class allows a direct
@@ -10883,10 +10942,10 @@ mips_vector_mode_supported_p( enum machine_mode mode )
   switch (mode) {
 
     /* Maven vector modes */
-    case V32SImode:
-    case V32HImode:
-    case V32QImode:
-    case V32SFmode:
+    case MIPS_MAVEN_VECTOR_MODE_NAME(SI):
+    case MIPS_MAVEN_VECTOR_MODE_NAME(HI):
+    case MIPS_MAVEN_VECTOR_MODE_NAME(QI):
+    case MIPS_MAVEN_VECTOR_MODE_NAME(SF):
       return true;
 
     case V2SFmode:
@@ -12594,9 +12653,9 @@ static const struct mips_builtin_description mips_builtins[] =
   DIRECT_NO_TARGET_BUILTIN( maven_vstore_vqi, MIPS_VOID_FTYPE_UVQI_POINTER, maven ),
   DIRECT_NO_TARGET_BUILTIN( maven_vstore_vsf, MIPS_VOID_FTYPE_VSF_POINTER,  maven ),
 
-  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vsi, MIPS_VOID_FTYPE_UVSI_POINTER_SI, maven ), 
-  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vhi, MIPS_VOID_FTYPE_UVHI_POINTER_SI, maven ), 
-  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vqi, MIPS_VOID_FTYPE_UVQI_POINTER_SI, maven ), 
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vsi, MIPS_VOID_FTYPE_UVSI_POINTER_SI, maven ),
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vhi, MIPS_VOID_FTYPE_UVHI_POINTER_SI, maven ),
+  DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vqi, MIPS_VOID_FTYPE_UVQI_POINTER_SI, maven ),
   DIRECT_NO_TARGET_BUILTIN( maven_vstore_strided_vsf, MIPS_VOID_FTYPE_VSF_POINTER_SI,  maven )
 };
 
@@ -12671,26 +12730,21 @@ mips_build_cvpointer_type( void )
 
 /* Maven vector argument types */
 
-#define MIPS_ATYPE_VSI \
-  mips_builtin_vector_type( intSI_type_node, V32SImode )
-
-#define MIPS_ATYPE_VHI \
-  mips_builtin_vector_type( intHI_type_node, V32HImode )
-
-#define MIPS_ATYPE_VQI \
-  mips_builtin_vector_type( intQI_type_node, V32QImode )
-
-#define MIPS_ATYPE_VSF \
-  mips_builtin_vector_type( float_type_node, V32SFmode )
-
 #define MIPS_ATYPE_UVSI \
-  mips_builtin_vector_type( unsigned_intSI_type_node, V32SImode )
+  mips_builtin_vector_type( unsigned_intSI_type_node, \
+    MIPS_MAVEN_VECTOR_MODE_NAME(SI) )
 
 #define MIPS_ATYPE_UVHI \
-  mips_builtin_vector_type( unsigned_intHI_type_node, V32HImode )
+  mips_builtin_vector_type( unsigned_intHI_type_node, \
+    MIPS_MAVEN_VECTOR_MODE_NAME(HI) )
 
 #define MIPS_ATYPE_UVQI \
-  mips_builtin_vector_type( unsigned_intQI_type_node, V32QImode )
+  mips_builtin_vector_type( unsigned_intQI_type_node, \
+    MIPS_MAVEN_VECTOR_MODE_NAME(QI) )
+
+#define MIPS_ATYPE_VSF \
+  mips_builtin_vector_type( float_type_node, \
+    MIPS_MAVEN_VECTOR_MODE_NAME(SF) )
 
 /* MIPS_FTYPE_ATYPESN takes N MIPS_FTYPES-like type codes and lists
    their associated MIPS_ATYPEs. */
@@ -15589,42 +15643,6 @@ mips_order_regs_for_local_alloc( void )
 }
 
 /*----------------------------------------------------------------------*/
-/* MAVEN_SYSCFG_VLEN_MAX                                                */
-/*----------------------------------------------------------------------*/
-/* Eventually we want to include syscfg.h here so that we can use the
-   common definition of MAVEN_SYSCFG_VLEN_MAX, but for now it is not
-   clear how to do this. syscfg.h in in libgloss which is not used when
-   building the actual cross-compiler. We kind of want to use the
-   "version" in sims - the one for native programs instead of maven
-   programs. Even if we could include syscfg.h though, we would still
-   need to figure out a way to include it in the mips-maven.md since the
-   machine description file also refers to these modes. */
-
-#define MAVEN_SYSCFG_VLEN_MAX 32
-
-/*----------------------------------------------------------------------*/
-/* MIPS_MAVEN_VECTOR_MODE_NAME                                          */
-/*----------------------------------------------------------------------*/
-/* This is a helper macro which creates a maven vector mode name from
-   the given inner_mode. It does this by concatenating a 'V' prefix, the
-   maximum maven vector length, and the inner mode together. For
-   example, MIPS_MAVEN_VECTOR_MODE_NAME(SI) should expand to V32SI if
-   the maven maximum vector length is 32. We need to use the nested
-   macros to make sure MAVEN_SYSCFG_VLEN_MAX is expanded _before_
-   concatenation. */
-
-#define MIPS_MAVEN_VECTOR_MODE_NAME_H2( res_ ) res_
-
-#define MIPS_MAVEN_VECTOR_MODE_NAME_H1( arg0_, arg1_ ) \
-  MIPS_MAVEN_VECTOR_MODE_NAME_H2( V ## arg0_ ## arg1_ ## mode )
-
-#define MIPS_MAVEN_VECTOR_MODE_NAME_H0( arg0_, arg1_ ) \
-  MIPS_MAVEN_VECTOR_MODE_NAME_H1( arg0_, arg1_ )
-
-#define MIPS_MAVEN_VECTOR_MODE_NAME( inner_mode_ ) \
-  MIPS_MAVEN_VECTOR_MODE_NAME_H0( MAVEN_SYSCFG_VLEN_MAX, inner_mode_ )
-
-/*----------------------------------------------------------------------*/
 /* mips_maven_output_vector_move                                        */
 /*----------------------------------------------------------------------*/
 /* cbatten - Return the appropriate instructions to move SRC into DEST.
@@ -15643,17 +15661,25 @@ mips_maven_output_vector_move( enum machine_mode mode, rtx dest, rtx src )
   int i;
   const char* inst;
 
-  dest_code = GET_CODE(dest);
-  src_code  = GET_CODE(src);
+  bool dest_mem, dest_vreg, dest_vfreg;
+  bool src_mem, src_vreg, src_vfreg;
 
-  /* Register to register move */
+  dest_mem   = ( (GET_CODE(dest) == MEM) );
+  dest_vreg  = ( (GET_CODE(dest) == REG) && VEC_REG_P(REGNO(dest)) );
+  dest_vfreg = ( (GET_CODE(dest) == REG) && VEC_FLAG_REG_P(REGNO(dest)) );
 
-  if ( (src_code == REG) && (dest_code == REG) )
+  src_mem    = ( (GET_CODE(src) == MEM) );
+  src_vreg   = ( (GET_CODE(src) == REG) && VEC_REG_P(REGNO(src)) );
+  src_vfreg  = ( (GET_CODE(src) == REG) && VEC_FLAG_REG_P(REGNO(src)) );
+
+  /* Move between vector registers */
+
+  if ( dest_vreg && src_vreg )
     return "mov.vv\t%0,%1";
 
-  /* Load */
+  /* Load into vector register */
 
-  if ( (src_code == MEM) && (dest_code == REG) ) {
+  if ( dest_vreg && src_mem ) {
 
     switch ( mode ) {
       case MIPS_MAVEN_VECTOR_MODE_NAME(SI): inst = "lw.v "; break;
@@ -15683,9 +15709,9 @@ mips_maven_output_vector_move( enum machine_mode mode, rtx dest, rtx src )
 
   }
 
-  /* Store */
+  /* Store from vector register */
 
-  if ( (src_code == REG) && (dest_code == MEM) ) {
+  if ( dest_mem && src_vreg ) {
 
     switch ( mode ) {
       case MIPS_MAVEN_VECTOR_MODE_NAME(SI): inst = "sw.v"; break;
@@ -15713,6 +15739,21 @@ mips_maven_output_vector_move( enum machine_mode mode, rtx dest, rtx src )
       return retval;
     }
   }
+
+  /* Move between vector flag registers */
+
+  if ( dest_vfreg && src_vfreg )
+    return "mov.f\t%0,%1";
+
+  /* Move from vector register to vector flag register */
+
+  if ( dest_vfreg && src_vreg )
+    return "mfvps.f\t%0,%1";
+
+  /* Move from vector flag register to vector register */
+
+  if ( dest_vreg && src_vfreg )
+    return "mtvps.f\t%0,%1";
 
   gcc_unreachable();
 }

@@ -30,6 +30,7 @@ test_gcc_srcs = \
   test-gcc-sched-fp.c \
   test-gcc-muldivrem.c \
   test-gcc-cmove.c \
+  test-gcc-vflags.c \
 
 #-------------------------------------------------------------------------
 # Compile tests

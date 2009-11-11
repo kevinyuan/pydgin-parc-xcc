@@ -176,7 +176,6 @@ long long rem_longlong( long long src0, long long src1 )
 //------------------------------------------------------------------------
 // Helper Macro
 //------------------------------------------------------------------------
-#include <stdio.h>
 
 #define DO_TEST( func_, src0_, src1_, dest_ )                           \
   error_code++;                                                         \
