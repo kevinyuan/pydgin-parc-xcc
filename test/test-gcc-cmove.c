@@ -116,6 +116,29 @@ void test_overwrite_cmp_v1( float* dest, float src0, float src1 )
 }
 
 //------------------------------------------------------------------------
+// test_mutex_cmove
+//------------------------------------------------------------------------
+// If the then block and the else block write different variables then
+// the if conversion has trouble converting it to a cmove. Even if we
+// break it into two mutually exclusive if statements, gcc recombines
+// them into a single if/then/else. So if we use some inline assembly we
+// can force gcc not to recombine them into a single if/then/else.
+
+__attribute__ ((noinline))
+int test_mutex_cmove( int dest0, int dest1, int sel, int src )
+{
+  if ( sel )
+    dest0 = src + 1;
+
+  asm ( "" : "+r"(sel) );
+
+  if ( !sel )
+    dest1 = src - 1;
+
+  return dest0 + dest1;
+}
+
+//------------------------------------------------------------------------
 // test
 //------------------------------------------------------------------------
 
@@ -179,9 +202,20 @@ int test()
   if ( dest_v1 != 0.0 )
     return error_code;
 
+  // Test mutually exclusive if/then cmove
+
+  error_code++;
+  int result_0 = test_mutex_cmove( 3, 7, 0, 13 );
+  if ( result_0 != 15 )
+    return error_code;
+
+  error_code++;
+  int result_1 = test_mutex_cmove( 3, 7, 1, 13 );
+  if ( result_1 != 21 )
+    return error_code;
+
   // If all tests passed return zero
 
   return 0;
 }
-
 
