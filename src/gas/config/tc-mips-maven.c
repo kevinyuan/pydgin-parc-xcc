@@ -1847,6 +1847,15 @@ static const struct regname reg_names_maven[] =
   {"$t6",       RTYPE_GP | 14},
   {"$t7",       RTYPE_GP | 15},
 
+  /* coprocessor 0 names */
+
+  {"$c0_count",   RTYPE_CP0 | 9 },
+  {"$c0_countlo", RTYPE_CP0 | 9 },
+  {"$c0_tidmask", RTYPE_CP0 | 18},
+  {"$c0_coreid",  RTYPE_CP0 | 17},
+  {"$c0_staten",  RTYPE_CP0 | 21},
+  {"$c0_counthi", RTYPE_CP0 | 25},
+
   /* Vector registers - these are in allocation order */
 
   {"$vzero",    RTYPE_VREG | 0}, 
