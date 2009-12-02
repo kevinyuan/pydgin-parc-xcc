@@ -254,6 +254,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 /* Maven Vector-Thread Instructions - VTU Configuration Instructions */
 
+{"vcfgvl",         "d,s,t",     0x48000000, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"vcfgivl",        "t,s,i",     0xdc000000, 0xfc000000, WR_t|RD_s,                    0,              INSN_MAVEN        },
 {"setvl",          "d,s",       0x48000002, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
 
 /* Maven Vector-Thread Instructions - Synchronization Instructions */
