@@ -278,6 +278,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"lbx.v",          "#d,t,#s",   0xb0000060, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 {"lbux.v",         "#d,t,#s",   0xb00000e0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 
+//TODO i think lw.v should technically be considered "unsigned"
 {"lw.v",           "#d,t",      0x60000000, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lh.v",           "#d,t",      0x60000020, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lhu.v",          "#d,t",      0x600000a0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
