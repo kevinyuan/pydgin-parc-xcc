@@ -1169,28 +1169,28 @@ static const struct mips_rtx_cost_data mips_rtx_cost_data[PROCESSOR_MAX] =
     4                    /* memory_latency */
   },
   { /* maven (tune for control processor) */
-    COSTS_N_INSNS( 4  ), /* fp_add */
-    COSTS_N_INSNS( 4  ), /* fp_mult_sf */
-    COSTS_N_INSNS( 4  ), /* fp_mult_df */
-    COSTS_N_INSNS( 4  ), /* fp_div_sf */
-    COSTS_N_INSNS( 4  ), /* fp_div_df */
+    COSTS_N_INSNS( 3  ), /* fp_add */
+    COSTS_N_INSNS( 3  ), /* fp_mult_sf */
+    COSTS_N_INSNS( 3  ), /* fp_mult_df */
+    COSTS_N_INSNS( 7  ), /* fp_div_sf */
+    COSTS_N_INSNS( 7  ), /* fp_div_df */
     COSTS_N_INSNS( 4  ), /* int_mult_si */
     COSTS_N_INSNS( 4  ), /* int_mult_di */
-    COSTS_N_INSNS( 4  ), /* int_div_si */
-    COSTS_N_INSNS( 4  ), /* int_div_di */
+    COSTS_N_INSNS( 16 ), /* int_div_si */
+    COSTS_N_INSNS( 16 ), /* int_div_di */
     1,                   /* branch_cost */
     4                    /* memory_latency */
   },
   { /* maven_vp (tune for virtual processors) */
-    COSTS_N_INSNS( 4  ), /* fp_add */
-    COSTS_N_INSNS( 4  ), /* fp_mult_sf */
-    COSTS_N_INSNS( 4  ), /* fp_mult_df */
-    COSTS_N_INSNS( 4  ), /* fp_div_sf */
-    COSTS_N_INSNS( 4  ), /* fp_div_df */
+    COSTS_N_INSNS( 3  ), /* fp_add */
+    COSTS_N_INSNS( 3  ), /* fp_mult_sf */
+    COSTS_N_INSNS( 3  ), /* fp_mult_df */
+    COSTS_N_INSNS( 7  ), /* fp_div_sf */
+    COSTS_N_INSNS( 7  ), /* fp_div_df */
     COSTS_N_INSNS( 4  ), /* int_mult_si */
     COSTS_N_INSNS( 4  ), /* int_mult_di */
-    COSTS_N_INSNS( 4  ), /* int_div_si */
-    COSTS_N_INSNS( 4  ), /* int_div_di */
+    COSTS_N_INSNS( 16 ), /* int_div_si */
+    COSTS_N_INSNS( 16 ), /* int_div_di */
     8,                   /* branch_cost */
     4                    /* memory_latency */
   }
