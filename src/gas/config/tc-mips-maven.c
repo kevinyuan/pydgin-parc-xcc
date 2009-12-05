@@ -3816,7 +3816,11 @@ macro_build( expressionS *ep, const char* name, const char* fmt, ... )
         switch ( *fmt++ ) {
           /* celio    - support for new field (segment ops "number of elements")*/
           case 'n':
-            INSERT_OPERAND( IMMNELM, insn, va_arg( args, int ) );
+            INSERT_OPERAND( IMMNELM, insn, va_arg( args, int ) - 1 );
+            continue;
+          /* cbatten - support for vcfg immediate field */
+          case 'c':
+            INSERT_OPERAND( IMMVCFG, insn, va_arg( args, int ) - 1 );
             continue;
           /* cbatten  - support for maven vector register specifiers */
           case 'd':
@@ -8615,6 +8619,10 @@ validate_mips_insn( const struct mips_opcode* opc )
           case 'n':
             USE_BITS( OP_MASK_IMMNELM, OP_SH_IMMNELM );
             break;
+          /* cbatten - support for vcfg immediate field */
+          case 'c':
+            USE_BITS( OP_MASK_IMMVCFG, OP_SH_IMMVCFG );
+            break;
           /* cbatten - support for maven vector register specifiers */
           case 'd':
             USE_BITS( OP_MASK_VD, OP_SH_VD );
@@ -9123,7 +9131,7 @@ mips_ip( char* str, struct mips_cl_insn* ip )
          
         case '#':
           switch ( *++args ) {
-                      
+
             /* maven modification - CCelio
              * code copied from '<' shift amount
              * support for segment vector loads field "# of elements"
@@ -9140,11 +9148,23 @@ mips_ip( char* str, struct mips_cl_insn* ip )
               if ((unsigned long) imm_expr.X_add_number > 31 )
                 as_warn( _( "Improper nelm amount (%lu)" ),
                          (unsigned long) imm_expr.X_add_number );
-              INSERT_OPERAND( IMMNELM, *ip, imm_expr.X_add_number );
+              INSERT_OPERAND( IMMNELM, *ip, imm_expr.X_add_number - 1 );
               imm_expr.X_op = O_absent;
               s = expr_end;
               continue;
-            
+
+            /* cbatten - support for vcfg immediate field */
+            case 'c':
+              my_getExpression( &imm_expr, s );
+              check_absolute_expr( ip, &imm_expr );
+              if ((unsigned long) imm_expr.X_add_number > 32 )
+                as_warn( _( "Improper number of private vregs (%lu)" ),
+                         (unsigned long) imm_expr.X_add_number );
+              INSERT_OPERAND( IMMVCFG, *ip, imm_expr.X_add_number - 1 );
+              imm_expr.X_op = O_absent;
+              s = expr_end;
+              continue;
+
             /* cbatten - support for maven vector register specifiers */
             case 'd':
               ok = reg_lookup( &s, RTYPE_NUM|RTYPE_VREG, &regno );
@@ -9164,7 +9184,7 @@ mips_ip( char* str, struct mips_cl_insn* ip )
                 as_bad( _( "Invalid vector register" ) );
               INSERT_OPERAND( VT, *ip, regno );
               continue;
-                           
+
             /* ccelio - support for maven flag register specifiers */
             case 'f':
               ok = reg_lookup( &s, RTYPE_NUM|RTYPE_FREG, &regno );
@@ -9184,7 +9204,7 @@ mips_ip( char* str, struct mips_cl_insn* ip )
                 as_bad( _( "Invalid vector register" ) );
               INSERT_OPERAND( FLAGT, *ip, regno );
               continue;
-            
+
             /* ccelio - support for maven flag register specifier for masking */
             case 'm':
               ok = reg_lookup( &s, RTYPE_NUM|RTYPE_FREG, &regno );

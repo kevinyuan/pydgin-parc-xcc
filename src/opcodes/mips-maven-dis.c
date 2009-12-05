@@ -917,7 +917,12 @@ print_insn_args( const char* d,
           case 'n':
             (*info->fprintf_func)
               ( info->stream, "0x%lx",
-                (l >> OP_SH_IMMNELM) & OP_MASK_IMMNELM);
+                (((l >> OP_SH_IMMNELM) & OP_MASK_IMMNELM) + 1));
+            break;
+          case 'c':
+            (*info->fprintf_func)
+              ( info->stream, "%d",
+                (((l >> OP_SH_IMMVCFG) & OP_MASK_IMMVCFG) + 1));
             break;
           case 'd':
             (*info->fprintf_func)

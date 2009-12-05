@@ -53,10 +53,8 @@
 
    The floating point 'r' format uses OP, FMT, FT, FS, FD and FUNCT.
 
-   //"#" is used to denote added Maven fields (such as #n for segment element count)
+   "#" is used to denote added Maven fields (such as #n for segment element count)
    The vtum format uses OP, RS, RT, RD/RV, U,S, N_ELM <<--- Maven modification - CCelio
-
-
 
    A breakpoint instruction uses OP, CODE and SPEC (10 bits of the
    breakpoint instruction are not defined; Kane says the breakpoint code
@@ -125,8 +123,10 @@
 #define OP_SH_FLAGS             21      /* celio was here */
 #define OP_MASK_FLAGT           0x1f    /* celio was here */
 #define OP_SH_FLAGT             16      /* celio was here */
-#define OP_MASK_VVFMASK         0x7    /* celio was here */
-#define OP_SH_VVFMASK           8      /* celio was here */
+#define OP_MASK_VVFMASK         0x7     /* celio was here */
+#define OP_SH_VVFMASK           8       /* celio was here */
+#define OP_MASK_IMMVCFG         0x1f    /* cbatten - vcfg imm field */
+#define OP_SH_IMMVCFG           0       /* cbatten - vcfg imm field */
 #define OP_MASK_IMMEDIATE       0xffff
 #define OP_SH_IMMEDIATE         0
 #define OP_MASK_DELTA           0xffff
@@ -308,18 +308,21 @@ struct mips_opcode
    "c" 10 bit breakpoint code (OP_*_CODE)
    "d" 5 bit destination register specifier (OP_*_RD)
    "h" 5 bit prefx hint (OP_*_PREFX)
-   "#n" 5 bit unsigned immediate for vtum ops (OP_*_IMMNELM) // maven modification -CCelio 
+
+   Both of these encode an assembly argument n as n-1 in the actual bits
+   "#n" 5 bit unsigned immediate for vtum ops (OP_*_IMMNELM)
+   "#c" 5 bit vcfg immediate field (OP_*_IMMVCFG)
+
    "#d" 5 bit destination vector register specifier (OP_*_VD) // maven modification -CCelio 
    "#s" 5 bit source vector register specifier (OP_*_VS)  // maven modification -CCelio
    "#t" 5 bit target vector register specifier (OP_*_VT) // maven modification -CCelio 
-   
+
    "#f" 5 bit destination vector register specifier (OP_*_FLAGD) // maven modification -CCelio 
    "#a" 5 bit source vector register specifier (OP_*_FLAGS)  // maven modification -CCelio
    "#b" 5 bit target vector register specifier (OP_*_VLAGT) // maven modification -CCelio 
-   
+
    "#m" 3 bit source flag register specifier for masking (OP_*_VVFMASK) // maven modification -CCelio 
-   
-   
+
    "i" 16 bit unsigned immediate (OP_*_IMMEDIATE)
    "j" 16 bit signed immediate (OP_*_DELTA)
    "k" 5 bit cache opcode in target register position (OP_*_CACHE)
