@@ -4,18 +4,16 @@
 #=========================================================================
 #
 #  -h --help          Display this message
-#  -v --[no-]verbose  Verbose mode 
+#  -v --[no-]verbose  Verbose mode
 #
 # Creates a summary of the cross-compiler test results. The given build
 # directory option should point to the "src" build directory.
 #
 # Author : Christopher Batten
 # Date   : July 31, 2009
-# 
+#
 
 require 'optparse'
-require 'rdoc/usage'
-require 'stringio'
 require 'find'
 
 # Enable ruby warnings (this avoid problems with "ruby -w")
@@ -26,10 +24,11 @@ $VERBOSE = true
 #-------------------------------------------------------------------------
 
 def usage()
-  $stdout = StringIO::new
-  RDoc::usage_no_exit
-  STDOUT.puts($stdout.string.gsub(/\A=+\n(.*)\n\n=+/,"\n\\1\n"))
-  exit(1)
+  puts ""
+  File::open($0).each do |line|
+    exit(1) if ( !(line =~ /^\#/) )
+    puts line.gsub(/^\#/,"") if (($. == 3) || ($. > 4))
+  end
 end
 
 $opts = {}
@@ -39,11 +38,11 @@ def parse_cmdline()
     opts.on("-v", "--[no-]verbose") { |v| $opts[:verbose] = v }
     opts.on("-h", "--help")         { usage() }
   end.parse!
-  
-  if ( !$ARGV.empty? )
-    $opts[:build_dir] = $ARGV.pop()
+
+  if ( !ARGV.empty? )
+    $opts[:build_dir] = ARGV.pop()
   end
-  $ARGV.empty? or raise OptionParser::InvalidOption
+  ARGV.empty? or raise OptionParser::InvalidOption
 rescue
   usage()
 end
@@ -67,7 +66,7 @@ def main()
   if ( !File::exists?(makefile) )
     puts "\n ERROR: Given build directory does not include Makefile\n"
     exit(1);
-  end  
+  end
 
   build   = ""
   host    = ""
@@ -88,7 +87,7 @@ def main()
   puts ""
 
   # Find the .sum files
-  
+
   sum_files = [];
   Find::find($opts[:build_dir]) do | path |
     if ( File::extname(path) == ".sum" )

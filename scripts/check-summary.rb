@@ -12,11 +12,9 @@
 #
 # Author : Christopher Batten
 # Date   : July 31, 2009
-# 
+#
 
 require 'optparse'
-require 'rdoc/usage'
-require 'stringio'
 require 'find'
 
 # Enable ruby warnings (this avoid problems with "ruby -w")
@@ -27,10 +25,11 @@ $VERBOSE = true
 #-------------------------------------------------------------------------
 
 def usage()
-  $stdout = StringIO::new
-  RDoc::usage_no_exit
-  STDOUT.puts($stdout.string.gsub(/\A=+\n(.*)\n\n=+/,"\n\\1\n"))
-  exit(1)
+  puts ""
+  File::open($0).each do |line|
+    exit(1) if ( !(line =~ /^\#/) )
+    puts line.gsub(/^\#/,"") if (($. == 3) || ($. > 4))
+  end
 end
 
 $opts = {}
@@ -40,7 +39,7 @@ def parse_cmdline()
     opts.on("-v", "--[no-]verbose") { |v| $opts[:verbose] = v }
     opts.on("-h", "--help")         { usage() }
   end.parse!
-  $opts[:test_outs] = $ARGV
+  $opts[:test_outs] = ARGV
 rescue
   usage()
 end
@@ -54,10 +53,10 @@ def check_out( test_out )
   if ( !FileTest::exist?(test_out) )
     return false;
   end
-  
+
   found  = false
   passed = true
-  IO::foreach(test_out) do | line | 
+  IO::foreach(test_out) do | line |
     if ( line =~ /^\*\*\* .* exit = (\d+)$/ )
       found = true
       if ( $1.to_i > 0 )
@@ -123,7 +122,7 @@ def main()
         results[test].run_result = check_out(test_out)
 
     end
-  
+
   end
 
   # Cascade failures from compile to link to run
