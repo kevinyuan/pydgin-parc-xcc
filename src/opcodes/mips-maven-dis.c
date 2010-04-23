@@ -398,6 +398,16 @@ static const char* const mips_gpr_names_maven[32] =
   "t8",   "t9",   "k0",   "k1",   "gp",   "sp",   "s8",   "ra"
 };
 
+/* Maven symbolic floating-point register names */
+
+static const char* const mips_fpr_names_maven[32] =
+{
+  "zero", "at",   "v0",   "v1",   "a0",   "a1",   "a2",   "a3",
+  "a4",   "a5",   "a6",   "a7",   "t4",   "t5",   "t6",   "t7",
+  "s0",   "s1",   "s2",   "s3",   "s4",   "s5",   "s6",   "s7",
+  "t8",   "t9",   "k0",   "k1",   "gp",   "sp",   "s8",   "ra"
+};
+
 /* Maven symbolic vector register names */
 
 static const char* const mips_vreg_names_maven[32] =
@@ -407,21 +417,21 @@ static const char* const mips_vreg_names_maven[32] =
   "vs0",   "vs1",  "vs2",  "vs3",  "vs4",  "vs5",  "vs6",  "vs7",
   "vt8",   "vt9",  "vk0",  "vk1",  "vgp",  "vsp",  "vs8",  "vra"
 };
-                   
+
 /* Maven symbolic flag register names */
 
 static const char* const mips_freg_names_maven[8] =
 {
   "flag0", "flag1", "flag2", "flag3", "flag4", "flag5", "flag6", "flag7"
 };
-                   
+
 /* Maven symbolic coprocessor register names */
 
 static const char* const mips_cp0_names_maven[32] =
 {
-  "$0",         "$1",         "$2",         "$3",    
+  "$0",         "$1",         "$2",         "$3",
   "$4",         "$5",         "$6",         "$7",
-  "$8",         "c0_count",   "$10",        "$11",  
+  "$8",         "c0_count",   "$10",        "$11",
   "$12",        "$13",        "$14",        "$15",
   "$16",        "c0_coreid",  "$18",        "$19",
   "$20",        "c0_staten",   "$22",        "$23",
@@ -688,13 +698,8 @@ set_default_mips_dis_options( struct disassemble_info* info )
      and numeric FPR, CP0 register, and HWR names. */
   mips_isa = ISA_MIPS3;
   mips_processor =  CPU_R3000;
-  /* YUNSUP: default is eabi. we need to use mips_gpr_names_newabi */
-  /* mips_gpr_names = mips_gpr_names_oldabi; */
-  mips_gpr_names = mips_gpr_names_newabi;
-  /* YUNSUP: we need to use GPRs for floating point instructions.
-   * default is eabi. we need to use mips_gpr_names_newabi */
-  /* mips_fpr_names = mips_fpr_names_numeric; */
-  mips_fpr_names = mips_gpr_names_newabi;
+  mips_gpr_names = mips_gpr_names_oldabi;
+  mips_fpr_names = mips_fpr_names_numeric;
   mips_cp0_names = mips_cp0_names_numeric;
   mips_cp0sel_names = NULL;
   mips_cp0sel_names_len = 0;
@@ -729,8 +734,10 @@ set_default_mips_dis_options( struct disassemble_info* info )
     /* cbatten - Maven uses EABI, but EABI does not currently
        disassemble a4-a7 correctly. So we do a custom check here and set
        the symbolic names to our own set if this is a maven binary. */
-    if ( mips_processor == CPU_MAVEN )
+    if ( mips_processor == CPU_MAVEN ) {
       mips_gpr_names = mips_gpr_names_maven;
+      mips_fpr_names = mips_fpr_names_maven;
+    }
 
   }
 #endif
