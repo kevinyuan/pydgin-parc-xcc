@@ -60,6 +60,7 @@
 
 #define MAVEN_SYSCFG_REGDEF_COP0_CORE_ID   17
 #define MAVEN_SYSCFG_REGDEF_COP0_TID_MASK  18
+#define MAVEN_SYSCFG_REGDEF_COP0_TID_STOP  19
 #define MAVEN_SYSCFG_REGDEF_COP0_STATS_EN  21
 
 //------------------------------------------------------------------------
