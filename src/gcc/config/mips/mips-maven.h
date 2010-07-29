@@ -1293,16 +1293,20 @@ march=*: -mhard-float}"
 #define DWARF_FRAME_REGNUM(REGNO) mips_dwarf_regno[REGNO]
 
 /* The DWARF 2 CFA column which tracks the return address. */
+/* YUNSUP: new register mapping */
 #define DWARF_FRAME_RETURN_COLUMN (GP_REG_FIRST + 31)
 
 /* Before the prologue, RA lives in r31. */
+/* YUNSUP: new register mapping */
 #define INCOMING_RETURN_ADDR_RTX  gen_rtx_REG (VOIDmode, GP_REG_FIRST + 31)
 
 /* Describe how we implement __builtin_eh_return. */
+/* YUNSUP: new register mapping */
 #define EH_RETURN_DATA_REGNO(N)                                         \
-  ((N) < (TARGET_MIPS16 ? 2 : 4) ? (N) + GP_ARG_FIRST : INVALID_REGNUM)
+  ((N) < (TARGET_MIPS16 ? 1 : 3) ? (N) + GP_ARG_FIRST : INVALID_REGNUM)
 
-#define EH_RETURN_STACKADJ_RTX  gen_rtx_REG (Pmode, GP_REG_FIRST + 3)
+/* YUNSUP: new register mapping */
+#define EH_RETURN_STACKADJ_RTX  gen_rtx_REG (Pmode, GP_REG_FIRST + 2)
 
 /* Offsets recorded in opcodes are a multiple of this alignment factor.
    The default for this in 64-bit mode is 8, which causes problems with
@@ -1579,10 +1583,12 @@ march=*: -mhard-float}"
    make sure that gcc is not trying to allocate and use them. And we
    fix flag0 since it is always all ones. */
 
+/* YUNSUP: new register mapping */
+
 #define FIXED_REGISTERS                                                 \
   {                                                                     \
-    1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0,                     \
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,                     \
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
     1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,                     \
@@ -1599,8 +1605,8 @@ march=*: -mhard-float}"
     0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,                                 \
     /* yunsup/cbatten - maven vector registers (see above) */           \
     1, 1, 1, 1,                                                         \
-    1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,                     \
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,                     \
     1, 0, 0, 0, 0, 0, 0, 0                                              \
   }
 
@@ -1618,10 +1624,12 @@ march=*: -mhard-float}"
 /* yunsup/cbatten - vector registers have similar clobber semantics as
    standard mips registers for now. */
 
+/* YUNSUP: new register mapping */
+
 #define CALL_USED_REGISTERS                                             \
   {                                                                     \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
-    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0,                     \
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,                     \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
     1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
@@ -1639,16 +1647,18 @@ march=*: -mhard-float}"
     /* yunsup - maven vector registers */                               \
     1, 1, 1, 1,                                                         \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
-    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,                     \
+    1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,                     \
     1, 1, 1, 1, 1, 1, 1, 1                                              \
   }
 
-/* Define this since $28, though fixed, is call-saved in many ABIs. */
+/* Define this since $gp, though fixed, is call-saved in many ABIs. */
+
+/* YUNSUP: new register mapping */
 
 #define CALL_REALLY_USED_REGISTERS                                      \
   { /* General registers. */                                            \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
-    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 0,                     \
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0,                     \
     /* Floating-point registers. */                                     \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
     1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
@@ -1668,7 +1678,7 @@ march=*: -mhard-float}"
     /* yunsup - maven vector registers */                               \
     1, 1, 1, 1,                                                         \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
-    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,                     \
+    1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,                     \
     1, 1, 1, 1, 1, 1, 1, 1                                              \
   }
 
@@ -1728,7 +1738,8 @@ march=*: -mhard-float}"
 #define DSP_ACC_REG_LAST 181
 #define DSP_ACC_REG_NUM (DSP_ACC_REG_LAST - DSP_ACC_REG_FIRST + 1)
 
-#define AT_REGNUM (GP_REG_FIRST + 1)
+/* YUNSUP: new register mapping */
+#define AT_REGNUM (GP_REG_FIRST + 30)
 #define HI_REGNUM (TARGET_BIG_ENDIAN ? MD_REG_FIRST : MD_REG_FIRST + 1)
 #define LO_REGNUM (TARGET_BIG_ENDIAN ? MD_REG_FIRST + 1 : MD_REG_FIRST)
 
@@ -1804,6 +1815,7 @@ march=*: -mhard-float}"
 #define MODES_TIEABLE_P mips_modes_tieable_p
 
 /* Register to use for pushing function arguments. */
+/* YUNSUP: new register mapping */
 #define STACK_POINTER_REGNUM (GP_REG_FIRST + 29)
 
 /* These two registers don't really exist: they get eliminated to either
@@ -1813,13 +1825,15 @@ march=*: -mhard-float}"
 
 /* $30 is not available on the mips16, so we use $17 as the frame
    pointer. */
+/* YUNSUP: new register mapping */
 #define HARD_FRAME_POINTER_REGNUM                                       \
-  (TARGET_MIPS16 ? GP_REG_FIRST + 17 : GP_REG_FIRST + 30)
+  (TARGET_MIPS16 ? GP_REG_FIRST + 17 : GP_REG_FIRST + 25)
 
 #define FRAME_POINTER_REQUIRED (mips_frame_pointer_required ())
 
 /* Register in which static-chain is passed to a function. */
-#define STATIC_CHAIN_REGNUM (GP_REG_FIRST + 15)
+/* YUNSUP: new register mapping */
+#define STATIC_CHAIN_REGNUM (GP_REG_FIRST + 14)
 
 /* Registers used as temporaries in prologue/epilogue code:
 
@@ -1839,9 +1853,10 @@ march=*: -mhard-float}"
    the PIC call register ($25), the frame pointer, the EH stack
    adjustment, or the EH data registers. */
 
-#define MIPS16_PIC_TEMP_REGNUM (GP_REG_FIRST + 2)
-#define MIPS_PROLOGUE_TEMP_REGNUM (GP_REG_FIRST + 3)
-#define MIPS_EPILOGUE_TEMP_REGNUM (GP_REG_FIRST + (TARGET_MIPS16 ? 6 : 8))
+/* YUNSUP: new register mapping */
+#define MIPS16_PIC_TEMP_REGNUM (GP_REG_FIRST + 1)
+#define MIPS_PROLOGUE_TEMP_REGNUM (GP_REG_FIRST + 2)
+#define MIPS_EPILOGUE_TEMP_REGNUM (GP_REG_FIRST + (TARGET_MIPS16 ? 5 : 7))
 
 #define MIPS16_PIC_TEMP gen_rtx_REG (Pmode, MIPS16_PIC_TEMP_REGNUM)
 #define MIPS_PROLOGUE_TEMP(MODE) gen_rtx_REG (MODE, MIPS_PROLOGUE_TEMP_REGNUM)
@@ -1853,6 +1868,7 @@ march=*: -mhard-float}"
 
 /* The ABI-defined global pointer. Sometimes we use a different
    register in leaf functions: see PIC_OFFSET_TABLE_REGNUM. */
+/* YUNSUP: new register mapping */
 #define GLOBAL_POINTER_REGNUM (GP_REG_FIRST + 28)
 
 /* We normally use $28 as the global pointer. However, when generating
@@ -1866,7 +1882,8 @@ march=*: -mhard-float}"
 #define PIC_OFFSET_TABLE_REGNUM                                         \
   (reload_completed ? REGNO (pic_offset_table_rtx) : GLOBAL_POINTER_REGNUM)
 
-#define PIC_FUNCTION_ADDR_REGNUM (GP_REG_FIRST + 25)
+/* YUNSUP: new register mapping */
+#define PIC_FUNCTION_ADDR_REGNUM (GP_REG_FIRST + 16)
 
 /* Define the classes of registers for register constraints in the
    machine description. Also define ranges of constants.
@@ -1971,13 +1988,22 @@ enum reg_class
 
 #define REG_CLASS_CONTENTS                                                                                                     \
   {                                                                                                                            \
+    /* YUNSUP: new register mapping */ \
+    /* { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* NO_REGS */          \
+    /* { 0x000300fc, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* M16_REGS */         \
+    /* { 0x01000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* T_REG */            \
+    /* { 0x010300fc, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* M16_T_REGS */       \
+    /* { 0x02000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* PIC_FN_ADDR_REG */  \
+    /* { 0x00000008, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* V1_REG */           \
+    /* { 0xfdffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* LEA_REGS */         \
+    /* { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* GR_REGS */          \
     { 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* NO_REGS */          \
-    { 0x000300fc, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* M16_REGS */         \
-    { 0x01000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* T_REG */            \
-    { 0x010300fc, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* M16_T_REGS */       \
-    { 0x02000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* PIC_FN_ADDR_REG */  \
-    { 0x00000008, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* V1_REG */           \
-    { 0xfdffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* LEA_REGS */         \
+    { 0x0018007e, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* M16_REGS */         \
+    { 0x00008000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* T_REG */            \
+    { 0x0018807e, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* M16_T_REGS */       \
+    { 0x00010000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* PIC_FN_ADDR_REG */  \
+    { 0x00000004, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* V1_REG */           \
+    { 0xfffeffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* LEA_REGS */         \
     { 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, /* GR_REGS */          \
     /* YUNSUP: change fpr mapping for FP_REGS. */                                                                              \
     /* { 0x00000000, 0xffffffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000 }, */ /* FP_REGS */                            \
@@ -2033,6 +2059,8 @@ enum reg_class
 /* We generally want to put call-clobbered registers ahead of call-saved
    ones. (IRA expects this.) */
 
+/* YUNSUP: new register mapping */
+
 #define REG_ALLOC_ORDER                                                 \
   { /* Accumulator registers. When GPRs and accumulators have equal     \
      cost, we generally prefer to use accumulators. For example,        \
@@ -2044,14 +2072,14 @@ enum reg_class
     64, 65,176,177,178,179,180,181,                                     \
     /* Call-clobbered GPRs. */                                          \
     1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,          \
-    24, 25, 31,                                                         \
+    16, 30, 31,                                                         \
     /* The global pointer. This is call-clobbered for o32 and o64       \
        abicalls, call-saved for n32 and n64 abicalls, and a program     \
        invariant otherwise. Putting it between the call-clobbered       \
        and call-saved registers should cope with all eventualities. */  \
     28,                                                                 \
     /* Call-saved GPRs. */                                              \
-    16, 17, 18, 19, 20, 21, 22, 23, 30,                                 \
+    17, 18, 19, 20, 21, 22, 23, 24, 25,                                 \
     /* GPRs that can never be exposed to the register allocator. */     \
     0,  26, 27, 29,                                                     \
     /* Call-clobbered FPRs. */                                          \
@@ -2200,13 +2228,14 @@ enum reg_class
 /* The eliminations to $17 are only used for mips16 code. See the
    definition of HARD_FRAME_POINTER_REGNUM. */
 
+/* YUNSUP: new register mapping */
 #define ELIMINABLE_REGS                                                 \
   {{ ARG_POINTER_REGNUM,   STACK_POINTER_REGNUM},                       \
-    { ARG_POINTER_REGNUM,   GP_REG_FIRST + 30},                         \
-    { ARG_POINTER_REGNUM,   GP_REG_FIRST + 17},                         \
+    { ARG_POINTER_REGNUM,   GP_REG_FIRST + 25},                         \
+    { ARG_POINTER_REGNUM,   GP_REG_FIRST + 20},                         \
     { FRAME_POINTER_REGNUM, STACK_POINTER_REGNUM},                      \
-    { FRAME_POINTER_REGNUM, GP_REG_FIRST + 30},                         \
-    { FRAME_POINTER_REGNUM, GP_REG_FIRST + 17}}
+    { FRAME_POINTER_REGNUM, GP_REG_FIRST + 25},                         \
+    { FRAME_POINTER_REGNUM, GP_REG_FIRST + 20}}
 
 /* Make sure that we're not trying to eliminate to the wrong hard frame
    pointer. */
@@ -2243,7 +2272,8 @@ enum reg_class
 /* Symbolic macros for the registers used to return integer and floating
    point values. */
 
-#define GP_RETURN (GP_REG_FIRST + 2)
+/* YUNSUP: new register mapping */
+#define GP_RETURN (GP_REG_FIRST + 1)
 /* YUNSUP: change fpr mapping for FP_REGS */
 /* #define FP_RETURN ((TARGET_SOFT_FLOAT) ? GP_RETURN : (FP_REG_FIRST + 0)) */
 #define FP_RETURN GP_RETURN
@@ -2252,7 +2282,8 @@ enum reg_class
 
 /* Symbolic macros for the first/last argument registers. */
 
-#define GP_ARG_FIRST (GP_REG_FIRST + 4)
+/* YUNSUP: new register mapping */
+#define GP_ARG_FIRST (GP_REG_FIRST + 3)
 #define GP_ARG_LAST  (GP_ARG_FIRST + MAX_ARGS_IN_REGISTERS - 1)
 /* YUNSUP: change fpr mapping for FP_REGS */
 /* #define FP_ARG_FIRST (FP_REG_FIRST + 12) */
@@ -2410,6 +2441,8 @@ typedef struct mips_args
 /* Output assembler code to FILE to increment profiler label # LABELNO
    for profiling a function entry. */
 
+/* YUNSUP: new register mapping */
+
 #define FUNCTION_PROFILER(FILE, LABELNO)                                \
   {                                                                     \
     if (TARGET_MIPS16)                                                  \
@@ -2418,13 +2451,13 @@ typedef struct mips_args
     {                                                                   \
       /*  For TARGET_LONG_CALLS use $3 for the address of _mcount. */   \
       if (Pmode == DImode)                                              \
-        fprintf (FILE, "\tdla\t%s,_mcount\n", reg_names[GP_REG_FIRST + 3]); \
+        fprintf (FILE, "\tdla\t%s,_mcount\n", reg_names[GP_REG_FIRST + 2]); \
       else                                                              \
-        fprintf (FILE, "\tla\t%s,_mcount\n", reg_names[GP_REG_FIRST + 3]); \
+        fprintf (FILE, "\tla\t%s,_mcount\n", reg_names[GP_REG_FIRST + 2]); \
     }                                                                   \
     fprintf (FILE, "\t.set\tnoat\n");                                   \
     fprintf (FILE, "\tmove\t%s,%s\t\t# save current return address\n",  \
-             reg_names[GP_REG_FIRST + 1], reg_names[GP_REG_FIRST + 31]); \
+             reg_names[GP_REG_FIRST + 30], reg_names[GP_REG_FIRST + 31]); \
     /* _mcount treats $2 as the static chain register. */               \
     if (cfun->static_chain_decl != NULL)                                \
       fprintf (FILE, "\tmove\t%s,%s\n", reg_names[2],                   \
@@ -2439,7 +2472,7 @@ typedef struct mips_args
                Pmode == DImode ? 16 : 8);                               \
     }                                                                   \
     if (TARGET_LONG_CALLS)                                              \
-      fprintf (FILE, "\tjalr\t%s\n", reg_names[GP_REG_FIRST + 3]);      \
+      fprintf (FILE, "\tjalr\t%s\n", reg_names[GP_REG_FIRST + 2]);      \
     else                                                                \
       fprintf (FILE, "\tjal\t_mcount\n");                               \
     fprintf (FILE, "\t.set\tat\n");                                     \
@@ -2794,6 +2827,8 @@ typedef struct mips_args
 #define ASM_APP_OFF " #NO_APP\n"
 #endif
 
+/* YUNSUP: new register mapping */
+
 #define REGISTER_NAMES                                                     \
 {                                                                          \
   "$0",    "$1",    "$2",    "$3",    "$4",    "$5",    "$6",    "$7",     \
@@ -2822,10 +2857,10 @@ typedef struct mips_args
   "$dsp_ca","$dsp_ou","$dsp_cc","$dsp_ef",                                 \
   /* yunsup/cbatten - maven vector registers */                            \
   "",      "",      "",      "",                                           \
-  "$vzero","$vat",  "$vv0",  "$vv1",  "$va0",  "$va1",  "$va2",  "$va3",   \
-  "$va4",  "$va5",  "$va6",  "$va7",  "$vt4",  "$vt5",  "$vt6",  "$vt7",   \
-  "$vs0",  "$vs1",  "$vs2",  "$vs3",  "$vs4",  "$vs5",  "$vs6",  "$vs7",   \
-  "$vt8",  "$vt9",  "$vk0",  "$vk1",  "$vgp",  "$vsp",  "$vs8",  "$vra",   \
+  "$vzero","$vv0",  "$vv1",  "$va0",  "$va1",  "$va2",  "$va3",  "$va4",   \
+  "$va5",  "$va6",  "$va7",  "$vt4",  "$vt5",  "$vt6",  "$vt7",  "$vt8",   \
+  "$vt9",  "$vs0",  "$vs1",  "$vs2",  "$vs3",  "$vs4",  "$vs5",  "$vs6",   \
+  "$vs7",  "$vs8",  "$vk0",  "$vk1",  "$vgp",  "$vsp",  "$vat",  "$vra",   \
   "$flag0","$flag1","$flag2","$flag3","$flag4","$flag5","$flag6","$flag7"  \
 }
 
@@ -2836,51 +2871,53 @@ typedef struct mips_args
    For now we just hard code this changes into the names below. We also
    add the extra names for vector registers vt0-vt3, and vfp. */
 
+/* YUNSUP: new register mapping */
+
 #define ADDITIONAL_REGISTER_NAMES                                       \
   {                                                                     \
     { "$29",    29 + GP_REG_FIRST },                                    \
     { "$30",    30 + GP_REG_FIRST },                                    \
-    { "at",      1 + GP_REG_FIRST },                                    \
-    { "v0",      2 + GP_REG_FIRST },                                    \
-    { "v1",      3 + GP_REG_FIRST },                                    \
-    { "a0",      4 + GP_REG_FIRST },                                    \
-    { "a1",      5 + GP_REG_FIRST },                                    \
-    { "a2",      6 + GP_REG_FIRST },                                    \
-    { "a3",      7 + GP_REG_FIRST },                                    \
-    { "a4",      8 + GP_REG_FIRST },                                    \
-    { "a5",      9 + GP_REG_FIRST },                                    \
-    { "a6",     10 + GP_REG_FIRST },                                    \
-    { "a7",     11 + GP_REG_FIRST },                                    \
-    { "t0",      8 + GP_REG_FIRST },                                    \
-    { "t1",      9 + GP_REG_FIRST },                                    \
-    { "t2",     10 + GP_REG_FIRST },                                    \
-    { "t3",     11 + GP_REG_FIRST },                                    \
-    { "t4",     12 + GP_REG_FIRST },                                    \
-    { "t5",     13 + GP_REG_FIRST },                                    \
-    { "t6",     14 + GP_REG_FIRST },                                    \
-    { "t7",     15 + GP_REG_FIRST },                                    \
-    { "s0",     16 + GP_REG_FIRST },                                    \
-    { "s1",     17 + GP_REG_FIRST },                                    \
-    { "s2",     18 + GP_REG_FIRST },                                    \
-    { "s3",     19 + GP_REG_FIRST },                                    \
-    { "s4",     20 + GP_REG_FIRST },                                    \
-    { "s5",     21 + GP_REG_FIRST },                                    \
-    { "s6",     22 + GP_REG_FIRST },                                    \
-    { "s7",     23 + GP_REG_FIRST },                                    \
-    { "t8",     24 + GP_REG_FIRST },                                    \
-    { "t9",     25 + GP_REG_FIRST },                                    \
-    { "k0",     26 + GP_REG_FIRST },                                    \
-    { "k1",     27 + GP_REG_FIRST },                                    \
+    { "v0",      1 + GP_REG_FIRST },                                    \
+    { "v1",      2 + GP_REG_FIRST },                                    \
+    { "a0",      3 + GP_REG_FIRST },                                    \
+    { "a1",      4 + GP_REG_FIRST },                                    \
+    { "a2",      5 + GP_REG_FIRST },                                    \
+    { "a3",      6 + GP_REG_FIRST },                                    \
+    { "a4",      7 + GP_REG_FIRST },                                    \
+    { "a5",      8 + GP_REG_FIRST },                                    \
+    { "a6",      9 + GP_REG_FIRST },                                    \
+    { "a7",     10 + GP_REG_FIRST },                                    \
+    { "t0",      7 + GP_REG_FIRST },                                    \
+    { "t1",      8 + GP_REG_FIRST },                                    \
+    { "t2",      9 + GP_REG_FIRST },                                    \
+    { "t3",     10 + GP_REG_FIRST },                                    \
+    { "t4",     11 + GP_REG_FIRST },                                    \
+    { "t5",     12 + GP_REG_FIRST },                                    \
+    { "t6",     13 + GP_REG_FIRST },                                    \
+    { "t7",     14 + GP_REG_FIRST },                                    \
+    { "t8",     15 + GP_REG_FIRST },                                    \
+    { "t9",     16 + GP_REG_FIRST },                                    \
+    { "t10",    17 + GP_REG_FIRST },                                    \
+    { "t11",    18 + GP_REG_FIRST },                                    \
+    { "s0",     19 + GP_REG_FIRST },                                    \
+    { "s1",     20 + GP_REG_FIRST },                                    \
+    { "s2",     21 + GP_REG_FIRST },                                    \
+    { "s3",     22 + GP_REG_FIRST },                                    \
+    { "s4",     23 + GP_REG_FIRST },                                    \
+    { "s5",     24 + GP_REG_FIRST },                                    \
+    { "s6",     25 + GP_REG_FIRST },                                    \
+    { "s7",     26 + GP_REG_FIRST },                                    \
+    { "s8",     27 + GP_REG_FIRST },                                    \
+    { "fp",     27 + GP_REG_FIRST },                                    \
     { "gp",     28 + GP_REG_FIRST },                                    \
     { "sp",     29 + GP_REG_FIRST },                                    \
-    { "s8",     30 + GP_REG_FIRST },                                    \
-    { "fp",     30 + GP_REG_FIRST },                                    \
+    { "at",     30 + GP_REG_FIRST },                                    \
     { "ra",     31 + GP_REG_FIRST },                                    \
-    { "vt0",     8 + VEC_REG_FIRST },                                   \
-    { "vt1",     9 + VEC_REG_FIRST },                                   \
-    { "vt2",    10 + VEC_REG_FIRST },                                   \
-    { "vt3",    11 + VEC_REG_FIRST },                                   \
-    { "vfp",    30 + VEC_REG_FIRST },                                   \
+    { "vt0",     7 + VEC_REG_FIRST },                                   \
+    { "vt1",     8 + VEC_REG_FIRST },                                   \
+    { "vt2",     9 + VEC_REG_FIRST },                                   \
+    { "vt3",    10 + VEC_REG_FIRST },                                   \
+    { "vfp",    27 + VEC_REG_FIRST },                                   \
     ALL_COP_ADDITIONAL_REGISTER_NAMES                                   \
   }
 

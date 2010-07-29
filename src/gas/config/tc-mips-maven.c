@@ -95,15 +95,17 @@ int mips_flag_pdr = TRUE;
 static char* mips_regmask_frag;
 #endif
 
+/* YUNSUP: new register mapping */
+
 #define ZERO 0
-#define ATREG 1
-#define TREG 24
-#define PIC_CALL_REG 25
+#define ATREG 30
+#define TREG 15
+#define PIC_CALL_REG 16
 #define KT0 26
 #define KT1 27
 #define GP  28
 #define SP  29
-#define FP  30
+#define FP  27
 #define RA  31
 
 #define ILLEGAL_REG (32)
@@ -1690,63 +1692,65 @@ struct regname
   {"$cc6",      RTYPE_FCC | RTYPE_CCC | 6},                             \
   {"$cc7",      RTYPE_FCC | RTYPE_CCC | 7}
 
+/* YUNSUP: new register mapping */
+
 #define N32N64_SYMBOLIC_REGISTER_NAMES                                  \
-  {"$a4",       RTYPE_GP | 8},                                          \
-  {"$a5",       RTYPE_GP | 9},                                          \
-  {"$a6",       RTYPE_GP | 10},                                         \
-  {"$a7",       RTYPE_GP | 11},                                         \
-  {"$ta0",      RTYPE_GP | 8},  /* alias for $a4 */                     \
-  {"$ta1",      RTYPE_GP | 9},  /* alias for $a5 */                     \
-  {"$ta2",      RTYPE_GP | 10}, /* alias for $a6 */                     \
-  {"$ta3",      RTYPE_GP | 11}, /* alias for $a7 */                     \
-  {"$t0",       RTYPE_GP | 12},                                         \
-  {"$t1",       RTYPE_GP | 13},                                         \
-  {"$t2",       RTYPE_GP | 14},                                         \
-  {"$t3",       RTYPE_GP | 15}
+  {"$a4",       RTYPE_GP | 7},                                          \
+  {"$a5",       RTYPE_GP | 8},                                          \
+  {"$a6",       RTYPE_GP | 9},                                          \
+  {"$a7",       RTYPE_GP | 10},                                         \
+  {"$ta0",      RTYPE_GP | 7},  /* alias for $a4 */                     \
+  {"$ta1",      RTYPE_GP | 8},  /* alias for $a5 */                     \
+  {"$ta2",      RTYPE_GP | 9}, /* alias for $a6 */                      \
+  {"$ta3",      RTYPE_GP | 10}, /* alias for $a7 */                     \
+  {"$t0",       RTYPE_GP | 11},                                         \
+  {"$t1",       RTYPE_GP | 12},                                         \
+  {"$t2",       RTYPE_GP | 13},                                         \
+  {"$t3",       RTYPE_GP | 14}
 
 #define O32_SYMBOLIC_REGISTER_NAMES                                     \
-  {"$t0",       RTYPE_GP | 8},                                          \
-  {"$t1",       RTYPE_GP | 9},                                          \
-  {"$t2",       RTYPE_GP | 10},                                         \
-  {"$t3",       RTYPE_GP | 11},                                         \
-  {"$t4",       RTYPE_GP | 12},                                         \
-  {"$t5",       RTYPE_GP | 13},                                         \
-  {"$t6",       RTYPE_GP | 14},                                         \
-  {"$t7",       RTYPE_GP | 15},                                         \
-  {"$ta0",      RTYPE_GP | 12}, /* alias for $t4 */                     \
-  {"$ta1",      RTYPE_GP | 13}, /* alias for $t5 */                     \
-  {"$ta2",      RTYPE_GP | 14}, /* alias for $t6 */                     \
-  {"$ta3",      RTYPE_GP | 15}  /* alias for $t7 */
+  {"$t0",       RTYPE_GP | 7},                                          \
+  {"$t1",       RTYPE_GP | 8},                                          \
+  {"$t2",       RTYPE_GP | 9},                                          \
+  {"$t3",       RTYPE_GP | 10},                                         \
+  {"$t4",       RTYPE_GP | 11},                                         \
+  {"$t5",       RTYPE_GP | 12},                                         \
+  {"$t6",       RTYPE_GP | 13},                                         \
+  {"$t7",       RTYPE_GP | 14},                                         \
+  {"$ta0",      RTYPE_GP | 11}, /* alias for $t4 */                     \
+  {"$ta1",      RTYPE_GP | 12}, /* alias for $t5 */                     \
+  {"$ta2",      RTYPE_GP | 13}, /* alias for $t6 */                     \
+  {"$ta3",      RTYPE_GP | 14}  /* alias for $t7 */
 
 /* Remaining symbolic register names */
 #define SYMBOLIC_REGISTER_NAMES                                         \
   {"$zero",     RTYPE_GP | 0},                                          \
-  {"$at",       RTYPE_GP | 1},                                          \
-  {"$AT",       RTYPE_GP | 1},                                          \
-  {"$v0",       RTYPE_GP | 2},                                          \
-  {"$v1",       RTYPE_GP | 3},                                          \
-  {"$a0",       RTYPE_GP | 4},                                          \
-  {"$a1",       RTYPE_GP | 5},                                          \
-  {"$a2",       RTYPE_GP | 6},                                          \
-  {"$a3",       RTYPE_GP | 7},                                          \
-  {"$s0",       RTYPE_GP | 16},                                         \
-  {"$s1",       RTYPE_GP | 17},                                         \
-  {"$s2",       RTYPE_GP | 18},                                         \
-  {"$s3",       RTYPE_GP | 19},                                         \
-  {"$s4",       RTYPE_GP | 20},                                         \
-  {"$s5",       RTYPE_GP | 21},                                         \
-  {"$s6",       RTYPE_GP | 22},                                         \
-  {"$s7",       RTYPE_GP | 23},                                         \
-  {"$t8",       RTYPE_GP | 24},                                         \
-  {"$t9",       RTYPE_GP | 25},                                         \
+  {"$v0",       RTYPE_GP | 1},                                          \
+  {"$v1",       RTYPE_GP | 2},                                          \
+  {"$a0",       RTYPE_GP | 3},                                          \
+  {"$a1",       RTYPE_GP | 4},                                          \
+  {"$a2",       RTYPE_GP | 5},                                          \
+  {"$a3",       RTYPE_GP | 6},                                          \
+  {"$t8",       RTYPE_GP | 15},                                         \
+  {"$t9",       RTYPE_GP | 16},                                         \
+  {"$s0",       RTYPE_GP | 17},                                         \
+  {"$s1",       RTYPE_GP | 18},                                         \
+  {"$s2",       RTYPE_GP | 19},                                         \
+  {"$s3",       RTYPE_GP | 20},                                         \
+  {"$s4",       RTYPE_GP | 21},                                         \
+  {"$s5",       RTYPE_GP | 22},                                         \
+  {"$s6",       RTYPE_GP | 23},                                         \
+  {"$s7",       RTYPE_GP | 24},                                         \
+  {"$s8",       RTYPE_GP | 25},                                         \
+  {"$fp",       RTYPE_GP | 25},                                         \
   {"$k0",       RTYPE_GP | 26},                                         \
   {"$kt0",      RTYPE_GP | 26},                                         \
   {"$k1",       RTYPE_GP | 27},                                         \
   {"$kt1",      RTYPE_GP | 27},                                         \
   {"$gp",       RTYPE_GP | 28},                                         \
   {"$sp",       RTYPE_GP | 29},                                         \
-  {"$s8",       RTYPE_GP | 30},                                         \
-  {"$fp",       RTYPE_GP | 30},                                         \
+  {"$at",       RTYPE_GP | 30},                                         \
+  {"$AT",       RTYPE_GP | 30},                                         \
   {"$ra",       RTYPE_GP | 31}
 
 #define MIPS16_SPECIAL_REGISTER_NAMES                                   \
@@ -1827,25 +1831,35 @@ static const struct regname reg_names_n32n64[] =
 /* Maven symbolic register names                                        */
 /*----------------------------------------------------------------------*/
 
+/* YUNSUP: new register mapping */
+/* $0, $v0, $v1, $a0
+   $a1, $a2, $a3, $t0
+   $t1, $t2, $t3, $t4
+   $t5, $t6, $t7, $t8
+   $t9, $s0, $s1, $s2
+   $s3, $s4, $s5, $s6
+   $s7, $fp, $k0, $k1
+   $gp, $sp, $at, $ra */
+
 static const struct regname reg_names_maven[] =
 {
   /* Maven uses EABI and has eight argument registers */
 
-  {"$a4",       RTYPE_GP | 8},
-  {"$a5",       RTYPE_GP | 9},
-  {"$a6",       RTYPE_GP | 10},
-  {"$a7",       RTYPE_GP | 11},
+  {"$a4",       RTYPE_GP | 7},
+  {"$a5",       RTYPE_GP | 8},
+  {"$a6",       RTYPE_GP | 9},
+  {"$a7",       RTYPE_GP | 10},
 
   /* We alias the temporary registers t0-t3 so o32 code works fine */
 
-  {"$t0",       RTYPE_GP | 8},  /* alias for $a4 */
-  {"$t1",       RTYPE_GP | 9},  /* alias for $a5 */
-  {"$t2",       RTYPE_GP | 10}, /* alias for $a6 */
-  {"$t3",       RTYPE_GP | 11}, /* alias for $a7 */
-  {"$t4",       RTYPE_GP | 12},
-  {"$t5",       RTYPE_GP | 13},
-  {"$t6",       RTYPE_GP | 14},
-  {"$t7",       RTYPE_GP | 15},
+  {"$t0",       RTYPE_GP | 7},  /* alias for $a4 */
+  {"$t1",       RTYPE_GP | 8},  /* alias for $a5 */
+  {"$t2",       RTYPE_GP | 9}, /* alias for $a6 */
+  {"$t3",       RTYPE_GP | 10}, /* alias for $a7 */
+  {"$t4",       RTYPE_GP | 11},
+  {"$t5",       RTYPE_GP | 12},
+  {"$t6",       RTYPE_GP | 13},
+  {"$t7",       RTYPE_GP | 14},
 
   /* coprocessor 0 names */
 
@@ -1859,48 +1873,48 @@ static const struct regname reg_names_maven[] =
   /* Vector registers - these are in allocation order */
 
   {"$vzero",    RTYPE_VREG | 0}, 
-  {"$vat",      RTYPE_VREG | 1},  
 
-  {"$va0",      RTYPE_VREG | 4},  
-  {"$va1",      RTYPE_VREG | 5},  
-  {"$va2",      RTYPE_VREG | 6},  
-  {"$va3",      RTYPE_VREG | 7},  
-  {"$va4",      RTYPE_VREG | 8},  
-  {"$va5",      RTYPE_VREG | 9},  
-  {"$va6",      RTYPE_VREG | 10}, 
-  {"$va7",      RTYPE_VREG | 11}, 
+  {"$vv0",      RTYPE_VREG | 1},  
+  {"$vv1",      RTYPE_VREG | 2},  
 
-  {"$vt0",      RTYPE_VREG | 8},  /* alias for $va4 */
-  {"$vt1",      RTYPE_VREG | 9},  /* alias for $va5 */
-  {"$vt2",      RTYPE_VREG | 10}, /* alias for $va6 */
-  {"$vt3",      RTYPE_VREG | 11}, /* alias for $va7 */
+  {"$va0",      RTYPE_VREG | 3},  
+  {"$va1",      RTYPE_VREG | 4},  
+  {"$va2",      RTYPE_VREG | 5},  
+  {"$va3",      RTYPE_VREG | 6},  
+  {"$va4",      RTYPE_VREG | 7},  
+  {"$va5",      RTYPE_VREG | 8},  
+  {"$va6",      RTYPE_VREG | 9}, 
+  {"$va7",      RTYPE_VREG | 10}, 
 
-  {"$vv0",      RTYPE_VREG | 2},  
-  {"$vv1",      RTYPE_VREG | 3},  
-  {"$vt4",      RTYPE_VREG | 12}, 
-  {"$vgp",      RTYPE_VREG | 28}, 
-  {"$vsp",      RTYPE_VREG | 29}, 
-  {"$vra",      RTYPE_VREG | 31}, 
+  {"$vt0",      RTYPE_VREG | 7},  /* alias for $va4 */
+  {"$vt1",      RTYPE_VREG | 8},  /* alias for $va5 */
+  {"$vt2",      RTYPE_VREG | 9}, /* alias for $va6 */
+  {"$vt3",      RTYPE_VREG | 10}, /* alias for $va7 */
+  {"$vt4",      RTYPE_VREG | 11}, 
+  {"$vt5",      RTYPE_VREG | 12}, 
+  {"$vt6",      RTYPE_VREG | 13}, 
+  {"$vt7",      RTYPE_VREG | 14}, 
+  {"$vt8",      RTYPE_VREG | 15}, 
+  {"$vt9",      RTYPE_VREG | 16}, 
 
-  {"$vt5",      RTYPE_VREG | 13}, 
-  {"$vt6",      RTYPE_VREG | 14}, 
-  {"$vt7",      RTYPE_VREG | 15}, 
-  {"$vt8",      RTYPE_VREG | 24}, 
-  {"$vt9",      RTYPE_VREG | 25}, 
+  {"$vs0",      RTYPE_VREG | 17}, 
+  {"$vs1",      RTYPE_VREG | 18}, 
+  {"$vs2",      RTYPE_VREG | 19}, 
+  {"$vs3",      RTYPE_VREG | 20}, 
+  {"$vs4",      RTYPE_VREG | 21}, 
+  {"$vs5",      RTYPE_VREG | 22}, 
+  {"$vs6",      RTYPE_VREG | 23}, 
+  {"$vs7",      RTYPE_VREG | 24}, 
 
-  {"$vs0",      RTYPE_VREG | 16}, 
-  {"$vs1",      RTYPE_VREG | 17}, 
-  {"$vs2",      RTYPE_VREG | 18}, 
-  {"$vs3",      RTYPE_VREG | 19}, 
-  {"$vs4",      RTYPE_VREG | 20}, 
-  {"$vs5",      RTYPE_VREG | 21}, 
-  {"$vs6",      RTYPE_VREG | 22}, 
-  {"$vs7",      RTYPE_VREG | 23}, 
+  {"$vs8",      RTYPE_VREG | 25}, 
+  {"$vfp",      RTYPE_VREG | 25}, 
 
-  {"$vs8",      RTYPE_VREG | 30}, 
-  {"$vfp",      RTYPE_VREG | 30}, 
   {"$vk0",      RTYPE_VREG | 26}, 
   {"$vk1",      RTYPE_VREG | 27}, 
+  {"$vgp",      RTYPE_VREG | 28}, 
+  {"$vsp",      RTYPE_VREG | 29}, 
+  {"$vat",      RTYPE_VREG | 30},  
+  {"$vra",      RTYPE_VREG | 31}, 
 
   /* flag registers */
 
