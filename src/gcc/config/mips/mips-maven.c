@@ -668,6 +668,8 @@ const struct attribute_spec mips_attribute_table[] =
   { "nomips16",    0, 0, true,  false, false, NULL },
   /* YUNSUP: added to support vpfunc attribute */
   { "vpfunc",      0, 0, true,  false, false, NULL },
+  /* YUNSUP: added to support extended registers */
+  { "vpfuncx",     0, 0, true,  false, false, NULL },
   { NULL,          0, 0, false, false, false, NULL }
 };
 
@@ -785,7 +787,7 @@ static const struct mips_cpu_info mips_cpu_info_table[] =
   /* MIPS64 Release 2 processors. */
   { "octeon", PROCESSOR_OCTEON, 65, PTF_AVOID_BRANCHLIKELY },
 
-  // cbatten - Add maven target
+  /* cbatten - Add maven target */
   { "maven",    PROCESSOR_MAVEN,    33, PTF_AVOID_BRANCHLIKELY },
   { "maven_vp", PROCESSOR_MAVEN_VP, 33, PTF_AVOID_BRANCHLIKELY }
 };
@@ -1350,6 +1352,17 @@ mips_vpfunc_decl_p( const_tree decl )
 }
 
 /*----------------------------------------------------------------------*/
+/* mips_vpfuncx_decl_p                                                  */
+/*----------------------------------------------------------------------*/
+/* YUNSUP: Similar predicates for "vpfuncx" function attributes. */
+
+static bool
+mips_vpfuncx_decl_p( const_tree decl )
+{
+  return lookup_attribute( "vpfuncx", DECL_ATTRIBUTES( decl ) ) != NULL;
+}
+
+/*----------------------------------------------------------------------*/
 /* mips_nomips16_decl_p                                                 */
 /*----------------------------------------------------------------------*/
 
@@ -1391,8 +1404,23 @@ mips_use_mips16_mode_p( tree decl )
 static bool
 mips_use_vpfunc_mode_p( tree decl )
 {
-  if ( decl ) 
+  if ( decl )
     return mips_vpfunc_decl_p( decl );
+
+  return false;
+}
+
+/*----------------------------------------------------------------------*/
+/* mips_use_vpfuncx_mode_p                                             */
+/*----------------------------------------------------------------------*/
+/* YUNSUP: Return true if function DECL is a VPREGEXT function. Return
+   false if DECL is null. */
+
+static bool
+mips_use_vpfuncx_mode_p( tree decl )
+{
+  if ( decl )
+    return mips_vpfuncx_decl_p( decl );
 
   return false;
 }
@@ -7933,7 +7961,7 @@ mips_print_operand( FILE *file, rtx op, int letter )
              offset parts and output just the offset. */
           else if ( letter == 'w' ) {
             mips_split_plus( XEXP(op,0), &base, &offset );
-            fprintf( file, "%lld", offset );
+            fprintf( file, "%ld", offset );
           }
 
           else if ( letter == 'D' )
@@ -10164,6 +10192,7 @@ mips_restore_reg( rtx reg, rtx mem )
 /* Emit any instructions needed before a return. */
 
 static bool mips_maven_in_vpfunc = false;
+static bool mips_maven_in_vpfuncx = false;
 
 void
 mips_expand_before_return( void )
@@ -14841,32 +14870,35 @@ mips_set_mips16_mode( int mips16_p )
 static void
 mips_set_vpfunc_mode( int vpfunc_p )
 {
-  int regno;
-
   if ( vpfunc_p ) {
-
     // Set global variable which indicates if we are in a vpfunc
     mips_maven_in_vpfunc = true;
-
-    // s0 - s7
-    for ( regno = 17; regno < 26; regno++ )
-      call_used_regs[regno] = call_really_used_regs[regno] = 1;
-
-    // ra
-    call_used_regs[31] = call_really_used_regs[31] = 1;
   }
   else {
-
     // Reset global variable which indicates if we are in a vpfunc
     mips_maven_in_vpfunc = false;
-
-    // s0 - s7
-    for ( regno = 17; regno < 26; regno++ )
-      call_used_regs[regno] = call_really_used_regs[regno] = 0;
-
-    // ra
-    call_used_regs[31] = call_really_used_regs[31] = 0;
   }
+
+  reinit_regs ();
+}
+
+/*----------------------------------------------------------------------*/
+/* mips_set_vpfuncx_mode                                               */
+/*----------------------------------------------------------------------*/
+/* YUNSUP: Set up the target-dependent global state for vpfuncx */
+/* YUNSUP: this function is affected by the register mapping */
+
+static void
+mips_set_vpfuncx_mode( int vpfuncx_p )
+{
+  if ( vpfuncx_p ) {
+    mips_maven_in_vpfuncx = true;
+  }
+  else {
+    mips_maven_in_vpfuncx = false;
+  }
+
+  reinit_regs ();
 }
 
 /*----------------------------------------------------------------------*/
@@ -14924,6 +14956,9 @@ mips_set_current_function( tree fndecl )
      the call_used_regs variable. But putting this second we can
      override the per-architecture settings like we want. */
   mips_set_vpfunc_mode( mips_use_vpfunc_mode_p( fndecl ) );
+
+  /* YUNSUP: added to support vpfuncx attribute. */
+  mips_set_vpfuncx_mode( mips_use_vpfuncx_mode_p ( fndecl ) );
 }
 
 /*----------------------------------------------------------------------*/
@@ -15618,6 +15653,38 @@ mips_conditional_register_usage( void )
     for ( regno = DSP_ACC_REG_FIRST; 
           regno <= DSP_ACC_REG_LAST; regno += 2 )
       mips_swap_registers( regno );
+  }
+
+  if ( mips_maven_in_vpfunc || mips_maven_in_vpfuncx ) {
+    unsigned int regno;
+
+    // callee-saved registers are caller-saved reigsters now
+    for ( regno = CALLEE_SAVED_REG_FIRST;
+          regno <= CALLEE_SAVED_REG_LAST; regno++ )
+      call_used_regs[regno] = call_really_used_regs[regno] = 1;
+
+    call_used_regs[31] = call_really_used_regs[31] = 1;
+
+    if ( mips_maven_in_vpfuncx ) {
+      // Make every register allocatable
+      for ( regno = FIXED_REG_FIRST;
+            regno <= FIXED_REG_LAST; regno++ )
+        fixed_regs[regno] = 0;
+    }
+  }
+  else {
+    unsigned int regno;
+
+    // back to default
+    for ( regno = CALLEE_SAVED_REG_FIRST;
+          regno <= CALLEE_SAVED_REG_LAST; regno++ )
+      call_used_regs[regno] = call_really_used_regs[regno] = 0;
+
+    call_used_regs[31] = call_really_used_regs[31] = 0;
+
+    for ( regno = FIXED_REG_FIRST;
+          regno <= FIXED_REG_LAST; regno++ )
+      fixed_regs[regno] = 1;
   }
 }
 

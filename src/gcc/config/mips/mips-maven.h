@@ -1606,7 +1606,7 @@ march=*: -mhard-float}"
     /* yunsup/cbatten - maven vector registers (see above) */           \
     1, 1, 1, 1,                                                         \
     1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                     \
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,                     \
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,                     \
     1, 0, 0, 0, 0, 0, 0, 0                                              \
   }
 
@@ -1647,7 +1647,7 @@ march=*: -mhard-float}"
     /* yunsup - maven vector registers */                               \
     1, 1, 1, 1,                                                         \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
-    1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1,                     \
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0,                     \
     1, 1, 1, 1, 1, 1, 1, 1                                              \
   }
 
@@ -1678,7 +1678,7 @@ march=*: -mhard-float}"
     /* yunsup - maven vector registers */                               \
     1, 1, 1, 1,                                                         \
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,                     \
-    1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,                     \
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 0,                     \
     1, 1, 1, 1, 1, 1, 1, 1                                              \
   }
 
@@ -1690,6 +1690,14 @@ march=*: -mhard-float}"
 #define GP_REG_LAST  31
 #define GP_REG_NUM   (GP_REG_LAST - GP_REG_FIRST + 1)
 #define GP_DBX_FIRST 0
+
+/* YUNSUP: define callee-saved registers */
+#define CALLEE_SAVED_REG_FIRST (GP_REG_FIRST + 17)
+#define CALLEE_SAVED_REG_LAST (CALLEE_SAVED_REG_FIRST + 9 - 1)
+
+/* YUNSUP: define fixed registers */
+#define FIXED_REG_FIRST (GP_REG_FIRST + 26)
+#define FIXED_REG_LAST (FIXED_REG_FIRST + 5 - 1)
 
 /* YUNSUP: floating point hack to map fprs to gprs. */
 /* #define FP_REG_FIRST 32 */
@@ -2072,16 +2080,19 @@ enum reg_class
     64, 65,176,177,178,179,180,181,                                     \
     /* Call-clobbered GPRs. */                                          \
     1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,          \
-    16, 30, 31,                                                         \
+    16,                                                                 \
     /* The global pointer. This is call-clobbered for o32 and o64       \
        abicalls, call-saved for n32 and n64 abicalls, and a program     \
        invariant otherwise. Putting it between the call-clobbered       \
-       and call-saved registers should cope with all eventualities. */  \
-    28,                                                                 \
+       and call-saved registers should cope with all eventualities.     \
+       YUNSUP: gp deleted and moved down */                             \
     /* Call-saved GPRs. */                                              \
     17, 18, 19, 20, 21, 22, 23, 24, 25,                                 \
     /* GPRs that can never be exposed to the register allocator. */     \
-    0,  26, 27, 29,                                                     \
+    0,                                                                  \
+    /* YUNSUP: move all the registers that aren't used down here.       \
+       k0, k1, gp, sp, at, ra */                                        \
+    26, 27, 28, 29, 30, 31,                                             \
     /* Call-clobbered FPRs. */                                          \
     32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47,     \
     48, 49, 50, 51,                                                     \
@@ -2897,18 +2908,18 @@ typedef struct mips_args
     { "t7",     14 + GP_REG_FIRST },                                    \
     { "t8",     15 + GP_REG_FIRST },                                    \
     { "t9",     16 + GP_REG_FIRST },                                    \
-    { "t10",    17 + GP_REG_FIRST },                                    \
-    { "t11",    18 + GP_REG_FIRST },                                    \
-    { "s0",     19 + GP_REG_FIRST },                                    \
-    { "s1",     20 + GP_REG_FIRST },                                    \
-    { "s2",     21 + GP_REG_FIRST },                                    \
-    { "s3",     22 + GP_REG_FIRST },                                    \
-    { "s4",     23 + GP_REG_FIRST },                                    \
-    { "s5",     24 + GP_REG_FIRST },                                    \
-    { "s6",     25 + GP_REG_FIRST },                                    \
-    { "s7",     26 + GP_REG_FIRST },                                    \
-    { "s8",     27 + GP_REG_FIRST },                                    \
-    { "fp",     27 + GP_REG_FIRST },                                    \
+    { "s0",     17 + GP_REG_FIRST },                                    \
+    { "s1",     18 + GP_REG_FIRST },                                    \
+    { "s2",     19 + GP_REG_FIRST },                                    \
+    { "s3",     20 + GP_REG_FIRST },                                    \
+    { "s4",     21 + GP_REG_FIRST },                                    \
+    { "s5",     22 + GP_REG_FIRST },                                    \
+    { "s6",     23 + GP_REG_FIRST },                                    \
+    { "s7",     24 + GP_REG_FIRST },                                    \
+    { "s8",     25 + GP_REG_FIRST },                                    \
+    { "fp",     25 + GP_REG_FIRST },                                    \
+    { "k0",     26 + GP_REG_FIRST },                                    \
+    { "k1",     27 + GP_REG_FIRST },                                    \
     { "gp",     28 + GP_REG_FIRST },                                    \
     { "sp",     29 + GP_REG_FIRST },                                    \
     { "at",     30 + GP_REG_FIRST },                                    \
