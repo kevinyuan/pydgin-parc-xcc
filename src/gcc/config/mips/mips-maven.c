@@ -10205,7 +10205,7 @@ mips_expand_before_return( void )
      emitted instructions will come _before_ the return RTL ... which
      eventually gets expanded into the jr instruction. */
 
-  if ( mips_maven_in_vpfunc )
+  if ( mips_maven_in_vpfunc || mips_maven_in_vpfuncx )
     emit_insn( gen_maven_stop() );
 
   /* When using a call-clobbered gp, we start out with unified call
