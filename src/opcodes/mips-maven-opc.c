@@ -559,6 +559,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"remu",           "d,s,t",     0x9c000008, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 
 {"vpidx",          "d",         0x9c000009, 0xffff07ff, WR_d,                         0,              INSN_MAVEN        },
+{"mulhi",          "d,s,t",     0x9c00000a, 0xfc0007ff, RD_s|RD_t|WR_HILO|WR_d,       0,              INSN_MAVEN        },
+{"clz",            "U,s",       0x9c00000b, 0xfc0007ff, WR_d|WR_t|RD_s,               0,              INSN_MAVEN        },
+{"bitrev",         "U,s",       0x9c00000c, 0xfc0007ff, WR_d|WR_t|RD_s,               0,              INSN_MAVEN        },
+//{"bitrev",         "d,t",       0x7c0006d2, 0xffe007ff, WR_d|RD_t,                    0,              D32               },
 
 /*----------------------------------------------------------------------------------------------------------------------*/
 
@@ -903,7 +907,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"cins",           "t,r,+P,+S", 0x70000033, 0xfc00003f, WR_t|RD_s,                    0,              IOCT              }, /* cins32 */
 {"cins",           "t,r,+p,+s", 0x70000032, 0xfc00003f, WR_t|RD_s,                    0,              IOCT              },
 {"clo",            "U,s",       0x70000021, 0xfc0007ff, WR_d|WR_t|RD_s,               0,              I32|N55           },
-{"clz",            "U,s",       0x70000020, 0xfc0007ff, WR_d|WR_t|RD_s,               0,              I32|N55           },
+// alex: added mulhi as a maven instruction
+//{"clz",            "U,s",       0x70000020, 0xfc0007ff, WR_d|WR_t|RD_s,               0,              I32|N55           },
 {"ctc0",           "t,G",       0x40c00000, 0xffe007ff, COD|RD_t|WR_CC,               0,              I1                },
 {"ctc1",           "t,G",       0x44c00000, 0xffe007ff, COD|RD_t|WR_CC|FP_S,          0,              I1                },
 {"ctc1",           "t,S",       0x44c00000, 0xffe007ff, COD|RD_t|WR_CC|FP_S,          0,              I1                },
@@ -1410,8 +1415,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"mula.ob",        "S,T[e]",    0x48000033, 0xfe2007ff, WR_CC|RD_S|RD_T,              0,              N54               },
 {"mula.ob",        "S,k",       0x4bc00033, 0xffe007ff, WR_CC|RD_S|RD_T,              0,              N54               },
 {"mula.qh",        "Y,Q",       0x78200033, 0xfc2007ff, RD_S|RD_T|FP_D,               WR_MACC,        MX                },
-
-{"mulhi",          "d,s,t",     0x00000258, 0xfc0007ff, RD_s|RD_t|WR_HILO|WR_d,       0,              N5                },
+// alex: added mulhi as a maven instruction
+//{"mulhi",          "d,s,t",     0x00000258, 0xfc0007ff, RD_s|RD_t|WR_HILO|WR_d,       0,              N5                },
 {"mulhiu",         "d,s,t",     0x00000259, 0xfc0007ff, RD_s|RD_t|WR_HILO|WR_d,       0,              N5                },
 {"mull.ob",        "Y,Q",       0x78000433, 0xfc2007ff, RD_S|RD_T|FP_D,               WR_MACC,        MX|SB1            },
 {"mull.ob",        "S,T",       0x4ac00433, 0xffe007ff, WR_CC|RD_S|RD_T,              0,              N54               },
@@ -1989,7 +1994,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"addu_s.ob",      "d,s,t",     0x7c000114, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              D64               },
 {"addu_s.qb",      "d,s,t",     0x7c000110, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              D32               },
 {"addwc",          "d,s,t",     0x7c000450, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              D32               },
-{"bitrev",         "d,t",       0x7c0006d2, 0xffe007ff, WR_d|RD_t,                    0,              D32               },
+// alex: maven has bitrev
+//{"bitrev",         "d,t",       0x7c0006d2, 0xffe007ff, WR_d|RD_t,                    0,              D32               },
 {"bposge32",       "p",         0x041c0000, 0xffff0000, CBD,                          0,              D32               },
 {"bposge64",       "p",         0x041d0000, 0xffff0000, CBD,                          0,              D64               },
 {"cmp.eq.ph",      "s,t",       0x7c000211, 0xfc00ffff, RD_s|RD_t,                    0,              D32               },
