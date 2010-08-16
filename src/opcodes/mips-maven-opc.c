@@ -366,6 +366,16 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"mul.vs",       "#d,#t,s",     0x48000087, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"mul.vs",       "#d,#t,s,#m",  0x48000087, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 
+// alex: add mulhi vector instructions, use the f cmd space
+{"mulhi.vv",     "#d,#s,#t",    0x480000fe, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"mulhi.vv",     "#d,#s,#t,#m", 0x480000fe, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"mulhi.vs",     "#d,#t,s",     0x480000ff, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"mulhi.vs",     "#d,#t,s,#m",  0x480000ff, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+
+// alex: add bitrev vector instruction, use the f cmd space
+{"bitrev.v",     "#d,#t",       0x480000fd, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+{"bitrev.v",     "#d,#t,#m",    0x480000fd, 0xffe000ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
+
 {"div.vv",       "#d,#s,#t",    0x48000088, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"div.vv",       "#d,#s,#t,#m", 0x48000088, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"div.vs",       "#d,#t,s",     0x48000089, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
