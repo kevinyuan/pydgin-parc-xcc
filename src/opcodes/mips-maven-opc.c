@@ -562,6 +562,17 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"popc.f",         "d,#a",      0x480000bb, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
 {"findfone.f",     "d,#a",      0x480000bc, 0xfc1f07ff, WR_d|RD_s,                    0,              INSN_MAVEN        },
 
+// Vector atomic memory instructions
+{"amo.add.vv",   "#d,#s,#t",    0x480000fb, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"amo.add.vv",   "#d,#s,#t,#m", 0x480000fb, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"amo.and.vv",   "#d,#s,#t",    0x480000fa, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"amo.and.vv",   "#d,#s,#t,#m", 0x480000fa, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"amo.or.vv",    "#d,#s,#t",    0x480000f9, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"amo.or.vv",    "#d,#s,#t,#m", 0x480000f9, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+
+{"utidx.v",      "#d",          0x480000f8, 0xffff07ff, WR_d,                         0,              INSN_MAVEN        },
+{"utidx.v",      "#d,#m",       0x480000f8, 0xffff00ff, WR_d,                         0,              INSN_MAVEN        },
+
 // note: does not do dependency checking
 {"div",            "d,s,t",     0x9c000005, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"divu",           "d,s,t",     0x9c000007, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
