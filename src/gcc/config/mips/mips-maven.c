@@ -669,7 +669,7 @@ const struct attribute_spec mips_attribute_table[] =
   /* YUNSUP: added to support vpfunc attribute */
   { "vpfunc",      0, 0, true,  false, false, NULL },
   /* YUNSUP: added to support extended registers */
-  //  { "vpfuncx",     0, 0, true,  false, false, NULL },
+  { "vpfuncx",     0, 0, true,  false, false, NULL },
   { NULL,          0, 0, false, false, false, NULL }
 };
 
@@ -1356,11 +1356,11 @@ mips_vpfunc_decl_p( const_tree decl )
 /*----------------------------------------------------------------------*/
 /* YUNSUP: Similar predicates for "vpfuncx" function attributes. */
 
-//static bool
-//mips_vpfuncx_decl_p( const_tree decl )
-//{
-//  return lookup_attribute( "vpfuncx", DECL_ATTRIBUTES( decl ) ) != NULL;
-//}
+static bool
+mips_vpfuncx_decl_p( const_tree decl )
+{
+  return lookup_attribute( "vpfuncx", DECL_ATTRIBUTES( decl ) ) != NULL;
+}
 
 /*----------------------------------------------------------------------*/
 /* mips_nomips16_decl_p                                                 */
@@ -1416,14 +1416,14 @@ mips_use_vpfunc_mode_p( tree decl )
 /* YUNSUP: Return true if function DECL is a VPREGEXT function. Return
    false if DECL is null. */
 
-//static bool
-//mips_use_vpfuncx_mode_p( tree decl )
-//{
-//  if ( decl )
-//    return mips_vpfuncx_decl_p( decl );
-// 
-//  return false;
-//}
+static bool
+mips_use_vpfuncx_mode_p( tree decl )
+{
+  if ( decl )
+    return mips_vpfuncx_decl_p( decl );
+
+  return false;
+}
 
 /*----------------------------------------------------------------------*/
 /* mips_comp_type_attributes                                            */
@@ -10205,7 +10205,7 @@ mips_expand_before_return( void )
      emitted instructions will come _before_ the return RTL ... which
      eventually gets expanded into the jr instruction. */
 
-  if ( mips_maven_in_vpfunc ) // || mips_maven_in_vpfuncx )
+  if ( mips_maven_in_vpfunc || mips_maven_in_vpfuncx )
     emit_insn( gen_maven_stop() );
 
   /* When using a call-clobbered gp, we start out with unified call
@@ -14958,7 +14958,7 @@ mips_set_current_function( tree fndecl )
   mips_set_vpfunc_mode( mips_use_vpfunc_mode_p( fndecl ) );
 
   /* YUNSUP: added to support vpfuncx attribute. */
-  //mips_set_vpfuncx_mode( mips_use_vpfuncx_mode_p ( fndecl ) );
+  mips_set_vpfuncx_mode( mips_use_vpfuncx_mode_p ( fndecl ) );
 }
 
 /*----------------------------------------------------------------------*/
@@ -15655,37 +15655,37 @@ mips_conditional_register_usage( void )
       mips_swap_registers( regno );
   }
 
-  // if ( mips_maven_in_vpfunc || mips_maven_in_vpfuncx ) {
-  //   unsigned int regno;
-  //  
-  //   // callee-saved registers are caller-saved reigsters now
-  //   for ( regno = CALLEE_SAVED_REG_FIRST;
-  //         regno <= CALLEE_SAVED_REG_LAST; regno++ )
-  //     call_used_regs[regno] = call_really_used_regs[regno] = 1;
-  //  
-  //   call_used_regs[31] = call_really_used_regs[31] = 1;
-  //  
-  //   if ( mips_maven_in_vpfuncx ) {
-  //     // Make every register allocatable
-  //     for ( regno = FIXED_REG_FIRST;
-  //           regno <= FIXED_REG_LAST; regno++ )
-  //       fixed_regs[regno] = 0;
-  //   }
-  // }
-  // else {
-  //   unsigned int regno;
-  //  
-  //   // back to default
-  //   for ( regno = CALLEE_SAVED_REG_FIRST;
-  //         regno <= CALLEE_SAVED_REG_LAST; regno++ )
-  //     call_used_regs[regno] = call_really_used_regs[regno] = 0;
-  //  
-  //   call_used_regs[31] = call_really_used_regs[31] = 0;
-  //  
-  //   for ( regno = FIXED_REG_FIRST;
-  //         regno <= FIXED_REG_LAST; regno++ )
-  //     fixed_regs[regno] = 1;
-  // }
+  if ( mips_maven_in_vpfunc || mips_maven_in_vpfuncx ) {
+    unsigned int regno;
+
+    // callee-saved registers are caller-saved reigsters now
+    for ( regno = CALLEE_SAVED_REG_FIRST;
+          regno <= CALLEE_SAVED_REG_LAST; regno++ )
+      call_used_regs[regno] = call_really_used_regs[regno] = 1;
+
+    call_used_regs[31] = call_really_used_regs[31] = 1;
+
+    if ( mips_maven_in_vpfuncx ) {
+      // Make every register allocatable
+      for ( regno = FIXED_REG_FIRST;
+            regno <= FIXED_REG_LAST; regno++ )
+        fixed_regs[regno] = 0;
+    }
+  }
+  else {
+    unsigned int regno;
+
+    // back to default
+    for ( regno = CALLEE_SAVED_REG_FIRST;
+          regno <= CALLEE_SAVED_REG_LAST; regno++ )
+      call_used_regs[regno] = call_really_used_regs[regno] = 0;
+
+    call_used_regs[31] = call_really_used_regs[31] = 0;
+
+    for ( regno = FIXED_REG_FIRST;
+          regno <= FIXED_REG_LAST; regno++ )
+      fixed_regs[regno] = 1;
+  }
 }
 
 /*----------------------------------------------------------------------*/
