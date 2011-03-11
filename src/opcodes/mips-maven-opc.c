@@ -500,6 +500,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 //does not capture the registers read and write dependencies
 {"seq.f.vv",       "#f,#s,#t",  0x480000b7, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"slt.f.vv",       "#f,#s,#t",  0x480000b8, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
+{"sltu.f.vv",      "#f,#s,#t",  0x480000f6, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 
 {"c.f.s.f.vv",     "#f,#s,#t",  0x480000c0, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"c.un.s.f.vv",    "#f,#s,#t",  0x480000c1, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },

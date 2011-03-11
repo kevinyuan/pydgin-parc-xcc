@@ -52,6 +52,7 @@ comp_test:
         # test compilation of flag instructions
         seq.f.vv   $flag1, $vt0, $vt0
         slt.f.vv   $flag1, $vt0, $vt0
+        sltu.f.vv  $flag1, $vt0, $vt0
         not.f      $flag3, $flag1
         mov.f      $flag4, $flag3
         or.f       $flag4, $flag3, $flag1
