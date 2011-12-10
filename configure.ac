@@ -106,7 +106,7 @@ AC_SUBST([cross_objdump_flags])
 
 case ${target} in
 
-  mipsmaven*-*-*) 
+  mipsmaven*-*-*)
 
     cross_libgloss_cppflags=" \
       -I ${abs_src_dir}/src/libgloss/maven"
@@ -118,7 +118,7 @@ case ${target} in
 
   ;;
 
-  mips*-*-*) 
+  mips*-*-*)
 
     cross_libgloss_cppflags=" \
       -I ${abs_src_dir}/src/libgloss/mips"
@@ -166,7 +166,7 @@ AC_SUBST([cross_gxx_flags])
 
 case ${target} in
 
-  mipsmaven*-*-*) 
+  mipsmaven*-*-*)
     cross_run_internal="no"
     cross_run_target_board="longcheck-setup"
     AC_CHECK_TARGET_TOOL([cross_run],[isa-run],[no])
@@ -176,7 +176,7 @@ case ${target} in
     ])
   ;;
 
-  mips*-*-*) 
+  mips*-*-*)
     cross_run_internal="yes"
     cross_run="./${target_alias}-run"
     cross_run_bin="${abs_build_dir}/src/sim/mips/run"
@@ -208,7 +208,7 @@ AX_DEFAULT_CONFIGURE_ARG([--enable-languages=c,c++])
 # We want our cross-compiler to use newlib instead of glibc. Newlib is a
 # simpler and easier to port implementation of libc. One reason newlib
 # is easier to port is because it has a relatively narrow syscall
-# interface - which we will be implementing with a proxy kernel for now. 
+# interface - which we will be implementing with a proxy kernel for now.
 
 AX_DEFAULT_CONFIGURE_ARG([--with-newlib])
 
@@ -221,7 +221,7 @@ AX_DEFAULT_CONFIGURE_ARG([--with-newlib])
 AX_DEFAULT_CONFIGURE_ARG([--disable-multilib])
 
 # There is no need to enable the statck smashing protection runtime
-# library since it is just one more thing to build. 
+# library since it is just one more thing to build.
 
 AX_DEFAULT_CONFIGURE_ARG([--disable-libssp])
 
@@ -238,6 +238,11 @@ AX_DEFAULT_CONFIGURE_ARG([--disable-libgomp])
 
 AX_DEFAULT_CONFIGURE_ARG([--disable-nls])
 
+# We needed to add this more recently to avoid a compile time erorr on a
+# warning when compiling binutils.
+
+AX_DEFAULT_CONFIGURE_ARG([--disable-werror])
+
 #-------------------------------------------------------------------------
 # Call combined tree configure
 #-------------------------------------------------------------------------
@@ -250,3 +255,4 @@ AC_CONFIG_SUBDIRS([src])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
+
