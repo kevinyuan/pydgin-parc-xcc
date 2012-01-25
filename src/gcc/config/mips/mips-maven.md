@@ -6679,21 +6679,21 @@
   [(set_attr "type"     "nop")])
 
 ;; MIPS4 Conditional move instructions.
-
-(define_insn "*mov<GPR:mode>_on_<MOVECC:mode>"
-  [(set (match_operand:GPR 0 "register_operand" "=d,d")
-        (if_then_else:GPR
-         (match_operator:MOVECC 4 "equality_operator"
-                [(match_operand:MOVECC 1 "register_operand" "<MOVECC:reg>,<MOVECC:reg>")
-                 (const_int 0)])
-         (match_operand:GPR 2 "reg_or_0_operand" "dJ,0")
-         (match_operand:GPR 3 "reg_or_0_operand" "0,dJ")))]
-  "ISA_HAS_CONDMOVE"
-  "@
-    mov%T4\t%0,%z2,%1
-    mov%t4\t%0,%z3,%1"
-  [(set_attr "type" "condmove")
-   (set_attr "mode" "<GPR:MODE>")])
+;; ji : temporarily turning off conditional moves for courses (ece4750/5950)
+;;(define_insn "*mov<GPR:mode>_on_<MOVECC:mode>"
+;;  [(set (match_operand:GPR 0 "register_operand" "=d,d")
+;;        (if_then_else:GPR
+;;         (match_operator:MOVECC 4 "equality_operator"
+;;                [(match_operand:MOVECC 1 "register_operand" "<MOVECC:reg>,<MOVECC:reg>")
+;;                 (const_int 0)])
+;;         (match_operand:GPR 2 "reg_or_0_operand" "dJ,0")
+;;         (match_operand:GPR 3 "reg_or_0_operand" "0,dJ")))]
+;;  "ISA_HAS_CONDMOVE"
+;;  "@
+;;    mov%T4\t%0,%z2,%1
+;;    mov%t4\t%0,%z3,%1"
+;;  [(set_attr "type" "condmove")
+;;   (set_attr "mode" "<GPR:MODE>")])
 
 ;;define_insn "*mov<SCALARF:mode>_on_<MOVECC:mode>"
 ;; [(set (match_operand:SCALARF 0 "register_operand" "=f,f")

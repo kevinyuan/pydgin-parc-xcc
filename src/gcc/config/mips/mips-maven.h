@@ -834,8 +834,14 @@ march=*: -mhard-float}"
 /* ISA has the integer conditional move instructions introduced in mips4
    and ST Loongson 2E/2F. */
 /* cbatten - turn on GPR conditional move for maven */
+/* ji - temporarily turning off conditional move for courses (ece4750/5950) */
+/*
 #define ISA_HAS_CONDMOVE \
   (ISA_HAS_FP_CONDMOVE || TARGET_LOONGSON_2EF || TARGET_MAVEN)
+*/
+
+#define ISA_HAS_CONDMOVE \
+  (ISA_HAS_FP_CONDMOVE || TARGET_LOONGSON_2EF)
 
 /* ISA has LDC1 and SDC1. */
 #define ISA_HAS_LDC1_SDC1 (!ISA_MIPS1 && !TARGET_MIPS16)
