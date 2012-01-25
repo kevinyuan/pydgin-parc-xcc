@@ -361,21 +361,22 @@ all: all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .c .dvi .html .info .lo .o .obj .pdf .ps .texi
-am--refresh:
-	@:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
-	@for dep in $?; do \
-	  case '$(am__configure_deps)' in \
-	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu '; \
-	      cd $(srcdir) && $(AUTOMAKE) --gnu  \
-		&& exit 0; \
-	      exit 1;; \
-	  esac; \
-	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  Makefile'; \
-	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  Makefile
+# ji : removing for now to avoid error on brg servers
+#am--refresh:
+# 	@:
+#$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
+# 	@for dep in $?; do \
+# 	  case '$(am__configure_deps)' in \
+# 	    *$$dep*) \
+# 	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu '; \
+# 	      cd $(srcdir) && $(AUTOMAKE) --gnu  \
+# 		&& exit 0; \
+# 	      exit 1;; \
+# 	  esac; \
+# 	done; \
+# 	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  Makefile'; \
+# 	cd $(top_srcdir) && \
+# 	  $(AUTOMAKE) --gnu  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -390,10 +391,11 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	$(SHELL) ./config.status --recheck
 
-$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
-	cd $(srcdir) && $(AUTOCONF)
-$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
-	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+# ji : removing for now to avoid error on brg servers
+#$(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
+# 	cd $(srcdir) && $(AUTOCONF)
+#$(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
+# 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 mparam.h: $(top_builddir)/config.status $(srcdir)/mparam_h.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-libLTLIBRARIES: $(lib_LTLIBRARIES)

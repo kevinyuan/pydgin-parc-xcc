@@ -823,10 +823,18 @@ march=*: -mhard-float}"
 
 /* ISA has the floating-point conditional move instructions introduced
    in mips4. */
+/* ji - temporarily turning off conditional move for courses (ece4750/5950) */
+/*
 #define ISA_HAS_FP_CONDMOVE \
   (   (    ISA_MIPS4 || ISA_MIPS32 || ISA_MIPS32R2 \
         || ISA_MIPS64 || ISA_MIPS64R2 ) \
     && !TARGET_MIPS5500 && !TARGET_MIPS16 && TARGET_MAVEN )
+*/
+#define ISA_HAS_FP_CONDMOVE \
+  (   (    ISA_MIPS4 || ISA_MIPS32 || ISA_MIPS32R2 \
+        || ISA_MIPS64 || ISA_MIPS64R2 ) \
+    && !TARGET_MIPS5500 && !TARGET_MIPS16 && !TARGET_MAVEN )
+
 /* YUNSUP: Maven doesn't have floating point conditional move. */
 /* cbatten: well it kind of does but it uses standard GPRs. */
 /*    && !TARGET_MIPS5500 && !TARGET_MIPS16 ) */
