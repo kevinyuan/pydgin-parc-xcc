@@ -267,6 +267,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 /* Maven Vector-Thread Instructions - Vector Fetch Instructions */
 
+{"xloop",          "s,p",       0xd0000000, 0xfc1f0000, UBD|RD_s,                     0,              INSN_MAVEN        },
 {"vf",             "p",         0xd0000000, 0xffff0000, UBD,                          0,              INSN_MAVEN        },
 
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
