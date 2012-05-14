@@ -432,14 +432,14 @@ static const char* const mips_freg_names_maven[8] =
 
 static const char* const mips_cp0_names_maven[32] =
 {
-  "$0",         "$1",         "$2",         "$3",
-  "$4",         "$5",         "$6",         "$7",
-  "$8",         "c0_count",   "$10",        "$11",
-  "$12",        "$13",        "$14",        "$15",
-  "$16",        "c0_coreid",  "$18",        "$19",
-  "$20",        "c0_staten",   "$22",        "$23",
-  "$24",        "c0_counthi", "$26",        "$27",
-  "$28",        "$29",        "$30",        "$31"
+  "$0",           "c0_toserv",    "c0_fromserv",  "c0_tosysc0",
+  "c0_tosysc1",   "c0_tosysc2",   "c0_tosysc3",   "c0_tosysc4",
+  "c0_tosysc5",   "c0_count",     "c0_fromsysc0", "c0_fromsysc1",
+  "c0_fromsysc2", "c0_fromsysc3", "c0_fromsysc4", "c0_fromsysc5",
+  "c0_numcores",  "c0_coreid",    "c0_tidmask",   "c0_tidstop",
+  "$20",          "c0_staten",    "$22",          "$23",
+  "$24",          "c0_counthi",   "$26",          "$27",
+  "$28",          "$29",          "$30",          "$31"
 };
 
 struct mips_abi_choice 

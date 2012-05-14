@@ -1863,12 +1863,28 @@ static const struct regname reg_names_maven[] =
 
   /* coprocessor 0 names */
 
-  {"$c0_count",   RTYPE_CP0 | 9 },
-  {"$c0_countlo", RTYPE_CP0 | 9 },
-  {"$c0_tidmask", RTYPE_CP0 | 18},
-  {"$c0_coreid",  RTYPE_CP0 | 17},
-  {"$c0_staten",  RTYPE_CP0 | 21},
-  {"$c0_counthi", RTYPE_CP0 | 25},
+  {"$c0_toserv",     RTYPE_CP0 | 1 },
+  {"$c0_fromserv",   RTYPE_CP0 | 2 },
+  {"$c0_tosysc0",    RTYPE_CP0 | 3 },
+  {"$c0_tosysc1",    RTYPE_CP0 | 4 },
+  {"$c0_tosysc2",    RTYPE_CP0 | 5 },
+  {"$c0_tosysc3",    RTYPE_CP0 | 6 },
+  {"$c0_tosysc4",    RTYPE_CP0 | 7 },
+  {"$c0_tosysc5",    RTYPE_CP0 | 8 },
+  {"$c0_count",      RTYPE_CP0 | 9 },
+  {"$c0_countlo",    RTYPE_CP0 | 9 },
+  {"$c0_fromsysc0",  RTYPE_CP0 | 10},
+  {"$c0_fromsysc1",  RTYPE_CP0 | 11},
+  {"$c0_fromsysc2",  RTYPE_CP0 | 12},
+  {"$c0_fromsysc3",  RTYPE_CP0 | 13},
+  {"$c0_fromsysc4",  RTYPE_CP0 | 14},
+  {"$c0_fromsysc5",  RTYPE_CP0 | 15},
+  {"$c0_numcores",   RTYPE_CP0 | 16},
+  {"$c0_coreid",     RTYPE_CP0 | 17},
+  {"$c0_tidmask",    RTYPE_CP0 | 18},
+  {"$c0_tidstop",    RTYPE_CP0 | 19},
+  {"$c0_staten",     RTYPE_CP0 | 21},
+  {"$c0_counthi",    RTYPE_CP0 | 25},
 
   /* Vector registers - these are in allocation order */
 
