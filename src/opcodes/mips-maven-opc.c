@@ -341,8 +341,11 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"sbsegst.v",      "#d,t,#n,s", 0x6c0000e0, 0xfc0007e0, SM|RD_v|RD_t|RD_s,            0,              INSN_MAVEN        },
 
 //does not capture the vector register write dependency
+{"mtut",           "s,#d,t",    0x48000007, 0xfc0007ff, RD_s|WR_d|RD_t,               0,              INSN_MAVEN        },
 {"mtvp",           "s,#d,t",    0x48000007, 0xfc0007ff, RD_s|WR_d|RD_t,               0,              INSN_MAVEN        },
+{"mfut",           "s,#d,t",    0x48000009, 0xfc0007ff, RD_s|RD_v|WR_t,               0,              INSN_MAVEN        },
 {"mfvp",           "s,#d,t",    0x48000009, 0xfc0007ff, RD_s|RD_v|WR_t,               0,              INSN_MAVEN        },
+{"mtuts",          "#d,t",      0x48000008, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
 {"mtvps",          "#d,t",      0x48000008, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
 
 //does not capture the vector registers read and write dependencies
