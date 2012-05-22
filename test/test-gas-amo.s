@@ -64,7 +64,32 @@ test:
         addu    $v0, 1
         li      $t3, 2
         bne     $t2, $t3, fail
+ 
+        # test amo.xchg
         
+        li       $t1, 3
+        amo.xchg $t1, $t0, $t1
+        addu     $v0, 1
+        li       $t2, 2
+        bne      $t1, $t2, fail
+        
+        lw       $t3, 0($t0)
+        addu     $v0, 1
+        li       $t4, 3
+        bne      $t3, $t4, fail
+ 
+        # test amo.min
+        
+        li       $t1, 0
+        amo.min  $t1, $t0, $t1
+        addu     $v0, 1
+        li       $t2, 3
+        bne      $t1, $t2, fail
+        
+        lw       $t3, 0($t0)
+        addu     $v0, 1
+        bnez     $t3, fail
+      
 pass:
         li        $v0, 0x0
 fail:   jr        $ra

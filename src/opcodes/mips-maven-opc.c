@@ -251,6 +251,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"amo.add",        "d,v,t",     0x9c000002, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 {"amo.and",        "d,v,t",     0x9c000003, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 {"amo.or",         "d,v,t",     0x9c000004, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+{"amo.xchg",       "d,v,t",     0x9c00000d, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+{"amo.min",        "d,v,t",     0x9c00000e, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 /* Maven Vector-Thread Instructions - VTU Configuration Instructions */
 
