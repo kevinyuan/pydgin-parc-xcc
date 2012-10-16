@@ -100,8 +100,8 @@ setjmp:
 
         # Always return zero
         
-        move    $v0, $0
-        j       $ra
+        move    $2, $0
+        j       $31
 
         .end    setjmp
 
@@ -156,9 +156,9 @@ longjmp:
 
         # Check ret_val and if zero, return 1, otherwise return ret_val
 
-        bne     $a1, $0, 1f
-        li      $a1, 1
-1:      move    $v0, $a1
-        j       $ra
+        bne     $5, $0, 1f
+        li      $5, 1
+1:      move    $2, $5
+        j       $31
 
         .end    longjmp
