@@ -31,8 +31,6 @@
  *  - FP_REGS, ST_REGS
  *  - FP_REG_P, ST_REG_P
  *  - FP_REG_RTX_P, ST_REG_RTX_P */
-/* for the new register mapping, I didn't care about the mips16 port.
- * it's already to messy */
 
 #include "config.h"
 #include "system.h"
@@ -564,41 +562,14 @@ static const char* mips_hi_relocs[NUM_SYMBOL_TYPES];
 /* Index R is the smallest register class that contains register R. */
 const enum reg_class mips_regno_to_class[FIRST_PSEUDO_REGISTER] =
 {
-/* YUNSUP: old register mapping */
-/* $0,  $at, $v0, $v1
-   $a0, $a1, $a2, $a3
-   $t0, $t1, $t2, $t3
-   $t4, $t5, $t6, $t7
-   $s0, $s1, $s2, $s3
-   $s4, $s5, $s6, $s7
-   $t8, $t9, $k0, $k1
-   $gp, $sp, $fp, $ra */
-/* LEA_REGS,     LEA_REGS,       M16_REGS,       V1_REG,
-   M16_REGS,     M16_REGS,       M16_REGS,       M16_REGS,
-   LEA_REGS,     LEA_REGS,       LEA_REGS,       LEA_REGS,
-   LEA_REGS,     LEA_REGS,       LEA_REGS,       LEA_REGS,
-   M16_REGS,     M16_REGS,       LEA_REGS,       LEA_REGS,
-   LEA_REGS,     LEA_REGS,       LEA_REGS,       LEA_REGS,
-   T_REG,        PIC_FN_ADDR_REG, LEA_REGS,      LEA_REGS,
-   LEA_REGS,     LEA_REGS,       LEA_REGS,       LEA_REGS, */
-
-/* YUNSUP: new register mapping */
-/* $0, $v0, $v1, $a0
-   $a1, $a2, $a3, $t0
-   $t1, $t2, $t3, $t4
-   $t5, $t6, $t7, $t8
-   $t9, $s0, $s1, $s2
-   $s3, $s4, $s5, $s6
-   $s7, $fp, $k0, $k1
-   $gp, $sp, $at, $ra */
-  /*0*/LEA_REGS,         /*v0*/M16_REGS,  /*v1*/V1_REG,    /*a0*/M16_REGS,
-  /*a1*/M16_REGS,        /*a2*/M16_REGS,  /*a3*/M16_REGS,  /*t0*/LEA_REGS,
-  /*t1*/LEA_REGS,        /*t2*/LEA_REGS,  /*t3*/LEA_REGS,  /*t4*/LEA_REGS,
-  /*t5*/LEA_REGS,        /*t6*/LEA_REGS,  /*t7*/LEA_REGS,  /*t8*/T_REG,
-  /*t9*/PIC_FN_ADDR_REG, /*s0*/M16_REGS,  /*s1*/M16_REGS,  /*s2*/LEA_REGS,
-  /*s3*/LEA_REGS,        /*s4*/LEA_REGS,  /*s5*/LEA_REGS,  /*s6*/LEA_REGS,
-  /*s7*/LEA_REGS,        /*fp*/LEA_REGS,  /*k0*/LEA_REGS,  /*k1*/LEA_REGS,
-  /*gp*/LEA_REGS,        /*sp*/LEA_REGS,  /*at*/LEA_REGS,  /*ra*/LEA_REGS,
+  LEA_REGS,     LEA_REGS,       M16_REGS,       V1_REG,
+  M16_REGS,     M16_REGS,       M16_REGS,       M16_REGS,
+  LEA_REGS,     LEA_REGS,       LEA_REGS,       LEA_REGS,
+  LEA_REGS,     LEA_REGS,       LEA_REGS,       LEA_REGS,
+  M16_REGS,     M16_REGS,       LEA_REGS,       LEA_REGS,
+  LEA_REGS,     LEA_REGS,       LEA_REGS,       LEA_REGS,
+  T_REG,        PIC_FN_ADDR_REG, LEA_REGS,      LEA_REGS,
+  LEA_REGS,     LEA_REGS,       LEA_REGS,       LEA_REGS,
   FP_REGS,      FP_REGS,        FP_REGS,        FP_REGS,
   FP_REGS,      FP_REGS,        FP_REGS,        FP_REGS,
   FP_REGS,      FP_REGS,        FP_REGS,        FP_REGS,
@@ -7652,15 +7623,11 @@ mips_print_operand_punctuation( FILE* file, int ch )
       break;
 
     case '.':
-      //YUNSUP fixed
-      //fputs( reg_names[GP_REG_FIRST + 0], file );
       fputs( reg_names[GP_REG_FIRST + 0], file );
       break;
 
     case '@':
-      //YUNSUP fixed
-      //fputs( reg_names[GP_REG_FIRST + 1], file );
-      fputs( reg_names[GP_REG_FIRST + 30], file );
+      fputs( reg_names[GP_REG_FIRST + 1], file );
       break;
 
     case '^':
@@ -14637,11 +14604,8 @@ mips_output_mi_thunk( FILE *file, tree thunk_fndecl ATTRIBUTE_UNUSED,
   }
 
   /* We need two temporary registers in some cases. */
-  /* YUNSUP: new register mapping */
-  /* temp1 = gen_rtx_REG( Pmode, 2 ); */
-  /* temp2 = gen_rtx_REG( Pmode, 3 ); */
-  temp1 = gen_rtx_REG( Pmode, 1 );
-  temp2 = gen_rtx_REG( Pmode, 2 );
+  temp1 = gen_rtx_REG( Pmode, 2 );
+  temp2 = gen_rtx_REG( Pmode, 3 );
 
   /* Find out which register contains the "this" pointer. */
   if ( aggregate_value_p( TREE_TYPE( TREE_TYPE( function ) ), function ) )
@@ -14836,7 +14800,6 @@ mips_set_mips16_mode( int mips16_p )
 /* mips_set_vpfunc_mode                                                 */
 /*----------------------------------------------------------------------*/
 /* YUNSUP: Set up the target-dependent global state for vpfunc */
-/* YUNSUP: this function is affected by the register mapping */
 
 static void
 mips_set_vpfunc_mode( int vpfunc_p )
@@ -14849,8 +14812,11 @@ mips_set_vpfunc_mode( int vpfunc_p )
     mips_maven_in_vpfunc = true;
 
     // s0 - s7
-    for ( regno = 17; regno < 26; regno++ )
+    for ( regno = 16; regno < 24; regno++ )
       call_used_regs[regno] = call_really_used_regs[regno] = 1;
+
+    // s8 or fp
+    call_used_regs[30] = call_really_used_regs[30] = 1;
 
     // ra
     call_used_regs[31] = call_really_used_regs[31] = 1;
@@ -14861,8 +14827,11 @@ mips_set_vpfunc_mode( int vpfunc_p )
     mips_maven_in_vpfunc = false;
 
     // s0 - s7
-    for ( regno = 17; regno < 26; regno++ )
+    for ( regno = 16; regno < 24; regno++ )
       call_used_regs[regno] = call_really_used_regs[regno] = 0;
+
+    // s8 or fp
+    call_used_regs[30] = call_really_used_regs[30] = 0;
 
     // ra
     call_used_regs[31] = call_really_used_regs[31] = 0;

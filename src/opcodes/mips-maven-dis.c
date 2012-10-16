@@ -389,36 +389,33 @@ static const char* const mips_hwr_names_mips3264r2[32] =
 };
 
 /* Maven symbolic general-purpose register names */
-/* YUNSUP: new register mapping */
 
 static const char* const mips_gpr_names_maven[32] =
 {
-  "zero", "v0",   "v1",   "a0",   "a1",   "a2",   "a3",   "a4",
-  "a5",   "a6",   "a7",   "t4",   "t5",   "t6",   "t7",   "t8",
-  "t9",   "s0",   "s1",   "s2",   "s3",   "s4",   "s5",   "s6",
-  "s7",   "s8",   "k0",   "k1",   "gp",   "sp",   "at",   "ra"
+  "zero", "at",   "v0",   "v1",   "a0",   "a1",   "a2",   "a3",
+  "a4",   "a5",   "a6",   "a7",   "t4",   "t5",   "t6",   "t7",
+  "s0",   "s1",   "s2",   "s3",   "s4",   "s5",   "s6",   "s7",
+  "t8",   "t9",   "k0",   "k1",   "gp",   "sp",   "s8",   "ra"
 };
 
 /* Maven symbolic floating-point register names */
-/* YUNSUP: new register mapping */
 
 static const char* const mips_fpr_names_maven[32] =
 {
-  "zero", "v0",   "v1",   "a0",   "a1",   "a2",   "a3",   "a4",
-  "a5",   "a6",   "a7",   "t4",   "t5",   "t6",   "t7",   "t8",
-  "t9",   "s0",   "s1",   "s2",   "s3",   "s4",   "s5",   "s6",
-  "s7",   "s8",   "k0",   "k1",   "gp",   "sp",   "at",   "ra"
+  "zero", "at",   "v0",   "v1",   "a0",   "a1",   "a2",   "a3",
+  "a4",   "a5",   "a6",   "a7",   "t4",   "t5",   "t6",   "t7",
+  "s0",   "s1",   "s2",   "s3",   "s4",   "s5",   "s6",   "s7",
+  "t8",   "t9",   "k0",   "k1",   "gp",   "sp",   "s8",   "ra"
 };
 
 /* Maven symbolic vector register names */
-/* YUNSUP: new register mapping */
 
 static const char* const mips_vreg_names_maven[32] =
 {
-  "vzero", "vv0",  "vv1",  "va0",  "va1",  "va2",  "va3",  "va4",
-  "va5",   "va6",  "va7",  "vt4",  "vt5",  "vt6",  "vt7",  "vt8",
-  "vt9",   "vs0",  "vs1",  "vs2",  "vs3",  "vs4",  "vs5",  "vs6",
-  "vs7",   "vs8",  "vk0",  "vk1",  "vgp",  "vsp",  "vat",  "vra"
+  "vzero", "vat",  "vv0",  "vv1",  "va0",  "va1",  "va2",  "va3",
+  "va4",   "va5",  "va6",  "va7",  "vt4",  "vt5",  "vt6",  "vt7",
+  "vs0",   "vs1",  "vs2",  "vs3",  "vs4",  "vs5",  "vs6",  "vs7",
+  "vt8",   "vt9",  "vk0",  "vk1",  "vgp",  "vsp",  "vs8",  "vra"
 };
 
 /* Maven symbolic flag register names */
