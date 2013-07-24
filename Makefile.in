@@ -291,7 +291,7 @@ install :
 ifeq ($(enable_stow),yes)
 	rm -rf $(addprefix $(DESTDIR)/, $(prestow_cleanup))
 	cd $(stow_pkg_dir) && \
-    $(STOW) --delete $(project_name)-* && \
+    ls -d $(project_name)-* | xargs -n 1 $(STOW) --delete && \
     $(STOW) $(project_name)-$(project_ver)
 endif
 
