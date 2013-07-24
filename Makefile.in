@@ -92,7 +92,7 @@ STOW          := @stow@
 
 # gas
 
-CROSS_GAS       = ./$(target_alias)-gas 
+CROSS_GAS       = ./$(target_alias)-gas
 CROSS_GAS_BIN   = @cross_gas_bin@
 CROSS_GAS_FLAGS = @cross_gas_flags@
 
@@ -150,7 +150,7 @@ $(CROSS_GXX) : $(CROSS_GXX_BIN)
 test_wrappers += $(CROSS_GXX)
 test_wrappers_junk += $(CROSS_GXX)
 
-# run 
+# run
 
 # The simulator is a little special since sometimes we want to use the
 # included gdb simulator, and sometimes we want to use an externally
@@ -198,7 +198,7 @@ junk += $(test_wrappers_junk)
 # extensive and thus pretty slow to run. We include some simple tests
 # for a quick check and also as a way to explicitly test and
 # modifications we make to gcc (which is what we are most interested in
-# anyways). 
+# anyways).
 
 # Test modules
 
@@ -223,7 +223,7 @@ check : $(test_objs) $(test_exes) $(test_run_outs)
 vcheck : $(test_objs) $(test_exes) $(test_run_outs)
 	$(scripts_dir)/check-summary.rb -v $(test_outs)
 
-clean-check : 
+clean-check :
 	rm -rf $(test_junk)
 
 junk += $(test_junk)
@@ -242,7 +242,15 @@ cross_run_target_board  = @cross_run_target_board@
 cross_libgloss_cppflags = @cross_libgloss_cppflags@
 cross_libgloss_ldflags  = @cross_libgloss_ldflags@
 
-longcheck longcheck% :
+# I used to have this:
+#
+# longcheck longcheck% :
+#   commands to run longcheck
+#
+# but this is actually not valid make syntax and causes an error with
+# make 3.82, so I removed the "longcheck%" part for now. -cbatten
+
+longcheck :
 	-$(MAKE) -k -C src check$* \
     RUNTESTFLAGS="--target_board=$(cross_run_target_board) \
       CROSS_LIBGLOSS_CPPFLAGS='$(cross_libgloss_cppflags)' \
@@ -270,7 +278,15 @@ longcheck longcheck% :
 
 prestow_cleanup = info man/man7 lib/libiberty.a lib64/libiberty.a
 
-install install% :
+# I used to have this:
+#
+# install install% :
+#   commands to do install
+#
+# but this is actually not valid make syntax and causes an error with
+# make 3.82, so I removed the "install%" part for now. -cbatten
+
+install :
 	$(MAKE) -C src $@ prefix=$(DESTDIR)
 ifeq ($(enable_stow),yes)
 	rm -rf $(addprefix $(DESTDIR)/, $(prestow_cleanup))
@@ -304,7 +320,7 @@ dist_junk += config.status Makefile config.log
 #-------------------------------------------------------------------------
 # Distribution
 #-------------------------------------------------------------------------
-# The distribution tarball is named project-ver.tar.gz 
+# The distribution tarball is named project-ver.tar.gz
 
 dist_files = \
   README \
@@ -353,11 +369,11 @@ junk += $(project_name)-*.tar.gz
 .PHONY : dist distcheck
 
 #-------------------------------------------------------------------------
-# Default 
+# Default
 #-------------------------------------------------------------------------
 
 # By default we just run the submake without any targets
-all : 
+all :
 	$(MAKE) -C src
 
 .PHONY : all
