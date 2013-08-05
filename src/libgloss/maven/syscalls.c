@@ -369,24 +369,74 @@ clock_t times( struct tms* buf )
 }
 
 //----------------------------------------------------------------------
-// sbrk                                                                 
+// sbrk
 //----------------------------------------------------------------------
-// Increase program data space. As malloc and related functions depend
-// on this, it is useful to have a working implementation. The following
-// is suggested by the newlib docs and suffices for a standalone
-// system.
+// Author: Chris Torng
+//
+// Increase program data space by increasing the program break value.
+// Malloc and other related functions depend on this. This sbrk
+// implementation uses brk syscalls inside.
 
 caddr_t sbrk( int incr )
 {
   extern unsigned char _end; // Defined by linker
-  static unsigned char* heap_end;
-  unsigned char* prev_heap_end;
+  int zero_arg;
 
-  if ( heap_end == 0 )
-    heap_end = &_end;
+  int result_initial;
+  int error_flag_initial;
+  unsigned char* end_initial;
 
-  prev_heap_end = heap_end;
-  heap_end += incr;
+  int result;
+  int error_flag;
+  unsigned char* end;
+
+  // The heap end variables are unsigned char pointers but are stored as
+  // integers. We use integers for convenience because the pkernel returns an
+  // integer type result; using int types still retains correct functionality.
+
+  int prev_heap_end;
+  int heap_end;
+
+  // We need to pass &_end to the pkernel so it knows where _end is. The
+  // pkernel has its own separate _end symbol. Note that a real brk syscall
+  // only takes a single argument -- the new break address -- so adding a
+  // second argument isn't really 'correct'. But when running simulation that
+  // does not use the pkernel, the extra argument will just be ignored. So
+  // this remains functionally correct.
+
+  end_initial = &_end;
+  end         = &_end;
+
+  zero_arg = 0;
+
+  // An empty brk call returns the current program break value.
+
+  MAVEN_SYSCALL_ARG2( BRK, result_initial, error_flag_initial, zero_arg, end_initial );
+
+  if ( error_flag_initial == 1 ) {
+    errno = result_initial;
+    return -1;
+  }
+
+  // Save the previous program break value so we can return it later.
+
+  prev_heap_end = result_initial;
+
+  // Compute new program break value.
+
+  heap_end = prev_heap_end + incr;
+
+  // Do another brk syscall to set the new break value.
+
+  MAVEN_SYSCALL_ARG2( BRK, result, error_flag, heap_end, end );
+
+  if ( error_flag == 1 ) {
+    errno = result;
+    return -1;
+  }
+
+  // Return previous break value.
+
   return (caddr_t) prev_heap_end;
 }
 

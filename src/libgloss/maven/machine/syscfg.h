@@ -33,15 +33,16 @@
 #define MAVEN_SYSCFG_SYSCALL_CLOSE                          5
 #define MAVEN_SYSCFG_SYSCALL_LINK                           6
 #define MAVEN_SYSCFG_SYSCALL_UNLINK                         7
-#define MAVEN_SYSCFG_SYSCALL_LSEEK                          8 
+#define MAVEN_SYSCFG_SYSCALL_LSEEK                          8
 #define MAVEN_SYSCFG_SYSCALL_FSTAT                          9
 #define MAVEN_SYSCFG_SYSCALL_STAT                          10
-                                                         
-// Extra maven specific system calls                     
-                                                         
+#define MAVEN_SYSCFG_SYSCALL_BRK                           11
+
+// Extra maven specific system calls
+
 #define MAVEN_SYSCFG_SYSCALL_NUMCORES                    4000
 #define MAVEN_SYSCFG_SYSCALL_SENDAM                      4001
-                                                         
+
 #define MAVEN_SYSCFG_SYSCALL_BTHREAD_ONCE                4002
 #define MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_CREATE          4003
 #define MAVEN_SYSCFG_SYSCALL_BTHREAD_KEY_DELETE          4004
