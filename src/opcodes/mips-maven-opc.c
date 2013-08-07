@@ -190,7 +190,7 @@
 
 /* these dependencies are unused and have no effect.
  * Therefore, optimizations will probably need to be turned OFF
- * for correct execution of assembled code.  
+ * for correct execution of assembled code.
  * However, in the interest of future work and to show what the
  * expected dependencies are, the below dependencies have been added
  * for Maven instructions.
@@ -263,7 +263,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 /*  SY = INSN_SYNC which should prevent gas from reording the sync ops */
 
 {"sync.l.v",       "",          0x48000005, 0xffffffff, SY,                           0,              INSN_MAVEN        },
-{"sync.g.v",       "",          0x48200005, 0xffffffff, SY,                           0,              INSN_MAVEN        }, 
+{"sync.g.v",       "",          0x48200005, 0xffffffff, SY,                           0,              INSN_MAVEN        },
 {"sync.l.cv",      "",          0x48000006, 0xffffffff, SY,                           0,              INSN_MAVEN        },
 {"sync.g.cv",      "",          0x48200006, 0xffffffff, SY,                           0,              INSN_MAVEN        },
 
@@ -271,6 +271,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 {"xloop",          "s,p",       0xd0000000, 0xfc1f0000, UBD|RD_s,                     0,              INSN_MAVEN        },
 {"vf",             "p",         0xd0000000, 0xffff0000, UBD,                          0,              INSN_MAVEN        },
+
+// shreesha - for.u instruction
+{"for.u",          "s,t,p",     0xc8000000, 0xfc000000, CBD|RD_s|RD_t,                0,              INSN_MAVEN        },
 
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
@@ -302,7 +305,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"lhush.v",        "#d,t",      0x640000a0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lbsh.v",         "#d,t",      0x64000060, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lbush.v",        "#d,t",      0x640000e0, 0xffe007ff, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-                     
+
 {"lwst.v",         "#d,t,s",    0x64000000, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 {"lhst.v",         "#d,t,s",    0x64000020, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 {"lhust.v",        "#d,t,s",    0x640000a0, 0xfc0007ff, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
@@ -314,7 +317,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"lhuseg.v",       "#d,t,#n",   0x600000a0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lbseg.v",        "#d,t,#n",   0x60000060, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
 {"lbuseg.v",       "#d,t,#n",   0x600000e0, 0xffe007e0, LDD|WR_d|RD_t,                0,              INSN_MAVEN        },
-                     
+
 {"lwsegst.v",      "#d,t,#n,s", 0x64000000, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 {"lhsegst.v",      "#d,t,#n,s", 0x64000020, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
 {"lhusegst.v",     "#d,t,#n,s", 0x640000a0, 0xfc0007e0, LDD|WR_d|RD_t|RD_s,           0,              INSN_MAVEN        },
@@ -359,7 +362,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"addu.vv",      "#d,#s,#t,#m", 0x48000081, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"addu.vs",      "#d,#t,s",     0x48000082, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"addu.vs",      "#d,#t,s,#m",  0x48000082, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-                                          
+
 {"subu.vv",      "#d,#s,#t",    0x48000083, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"subu.vv",      "#d,#s,#t,#m", 0x48000083, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"subu.vs",      "#d,#t,s",     0x48000084, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
@@ -417,69 +420,69 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"sll.vs",       "#d,#t,s,#m",  0x4800008f, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sll.sv",       "#d,s,#t",     0x48000090, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sll.sv",       "#d,s,#t,#m",  0x48000090, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-                                            
+
 {"srl.vv",       "#d,#s,#t",    0x48000091, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"srl.vv",       "#d,#s,#t,#m", 0x48000091, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"srl.vs",       "#d,#t,s",     0x48000092, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"srl.vs",       "#d,#t,s,#m",  0x48000092, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"srl.sv",       "#d,s,#t",     0x48000093, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"srl.sv",       "#d,s,#t,#m",  0x48000093, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-                                             
+
 {"sra.vv",       "#d,#s,#t",    0x48000094, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sra.vv",       "#d,#s,#t,#m", 0x48000094, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sra.vs",       "#d,#t,s",     0x48000095, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sra.vs",       "#d,#t,s,#m",  0x48000095, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sra.sv",       "#d,s,#t",     0x48000096, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sra.sv",       "#d,s,#t,#m",  0x48000096, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-                                              
+
 {"and.vv",       "#d,#s,#t",    0x48000097, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"and.vv",       "#d,#s,#t,#m", 0x48000097, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"and.vs",       "#d,#t,s",     0x48000098, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"and.vs",       "#d,#t,s,#m",  0x48000098, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-                                               
+
 {"or.vv",        "#d,#s,#t",    0x48000099, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"or.vv",        "#d,#s,#t,#m", 0x48000099, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"or.vs",        "#d,#t,s",     0x4800009a, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"or.vs",        "#d,#t,s,#m",  0x4800009a, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-                                                 
+
 {"xor.vv",       "#d,#s,#t",    0x4800009b, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"xor.vv",       "#d,#s,#t,#m", 0x4800009b, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"xor.vs",       "#d,#t,s",     0x4800009c, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"xor.vs",       "#d,#t,s,#m",  0x4800009c, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-                                              
+
 {"nor.vv",       "#d,#s,#t",    0x4800009d, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"nor.vv",       "#d,#s,#t,#m", 0x4800009d, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"nor.vs",       "#d,#t,s",     0x4800009e, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"nor.vs",       "#d,#t,s,#m",  0x4800009e, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
- 
+
 {"add.s.vv",     "#d,#s,#t",    0x480000a0, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"add.s.vv",     "#d,#s,#t,#m", 0x480000a0, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"add.s.vs",     "#d,#t,s",     0x480000a1, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"add.s.vs",     "#d,#t,s,#m",  0x480000a1, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"add.s.sv",     "#d,s,#t",     0x480000a2, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"add.s.sv",     "#d,s,#t,#m",  0x480000a2, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-   
+
 {"sub.s.vv",     "#d,#s,#t",    0x480000a3, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sub.s.vv",     "#d,#s,#t,#m", 0x480000a3, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sub.s.vs",     "#d,#t,s",     0x480000a4, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sub.s.vs",     "#d,#t,s,#m",  0x480000a4, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sub.s.sv",     "#d,s,#t",     0x480000a5, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"sub.s.sv",     "#d,s,#t,#m",  0x480000a5, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
- 
+
 {"mul.s.vv",     "#d,#s,#t",    0x480000a6, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"mul.s.vv",     "#d,#s,#t,#m", 0x480000a6, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"mul.s.vs",     "#d,#t,s",     0x480000a7, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"mul.s.vs",     "#d,#t,s,#m",  0x480000a7, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"mul.s.sv",     "#d,s,#t",     0x480000a8, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"mul.s.sv",     "#d,s,#t,#m",  0x480000a8, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-    
+
 {"div.s.vv",     "#d,#s,#t",    0x480000a9, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"div.s.vv",     "#d,#s,#t,#m", 0x480000a9, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"div.s.vs",     "#d,#t,s",     0x480000aa, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"div.s.vs",     "#d,#t,s,#m",  0x480000aa, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"div.s.sv",     "#d,s,#t",     0x480000ab, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
 {"div.s.sv",     "#d,s,#t,#m",  0x480000ab, 0xfc0000ff, WR_d|RD_s|RD_t,               0,              INSN_MAVEN        },
-  
+
 {"abs.s.v",        "#d,#t",     0x480000ac, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
 {"abs.s.v",        "#d,#t,#m",  0x480000ac, 0xffe000ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
 {"neg.s.v",        "#d,#t",     0x480000ad, 0xffe007ff, WR_d|RD_t,                    0,              INSN_MAVEN        },
