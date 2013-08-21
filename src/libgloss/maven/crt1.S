@@ -20,7 +20,7 @@
 # We assume that the application server or proxy kernel has put
 # the command line arguments on the stack and initialized the stack
 # pointer appropriately as illustrated below.
-#  
+#
 #  address = MEMORY_SIZE - ARGS_SIZE
 #  -------------------------------------------
 #  argc         : argument count                <--- stack pointer
@@ -63,13 +63,13 @@
 #  heap                                          | heap grows down
 #  ...                                           v
 #  -------------------------------------------
-#  stack space for thread 1                      ^               
+#  stack space for thread 1                      ^
 #  ...                                           | stack grows up
-#  ------------------------------------------- <--- thread 1 sp  
-#  stack space for thread 0                      ^               
+#  ------------------------------------------- <--- thread 1 sp
+#  stack space for thread 0                      ^
 #  ...                                           | stack grows up
-#  ------------------------------------------- <--- thread 0 sp  
-#  argument count and argument pointers        
+#  ------------------------------------------- <--- thread 0 sp
+#  argument count and argument pointers
 #  ...
 #  -------------------------------------------
 #  argument strings
@@ -86,7 +86,7 @@
 
 #define c0_coreid MAVEN_SYSCFG_REGDEF_COP0_CORE_ID
 #define tstack_sz MAVEN_SYSCFG_THREAD_STACK_SIZE
-        
+
 #-------------------------------------------------------------------------
 # Global symbols defined elsewhere
 #-------------------------------------------------------------------------
@@ -96,7 +96,7 @@
         .global atexit          # Register exit functions
         .global main            # User program
         .global exit            # Exit function
-        
+
 #-------------------------------------------------------------------------
 # _start
 #-------------------------------------------------------------------------
@@ -108,8 +108,21 @@ _start:
 
         la      $gp, _gp        # Initialize global pointer
 
+        # Normally when using the pkernel, the pkernel-bootstrap.S code
+        # will ensure that only core 0 ever makes it into this
+        # user-level _start function. gem5 is setup such that all cores
+        # begin execution in the _start function. So we check here to see
+        # whether or not this code is being executed by a core other than
+        # core 0. If so we just spin forever, and we will let the SEND_AM
+        # system call take care of making this core do something
+        # interesting.
+
+        mfc0    $t0, $c0_coreid
+_notcore0:
+        bnez    $t0, _notcore0
+
 #        la      $v0, _fbss      # Zero out uninitialized data sections
-#        la      $v1, _end       #  (the .sbss and .bss sections). See 
+#        la      $v1, _end       #  (the .sbss and .bss sections). See
 #1:      sw      $0,  0($v0)     #  linker script for how _fbss and
 #        addiu   $v0, $v0, 4     #  _end are defined.
 #        bltu    $v0, $v1, 1b    #
@@ -122,7 +135,7 @@ _start:
         lw      $a0, 0($sp)     # Start the program, setup args
         addiu   $a1, $sp, 4     #  a0 = argc
         jal     main            #  a1 = argv
-        
+
         move    $a0, $v0        # Call exit function with return value
         jal     exit            #  from main as exit code
 
