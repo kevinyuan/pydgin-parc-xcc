@@ -273,7 +273,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"vf",             "p",         0xd0000000, 0xffff0000, UBD,                          0,              INSN_MAVEN        },
 
 // shreesha - for.u instruction
-{"for.u",          "s,t,p",     0xc8000000, 0xfc000000, CBD|RD_s|RD_t,                0,              INSN_MAVEN        },
+{"for.u",          "s,t,p",     0xc4000000, 0xfc000000, CBD|RD_s|RD_t,                0,              INSN_MAVEN        },
+
+// shreesha - for.r instruction
+{"for.r",          "s,t,p",     0xc8000000, 0xfc000000, CBD|RD_s|RD_t,                0,              INSN_MAVEN        },
 
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
