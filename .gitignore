@@ -8,3 +8,5 @@
 build*/
 autom4te.cache/
 
+# Ignore the symlinks created by "work-mkdir" script
+build*
