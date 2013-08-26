@@ -9,17 +9,17 @@
    Brendan Eich (brendan@microunity.com).
 
    This file is part of GCC.
-    
+
    GCC is free software; you can redistribute it and/or modify it under
    the terms of the GNU General Public License as published by the Free
    Software Foundation; either version 3, or (at your option) any later
    version.
-    
+
    GCC is distributed in the hope that it will be useful, but WITHOUT
    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
    for more details.
-    
+
    You should have received a copy of the GNU General Public License
    along with GCC; see the file COPYING3. If not see
    <http://www.gnu.org/licenses/>. */
@@ -35,7 +35,7 @@
 
 /* YUNSUP: changes for the Maven compiler, this port is based on MIPS. */
 
-enum processor_type 
+enum processor_type
 {
   PROCESSOR_R3000,
   PROCESSOR_4KC,
@@ -82,7 +82,7 @@ enum processor_type
 
 /* Costs of various operations on the different architectures. */
 
-struct mips_rtx_cost_data 
+struct mips_rtx_cost_data
 {
   unsigned short fp_add;
   unsigned short fp_mult_sf;
@@ -118,7 +118,7 @@ struct mips_rtx_cost_data
 
 /* Information about one recognized processor. Defined here for the
    benefit of TARGET_CPU_CPP_BUILTINS. */
-struct mips_cpu_info 
+struct mips_cpu_info
 {
 
   /* The 'canonical' name of the processor as far as GCC is concerned.
@@ -140,7 +140,7 @@ struct mips_cpu_info
 };
 
 /* Enumerates the setting of the -mcode-readable option. */
-enum mips_code_readable_setting 
+enum mips_code_readable_setting
 {
   CODE_READABLE_NO,
   CODE_READABLE_PCREL,
@@ -248,7 +248,7 @@ enum mips_code_readable_setting
 #define TARGET_MIPS16_PCREL_LOADS                                       \
   (TARGET_MIPS16 && mips_code_readable >= CODE_READABLE_PCREL)
 
-/* Generic ISA defines. */  
+/* Generic ISA defines. */
 #define ISA_MIPS1               (mips_isa == 1)
 #define ISA_MIPS2               (mips_isa == 2)
 #define ISA_MIPS3               (mips_isa == 3)
@@ -886,11 +886,11 @@ march=*: -mhard-float}"
 /* Integer multiply-accumulate instructions should be generated. */
 #define GENERATE_MADD_MSUB (ISA_HAS_MADD_MSUB && !TUNE_74K)
 
-/* ISA has floating-point madd and msub instructions 
+/* ISA has floating-point madd and msub instructions
    'd = a * b [+-] c'. */
 #define ISA_HAS_FP_MADD4_MSUB4  ISA_HAS_FP4
 
-/* ISA has floating-point madd and msub instructions 
+/* ISA has floating-point madd and msub instructions
    'c = a * b [+-] c'. */
 #define ISA_HAS_FP_MADD3_MSUB3  TARGET_LOONGSON_2EF
 
@@ -950,13 +950,14 @@ march=*: -mhard-float}"
                          && !TARGET_MIPS16)
 
 /* ISA has the "ror" (rotate right) instructions. */
+// shreesha: disabling "ror" instruction for MAVEN
 #define ISA_HAS_ROR ((ISA_MIPS32R2                                      \
                        || ISA_MIPS64R2                                  \
                        || TARGET_MIPS5400                               \
                        || TARGET_MIPS5500                               \
                        || TARGET_SR71K                                  \
                        || TARGET_SMARTMIPS)                             \
-                      && !TARGET_MIPS16 )
+                      && !TARGET_MIPS16 && !TARGET_MAVEN)
 
 /* ISA has data prefetch instructions. This controls use of 'pref'. */
 #define ISA_HAS_PREFETCH ((ISA_MIPS4                                    \
@@ -1566,7 +1567,7 @@ march=*: -mhard-float}"
         - GOT_VERSION_REGNUM (see above load_call<mode> for details)
    - 3 dummy entries that were used at various times in the past.
    - 6 DSP accumulator registers (3 hi-lo pairs) for MIPS DSP ASE
-   - 4 dummy entries so that vec registers are conveniently located 
+   - 4 dummy entries so that vec registers are conveniently located
    - 32 maven vector registers
    - 8  maven vector flag registers */
 
@@ -1899,7 +1900,7 @@ march=*: -mhard-float}"
    For any two classes, it is very desirable that there be another
    class that represents their union. */
 
-enum reg_class 
+enum reg_class
 {
   NO_REGS,          /* no registers in set */
   M16_REGS,         /* mips16 directly accessible registers */
@@ -2319,7 +2320,7 @@ enum reg_class
    basis whether that argument should really go in an integer register,
    or in a floating-point one. */
 
-typedef struct mips_args 
+typedef struct mips_args
 {
 
   /* Always true for varargs functions. Otherwise true if at least one
