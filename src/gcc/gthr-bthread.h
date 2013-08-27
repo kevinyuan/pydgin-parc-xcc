@@ -88,41 +88,47 @@ __bthread_once (__bthread_once_t *__once, void (*__func) (void))
   return 0;  
 }
 
+// This function is commented out because it is not used in our apps and
+// because gem5 doesn't support it right now.
 static inline int 
 __bthread_key_create( __bthread_key_t* __key, void (*__dtor) (void*) )
                                         
 {
-  int result, error_flag;
-  MAVEN_SYSCALL_ARG2(BTHREAD_KEY_CREATE,result,error_flag,__key,__dtor);
-  if (error_flag)
-  {
-//    errno = result;
-    return -1;
-  }
-  
-  return result;
+  return 0;
+//  int result, error_flag;
+//  MAVEN_SYSCALL_ARG2(BTHREAD_KEY_CREATE,result,error_flag,__key,__dtor);
+//  if (error_flag)
+//  {
+////    errno = result;
+//    return -1;
+//  }
+//  
+//  return result;
 }
 
+// This function is commented out because it is not used in our apps and
+// because gem5 doesn't support it right now.
 static inline int
 __bthread_key_delete( __bthread_key_t __key )
 {
-  int result, error_flag;
-  int val, *pval;
-  void (*dtor)(void*);
-  void *pdtor = &dtor;
-  pval = &val;
-  
-  MAVEN_SYSCALL_ARG3(BTHREAD_KEY_DELETE,result,error_flag,__key,pdtor,pval);
-  if (error_flag)
-  {
-//    errno = result;
-    return -1;
-  }
-  
-  if (dtor)
-    dtor((void *)val);
-  
-  return result;
+  return 0;
+//  int result, error_flag;
+//  int val, *pval;
+//  void (*dtor)(void*);
+//  void *pdtor = &dtor;
+//  pval = &val;
+//  
+//  MAVEN_SYSCALL_ARG3(BTHREAD_KEY_DELETE,result,error_flag,__key,pdtor,pval);
+//  if (error_flag)
+//  {
+////    errno = result;
+//    return -1;
+//  }
+//  
+//  if (dtor)
+//    dtor((void *)val);
+//  
+//  return result;
 }
 
 static inline int
