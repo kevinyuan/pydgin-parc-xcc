@@ -1740,6 +1740,10 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"srl.qh",         "X,Y,Q",     0x78200012, 0xfc20003f, WR_D|RD_S|RD_T|FP_D,          0,              MX                },
 /* ssnop is at the start of the table. */
 {"standby",        "",          0x42000021, 0xffffffff, 0,                            0,              V1                },
+
+// ctorng: Adding a statistics instruction.
+{"stat",           "<",         0x9c00000f, 0xfffff83f, 0,                            0,              INSN_MAVEN        },
+
 {"sub",            "d,v,t",     0x00000022, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              I1                },
 {"sub",            "d,v,I",     0,   (int)  M_SUB_I,    INSN_MACRO,                   0,              I1                },
 {"sub",            "D,S,T",     0x45c00001, 0xffe0003f, RD_S|RD_T|WR_D|FP_S,          0,              IL2E              },
