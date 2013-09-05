@@ -1745,7 +1745,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"standby",        "",          0x42000021, 0xffffffff, 0,                            0,              V1                },
 
 // ctorng: Adding a statistics instruction.
-{"stat",           "<",         0x9c00000f, 0xfffff83f, 0,                            0,              INSN_MAVEN        },
+{"stat",           "k",         0x9c00000f, 0xffe0ffff, 0,                            0,              INSN_MAVEN        },
 
 {"sub",            "d,v,t",     0x00000022, 0xfc0007ff, WR_d|RD_s|RD_t,               0,              I1                },
 {"sub",            "d,v,I",     0,   (int)  M_SUB_I,    INSN_MACRO,                   0,              I1                },
