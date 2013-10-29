@@ -282,8 +282,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"macro",          "a",         0xd4000000, 0xfc000000, UBD,                          0,              INSN_MAVEN        },
 
 // shreesha - tbegin instruction
-{"tbegin",          "a",        0xd8000000, 0xfc000000, UBD,                          0,              INSN_MAVEN        },
-
+{"addiu.xi",       "t,r,j",     0xd8000000, 0xfc000000, WR_t|RD_s,                    0,              INSN_MAVEN        },
 
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
