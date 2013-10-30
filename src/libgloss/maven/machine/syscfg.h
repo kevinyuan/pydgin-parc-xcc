@@ -55,15 +55,34 @@
 // Coprocessor 0 Control Registers
 //------------------------------------------------------------------------
 
-#define MAVEN_SYSCFG_REGDEF_COP0_COUNT      9
-#define MAVEN_SYSCFG_REGDEF_COP0_COUNT_LO   9
-#define MAVEN_SYSCFG_REGDEF_COP0_COUNT_HI  25
+#define MAVEN_SYSCFG_REGDEF_COP0_TO_SERV     1
+#define MAVEN_SYSCFG_REGDEF_COP0_FROM_SERV   2
 
-#define MAVEN_SYSCFG_REGDEF_COP0_NUMCORES  16
-#define MAVEN_SYSCFG_REGDEF_COP0_CORE_ID   17
-#define MAVEN_SYSCFG_REGDEF_COP0_TID_MASK  18
-#define MAVEN_SYSCFG_REGDEF_COP0_TID_STOP  19
-#define MAVEN_SYSCFG_REGDEF_COP0_STATS_EN  21
+#define MAVEN_SYSCFG_REGDEF_COP0_TO_SYSC0    3
+#define MAVEN_SYSCFG_REGDEF_COP0_TO_SYSC1    4
+#define MAVEN_SYSCFG_REGDEF_COP0_TO_SYSC2    5
+#define MAVEN_SYSCFG_REGDEF_COP0_TO_SYSC3    6
+#define MAVEN_SYSCFG_REGDEF_COP0_TO_SYSC4    7
+#define MAVEN_SYSCFG_REGDEF_COP0_TO_SYSC5    8
+
+#define MAVEN_SYSCFG_REGDEF_COP0_COUNT       9
+#define MAVEN_SYSCFG_REGDEF_COP0_COUNT_LO    9
+
+#define MAVEN_SYSCFG_REGDEF_COP0_FROM_SYSC0 10
+#define MAVEN_SYSCFG_REGDEF_COP0_FROM_SYSC1 11
+#define MAVEN_SYSCFG_REGDEF_COP0_FROM_SYSC2 12
+#define MAVEN_SYSCFG_REGDEF_COP0_FROM_SYSC3 13
+#define MAVEN_SYSCFG_REGDEF_COP0_FROM_SYSC4 14
+#define MAVEN_SYSCFG_REGDEF_COP0_FROM_SYSC5 15
+
+#define MAVEN_SYSCFG_REGDEF_COP0_NUMCORES   16
+
+#define MAVEN_SYSCFG_REGDEF_COP0_CORE_ID    17
+#define MAVEN_SYSCFG_REGDEF_COP0_TID_MASK   18
+#define MAVEN_SYSCFG_REGDEF_COP0_TID_STOP   19
+#define MAVEN_SYSCFG_REGDEF_COP0_STATS_EN   21
+
+#define MAVEN_SYSCFG_REGDEF_COP0_COUNT_HI   25
 
 //------------------------------------------------------------------------
 // Maven minimum and maximum vector length
@@ -84,7 +103,7 @@
 //------------------------------------------------------------------------
 
 // Size of the various stacks
-#define MAVEN_SYSCFG_USER_THREAD_STACK_SIZE   0x00010000
+#define MAVEN_SYSCFG_USER_THREAD_STACK_SIZE   0x00100000
 #define MAVEN_SYSCFG_KERNEL_THREAD_STACK_SIZE 0x00010000
 #define MAVEN_SYSCFG_VP_THREAD_STACK_SIZE     0x00001000
 
@@ -92,14 +111,15 @@
 // Memory layout
 //------------------------------------------------------------------------
 
-#define MAVEN_SYSCFG_MEMORY_SIZE  0x10000000
-#define MAVEN_SYSCFG_USER_START   0x00000000
-#define MAVEN_SYSCFG_USER_SIZE    0x0C000000
-#define MAVEN_SYSCFG_KERNEL_START 0x0C000000
-#define MAVEN_SYSCFG_KERNEL_SIZE  0x04000000
-#define MAVEN_SYSCFG_ARGS_SIZE    0x00010000
+#define MAVEN_SYSCFG_MEMORY_SIZE       0x10000000
+#define MAVEN_SYSCFG_XCPTHANDLER_START 0x00000020
+#define MAVEN_SYSCFG_USER_START        0x00001000
+#define MAVEN_SYSCFG_USER_SIZE         0x0BFFF000
+#define MAVEN_SYSCFG_KERNEL_START      0x0C000000
+#define MAVEN_SYSCFG_KERNEL_SIZE       0x04000000
+#define MAVEN_SYSCFG_ARGS_SIZE         0x00010000
 
-#define MAVEN_SYSCFG_MAX_PROCS 64 // maximum number of processors in the system
-#define MAVEN_SYSCFG_MAX_KEYS  64 // maximum number of unique keys per thread
+#define MAVEN_SYSCFG_MAX_PROCS 8 // maximum number of processors in the system
+#define MAVEN_SYSCFG_MAX_KEYS  8 // maximum number of unique keys per thread
 
 #endif /* MAVEN_SYSCFG_H */
