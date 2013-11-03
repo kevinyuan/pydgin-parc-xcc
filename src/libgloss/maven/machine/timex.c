@@ -23,7 +23,7 @@
 //   0  2
 //   0  3  mfc0 t0, cp0_countlo (t0 = 3)
 //   1  0  mfc0 t1, cp0_counthi (t1 = 1) {t1,t0} = 13
-//   1  1  mfc0 t2, cp0_countlo (t2 = 1) 
+//   1  1  mfc0 t2, cp0_countlo (t2 = 1)
 //   1  2  mfc0 t3, cp0_countlo (t3 = 1) {t3,t2} = 11
 //   1  3
 //
@@ -47,7 +47,7 @@ cycles_t get_cycles()
   // order) so that we can detect overflow.
 
   __asm__ ( "mfc0 %0, $%4; mfc0 %1, $%5; mfc0 %2, $%4; mfc0 %3, $%5"
-          : "=r"(count_0_lo), "=r"(count_0_hi), 
+          : "=r"(count_0_lo), "=r"(count_0_hi),
             "=r"(count_1_lo), "=r"(count_1_hi)
           : "i"(MAVEN_SYSCFG_REGDEF_COP0_COUNT_LO),
             "i"(MAVEN_SYSCFG_REGDEF_COP0_COUNT_HI) );

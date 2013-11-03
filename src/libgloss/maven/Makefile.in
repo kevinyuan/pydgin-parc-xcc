@@ -24,6 +24,7 @@ gloss_hdrs = \
 gloss_srcs = \
   machine/resource.c \
   machine/setjmp.S \
+  machine/time.c \
   machine/timex.c \
 
 # Extra files
@@ -66,7 +67,7 @@ install_hdrs_dir := $(DESTDIR)$(prefix)/$(target_alias)/include/machine
 install_libs_dir := $(DESTDIR)$(prefix)/$(target_alias)/lib
 
 #-------------------------------------------------------------------------
-# Programs and flags 
+# Programs and flags
 #-------------------------------------------------------------------------
 
 # C compiler
@@ -201,7 +202,7 @@ install-libs : $(install_libs)
     $(INSTALL_LIB) $$file $(install_libs_dir); \
   done
 
-install : install-hdrs install-libs 
+install : install-hdrs install-libs
 .PHONY : install install-hdrs install-libs
 
 #-------------------------------------------------------------------------
