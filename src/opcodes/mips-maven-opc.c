@@ -281,7 +281,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 // shreesha - macro instruction
 {"macro",          "a",         0xd4000000, 0xfc000000, UBD,                          0,              INSN_MAVEN        },
 
-// shreesha - tbegin instruction
+// shreesha - addiu.xi instruction
 {"addiu.xi",       "t,r,j",     0xd8000000, 0xfc000000, WR_t|RD_s,                    0,              INSN_MAVEN        },
 
 // shreesha - for.m instruction
@@ -289,6 +289,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 // shreesha - for.o instruction
 {"for.o",          "s,t,p",     0xe8000000, 0xfc000000, CBD|RD_s|RD_t,                0,              INSN_MAVEN        },
+
+// shreesha - addu.xi instruction
+{"addu.xi",        "d,v,t",     0x9c000010, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
