@@ -293,6 +293,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
 // shreesha - addu.xi instruction
 {"addu.xi",        "d,v,t",     0x9c000010, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
+// shreesha - subu.xi instruction
+{"subu.xi",        "d,v,t",     0x9c000011, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
 //NOTE: these dependencies are not used and may be incorrect if optimizations are turned on!
