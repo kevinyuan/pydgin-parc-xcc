@@ -39,15 +39,32 @@
 // MAVEN_SYSCALL_ARG0
 //------------------------------------------------------------------------
 
+// BERKIN: llvm has a bug where outputs that are constrained to a
+// particular register fails satisfying this constraint
+// (http://llvm.org/bugs/show_bug.cgi?id=13795). This seems to be fixed in
+// the most recent version of llvm, but the following is a temporary
+// workaround until we update our llvm
 #define MAVEN_SYSCALL_ARG0( sys_, res_, eflag_ )                        \
-  register __typeof__ (res_)   res_   ## _ asm ("v0");                  \
-  register __typeof__ (eflag_) eflag_ ## _ asm ("a3");                  \
+  register __typeof__ (res_)   res_   ## _;                             \
+  register __typeof__ (eflag_) eflag_ ## _;                             \
+  register __typeof__ (res_)   res_   ## __ asm ("v0") = res_ ## _;     \
+  register __typeof__ (eflag_) eflag_ ## __ asm ("a3") = eflag_ ## _;   \
   __asm__ volatile                                                      \
   ( "li $v0, %2; syscall"                                               \
     : "=r"(res_ ## _), "=r"(eflag_ ## _)                                \
     : "i"(MAVEN_SYSCFG_SYSCALL_ ## sys_) );                             \
   res_   = res_ ## _;                                                   \
   eflag_ = eflag_ ## _;                                                 \
+
+// #define MAVEN_SYSCALL_ARG0( sys_, res_, eflag_ )                        \
+//   register __typeof__ (res_)   res_   ## _ asm ("v0");                  \
+//   register __typeof__ (eflag_) eflag_ ## _ asm ("a3");                  \
+//   __asm__ volatile                                                      \
+//   ( "li $v0, %2; syscall"                                               \
+//     : "=r"(res_ ## _), "=r"(eflag_ ## _)                                \
+//     : "i"(MAVEN_SYSCFG_SYSCALL_ ## sys_) );                             \
+//   res_   = res_ ## _;                                                   \
+//   eflag_ = eflag_ ## _;                                                 \
 
 //------------------------------------------------------------------------
 // MAVEN_SYSCALL_ARG1
