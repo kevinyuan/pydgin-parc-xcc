@@ -45,16 +45,12 @@
 // the most recent version of llvm, but the following is a temporary
 // workaround until we update our llvm
 #define MAVEN_SYSCALL_ARG0( sys_, res_, eflag_ )                        \
-  register __typeof__ (res_)   res_   ## _;                             \
-  register __typeof__ (eflag_) eflag_ ## _;                             \
-  register __typeof__ (res_)   res_   ## __ asm ("v0") = res_ ## _;     \
-  register __typeof__ (eflag_) eflag_ ## __ asm ("a3") = eflag_ ## _;   \
+  register __typeof__ (res_)   res_   ## _ asm ("v0") = res_;           \
+  register __typeof__ (eflag_) eflag_ ## _ asm ("a3") = eflag_;         \
   __asm__ volatile                                                      \
   ( "li $v0, %2; syscall"                                               \
-    : "=r"(res_ ## _), "=r"(eflag_ ## _)                                \
+    : "=r"(res_), "=r"(eflag_)                                          \
     : "i"(MAVEN_SYSCFG_SYSCALL_ ## sys_) );                             \
-  res_   = res_ ## _;                                                   \
-  eflag_ = eflag_ ## _;                                                 \
 
 // #define MAVEN_SYSCALL_ARG0( sys_, res_, eflag_ )                        \
 //   register __typeof__ (res_)   res_   ## _ asm ("v0");                  \
