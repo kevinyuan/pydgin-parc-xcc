@@ -299,6 +299,21 @@ const struct mips_opcode mips_builtin_opcodes[] =
 // shreesha - hint.wl instruction
 {"hint.wl",        "d,v,t",     0x9c000012, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
+// shreesha - ds.alloc (reclaimed addi)
+{"ds.alloc",       "t,j",       0x20000000, 0xffe00000, WR_t,                         0,              INSN_MAVEN        },
+
+// shreesha - ds.get instruction
+{"ds.get",         "d,v,t",     0x9c000013, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+
+// shreesha - ds.set instruction
+{"ds.set",         "d,v,t",     0x9c000014, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+
+// shreesha - ds.init instruction -- rt should always be zero
+{"ds.init",         "d,v,t",     0x9c000015, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+
+// shreesha - ds.dealloc instruction -- rt, rd should always be zero
+{"ds.dealloc",      "d,v,t",     0x9c000016, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
 //NOTE: these dependencies are not used and may be incorrect if optimizations are turned on!
