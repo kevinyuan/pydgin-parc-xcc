@@ -314,6 +314,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
 // shreesha - ds.dealloc instruction -- rt, rd should always be zero
 {"ds.dealloc",      "d,v,t",     0x9c000016, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
+// shreesha - ds.halt instruction -- rs, rt, rd should always be zero
+{"ds.halt",         "d,v,t",     0x9c000017, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
 //NOTE: these dependencies are not used and may be incorrect if optimizations are turned on!
