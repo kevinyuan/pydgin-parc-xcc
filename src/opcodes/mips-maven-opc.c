@@ -309,13 +309,19 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"ds.set",         "d,v,t",     0x9c000014, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 // shreesha - ds.init instruction -- rt should always be zero
-{"ds.init",         "d,v,t",     0x9c000015, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+{"ds.init",        "d,v,t",     0x9c000015, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 // shreesha - ds.dealloc instruction -- rt, rd should always be zero
-{"ds.dealloc",      "d,v,t",     0x9c000016, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+{"ds.dealloc",     "d,v,t",     0x9c000016, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 // shreesha - ds.halt instruction -- rs, rt, rd should always be zero
-{"ds.halt",         "d,v,t",     0x9c000017, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+{"ds.halt",        "d,v,t",     0x9c000017, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+
+// shreesha - xcall insruction for polyhs (claimed new primary opcode - 111111)
+{"xcall",          "a",         0xfc000000, 0xfc000000, UBD|WR_31,                    0,              INSN_MAVEN        },
+
+// shreesha - xret instruction -- rs, rt, rd should always be zero
+{"xret",           "s",         0x00000028, 0xfc1fffff, UBD|RD_s,                     0,              INSN_MAVEN        },
 
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
