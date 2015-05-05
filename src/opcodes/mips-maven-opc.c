@@ -326,6 +326,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 // shreesha - mtxcel,mfxcel instructions
 {"mtx",            "t,s,i",     0x48000000, 0xfc00f800, WR_t|RD_s,                    0,              INSN_MAVEN        },
 {"mfx",            "t,s,i",     0x48000800, 0xfc00f800, WR_t|RD_s,                    0,              INSN_MAVEN        },
+{"mtxr",           "t,s,D",     0x48001000, 0xfc00f83f, WR_t|RD_s|WR_D,               0,              INSN_MAVEN        },
+{"mfxr",           "t,s,D",     0x48001800, 0xfc00f83f, WR_t|RD_s|WR_D,               0,              INSN_MAVEN        },
 
 /* Maven Vector-Thread Instructions - Vector Memory Instructions */
 
