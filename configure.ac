@@ -166,15 +166,16 @@ AC_SUBST([cross_gxx_flags])
 
 case ${target} in
 
-  mipsmaven*-*-*)
-    cross_run_internal="no"
-    cross_run_target_board="longcheck-setup"
-    AC_CHECK_TARGET_TOOL([cross_run],[isa-run],[no])
-    AS_IF([ test ${cross_run} = "no" ],
-    [
-      AC_MSG_ERROR([Cannot find maven ISA simulator])
-    ])
-  ;;
+  # berkin: disable check for maven-isa-run
+  #mipsmaven*-*-*)
+  #  cross_run_internal="no"
+  #  cross_run_target_board="longcheck-setup"
+  #  AC_CHECK_TARGET_TOOL([cross_run],[isa-run],[no])
+  #  AS_IF([ test ${cross_run} = "no" ],
+  #  [
+  #    AC_MSG_ERROR([Cannot find maven ISA simulator])
+  #  ])
+  #;;
 
   mips*-*-*)
     cross_run_internal="yes"
