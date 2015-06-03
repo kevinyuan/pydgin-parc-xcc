@@ -294,7 +294,8 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"addu.xi",        "d,v,t",     0x9c000010, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 // shreesha - subu.xi instruction
-{"subu.xi",        "d,v,t",     0x9c000011, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+// berkin -- reclaiming this as gcd
+{"gcd",            "d,v,t",     0x9c000011, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 // shreesha - hint.wl instruction
 {"hint.wl",        "d,v,t",     0x9c000012, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
