@@ -15,6 +15,19 @@ build steps are as follows:
  % make
  % make install
 
+
+Kevin 20201216:
+
+When building binutils, if report below error messages in files "bdf.texinfo" and "ld.texinfo",
+
+../../../binutils-2.23.2/bfd/doc/bfd.texinfo:325: unknown command `colophon'
+../../../binutils-2.23.2/bfd/doc/bfd.texinfo:336: unknown command `cygnus'
+
+the solution is to ignore the commands "colophon" and "cygnus", 
+
+sed -i -e 's/@colophon/@@colophon/' \
+       -e 's/doc@cygnus.com/doc@@cygnus.com/' bfd/doc/bfd.texinfo
+       
 --------------------------------------------------------------------------
 Combined Source Tree Build
 --------------------------------------------------------------------------
