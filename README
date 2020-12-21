@@ -5,6 +5,15 @@ Maven Cross-Compiler
 # Date    : August 10, 2009
 # Version : (under version control)
 
+--------------------------------------------------------------------------
+IMPORTANT: Make sure gcc 4.8.2 and texinfo 4.13 are installed. 
+Don't use the latest ones, or you will encounter compile errors.
+Then set environment variables:
+>export PATH=/usr/local/gcc/4.8.2/bin:$PATH
+>export C_INCLUDE_PATH=/usr/local/gcc/4.8.2/include/c++/4.8.2
+>export CPLUS_INCLUDE_PATH=/usr/local/gcc/4.8.2/include/c++/4.8.2
+--------------------------------------------------------------------------
+
 This is the maven C and C++ cross-compiler. It includes a toplevel
 configure script and Makefile which drives the build process. The basic
 build steps are as follows:
