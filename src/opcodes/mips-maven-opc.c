@@ -294,8 +294,7 @@ const struct mips_opcode mips_builtin_opcodes[] =
 {"addu.xi",        "d,v,t",     0x9c000010, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 // shreesha - subu.xi instruction
-// berkin -- reclaiming this as gcd
-{"gcd",            "d,v,t",     0x9c000011, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+{"subu.xi",        "d,v,t",     0x9c000011, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 // shreesha - hint.wl instruction
 {"hint.wl",        "d,v,t",     0x9c000012, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
@@ -317,6 +316,9 @@ const struct mips_opcode mips_builtin_opcodes[] =
 
 // shreesha - ds.halt instruction -- rs, rt, rd should always be zero
 {"ds.halt",        "d,v,t",     0x9c000017, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
+
+// Kevin Yuan - gcd instruction
+{"gcd",            "d,v,t",     0x9c000018, 0xfc0007ff, SY|SM|WR_d|RD_s|RD_t,         0,              INSN_MAVEN        },
 
 // shreesha - xcall insruction for polyhs (claimed new primary opcode - 111111)
 {"xcall",          "a",         0xfc000000, 0xfc000000, UBD|WR_31,                    0,              INSN_MAVEN        },
