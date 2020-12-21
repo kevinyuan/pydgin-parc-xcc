@@ -6,7 +6,8 @@ Maven Cross-Compiler
 # Version : (under version control)
 
 --------------------------------------------------------------------------
-IMPORTANT: Make sure gcc 4.8.2 and texinfo 4.13 are installed. 
+Kevin 20201221:
+Make sure gcc 4.8.2 and texinfo 4.13 are installed. 
 Don't use the latest ones, or you will encounter compile errors.
 Then set environment variables:
 >export PATH=/usr/local/gcc/4.8.2/bin:$PATH
@@ -24,19 +25,23 @@ build steps are as follows:
  % make
  % make install
 
+--------------------------------------------------------------------------
+Kevin 20201221:
+How to build GCD tutorial?
+Step 0: Make sure you are using python2.7, not python3.x
+Step 1: Modify the following file and add a new gcd opcode
+ - 'src/opcodes/mips-maven-opc.c'
+Step 2: build this project again
+Step 3: Goto pydgin/parc/isa.py, add gcd instruction encode, 
+        and the execute_gcd()
+Step 4: Goto pydgin/parc/asm_tests/parcv1 and add test case parcv1_gcd.S
+Step 5: Build the test cases in asm_tests, see asm_tests/README.rst
+Step 6: You can check the asm code of the binary
+    >maven-objdump -dC asm_tests/build/parcv1-gcd
+Step 7: Goto pydgin/parc and run the simulation with:
+    >python ./parc-sim.py --test -d insts,rf asm_tests/build/parcv1-gcd
+--------------------------------------------------------------------------
 
-Kevin 20201216:
-
-When building binutils, if report below error messages in files "bdf.texinfo" and "ld.texinfo",
-
-../../../binutils-2.23.2/bfd/doc/bfd.texinfo:325: unknown command `colophon'
-../../../binutils-2.23.2/bfd/doc/bfd.texinfo:336: unknown command `cygnus'
-
-the solution is to ignore the commands "colophon" and "cygnus", 
-
-sed -i -e 's/@colophon/@@colophon/' \
-       -e 's/doc@cygnus.com/doc@@cygnus.com/' bfd/doc/bfd.texinfo
-       
 --------------------------------------------------------------------------
 Combined Source Tree Build
 --------------------------------------------------------------------------
